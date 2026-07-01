@@ -1,0 +1,7 @@
+{
+  "database": "dolt",
+  "backend": "dolt",
+  "dolt_mode": "embedded",
+  "dolt_database": "enigma2_player_page",
+  "project_id": "67786c96-701a-4dab-970d-6ac9070d78f9"
+}
