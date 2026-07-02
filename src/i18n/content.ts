@@ -263,3 +263,76 @@ const licenseInfo: Record<Lang, InfoBlock[]> = {
 export function getLicenseInfo(lang: Lang): InfoBlock[] {
   return licenseInfo[lang] ?? licenseInfo[defaultLang];
 }
+
+// End-user documentation (getting started), condensed from the README.
+const docs: Record<Lang, InfoBlock[]> = {
+  de: [
+    {
+      heading: '1. Installieren',
+      body: 'Lade den Installer für deine Plattform von der Downloads-Seite und führe ihn aus. Auf dem Desktop prüft die App beim Start auf Updates.',
+    },
+    {
+      heading: '2. Receiver vorbereiten',
+      body: 'Aktiviere auf deinem Enigma2-Receiver das OpenWebIF-Plugin. Notiere Host/IP, ggf. Benutzername/Passwort sowie Web-Port (Standard 80) und Stream-Port (Standard 8001).',
+    },
+    {
+      heading: '3. Receiver hinzufügen',
+      body: 'Lege in der App einen Receiver mit Host, Zugangsdaten und Ports an. Für den Zugriff von unterwegs kannst du einen externen Host/Port (Portweiterleitung/VPN) hinterlegen. Zugangsdaten werden verschlüsselt gespeichert.',
+    },
+    {
+      heading: '4. Loslegen',
+      body: 'Durchsuche Bouquets, starte Live-TV mit EPG, spiele Aufnahmen ab und nutze Timer. DVB-Untertitel und Videotext lassen sich direkt einblenden.',
+    },
+  ],
+  en: [
+    {
+      heading: '1. Install',
+      body: 'Download the installer for your platform from the Downloads page and run it. On desktop the app checks for updates on startup.',
+    },
+    {
+      heading: '2. Prepare the receiver',
+      body: 'Enable the OpenWebIF plugin on your Enigma2 receiver. Note the host/IP, any username/password, and the web port (default 80) and stream port (default 8001).',
+    },
+    {
+      heading: '3. Add the receiver',
+      body: 'Add a receiver in the app with its host, credentials and ports. For remote access you can set an external host/port (port forwarding/VPN). Credentials are stored encrypted.',
+    },
+    {
+      heading: '4. Get going',
+      body: 'Browse bouquets, start live TV with EPG, play recordings and use timers. DVB subtitles and teletext can be shown right away.',
+    },
+  ],
+  es: [
+    {
+      heading: '1. Instalar',
+      body: 'Descarga el instalador para tu plataforma desde la página de Descargas y ejecútalo. En escritorio la app busca actualizaciones al iniciar.',
+    },
+    {
+      heading: '2. Preparar el receptor',
+      body: 'Activa el plugin OpenWebIF en tu receptor Enigma2. Anota el host/IP, usuario/contraseña si aplica, y el puerto web (80 por defecto) y de streaming (8001 por defecto).',
+    },
+    {
+      heading: '3. Añadir el receptor',
+      body: 'Añade un receptor en la app con su host, credenciales y puertos. Para acceso remoto puedes definir un host/puerto externo (reenvío de puertos/VPN). Las credenciales se guardan cifradas.',
+    },
+    {
+      heading: '4. Empezar',
+      body: 'Explora bouquets, inicia TV en directo con EPG, reproduce grabaciones y usa temporizadores. Los subtítulos DVB y el teletexto se muestran al instante.',
+    },
+  ],
+};
+
+export function getDocs(lang: Lang): InfoBlock[] {
+  return docs[lang] ?? docs[defaultLang];
+}
+
+// Captions for the (placeholder) screenshot tiles; real images land later (#5).
+const screenshotCaptions: Record<Lang, string[]> = {
+  de: ['Live-TV', 'EPG', 'Player', 'Bouquets', 'Untertitel', 'Einstellungen'],
+  en: ['Live TV', 'EPG', 'Player', 'Bouquets', 'Subtitles', 'Settings'],
+  es: ['TV en directo', 'EPG', 'Reproductor', 'Bouquets', 'Subtítulos', 'Ajustes'],
+};
+
+export function getScreenshotCaptions(lang: Lang): string[] {
+  return screenshotCaptions[lang] ?? screenshotCaptions[defaultLang];
+}

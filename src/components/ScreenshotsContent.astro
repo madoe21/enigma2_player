@@ -1,0 +1,55 @@
+---
+/** Screenshots section — placeholder tiles until real images land (#5). */
+import {useTranslations} from '../i18n/utils';
+import {getScreenshotCaptions} from '../i18n/content';
+import type {Lang} from '../i18n/ui';
+
+interface Props {
+  lang: Lang;
+}
+const {lang} = Astro.props;
+const t = useTranslations(lang);
+const captions = getScreenshotCaptions(lang);
+---
+
+<h1>{t('nav.screenshots')}</h1>
+<p>{t('screenshots.note')}</p>
+<div class="grid">
+  {
+    captions.map(c => (
+      <figure class="tile">
+        <div class="ph" aria-hidden="true"></div>
+        <figcaption>{c}</figcaption>
+      </figure>
+    ))
+  }
+</div>
+
+<style>
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+    gap: 1rem 1.5rem;
+    margin-top: 1.5rem;
+  }
+  .tile {
+    margin: 0;
+  }
+  .ph {
+    aspect-ratio: 16 / 10;
+    border: 1px dashed #cbd5e1;
+    border-radius: 0.6rem;
+    background: repeating-linear-gradient(
+      45deg,
+      #f1f5f9,
+      #f1f5f9 10px,
+      #e2e8f0 10px,
+      #e2e8f0 20px
+    );
+  }
+  figcaption {
+    margin-top: 0.4rem;
+    color: #4b5563;
+    font-size: 0.95rem;
+  }
+</style>

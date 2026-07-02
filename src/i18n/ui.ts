@@ -64,6 +64,7 @@ export const ui = {
     'contact.issues': 'Problem melden (GitHub Issues)',
     'contact.email': 'E-Mail',
     'contact.buy': 'Für Kauf-/Lizenzfragen siehe „Lizenz kaufen“ und dein Konto.',
+    'screenshots.note': 'Echte Screenshots folgen in Kürze.',
     'footer.note': 'Enigma2 Player — von madoe21.',
   },
   en: {
@@ -98,6 +99,7 @@ export const ui = {
     'contact.issues': 'Report a problem (GitHub Issues)',
     'contact.email': 'Email',
     'contact.buy': 'For purchase/license questions see “Buy a license” and your account.',
+    'screenshots.note': 'Real screenshots coming soon.',
     'footer.note': 'Enigma2 Player — by madoe21.',
   },
   es: {
@@ -132,6 +134,7 @@ export const ui = {
     'contact.issues': 'Informar de un problema (GitHub Issues)',
     'contact.email': 'Correo',
     'contact.buy': 'Para compras/licencias consulta “Comprar licencia” y tu cuenta.',
+    'screenshots.note': 'Capturas reales próximamente.',
     'footer.note': 'Enigma2 Player — por madoe21.',
   },
 } as const;
