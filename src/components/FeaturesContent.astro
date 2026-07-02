@@ -1,0 +1,47 @@
+---
+/** Features section content, shared across locales. */
+import {useTranslations} from '../i18n/utils';
+import {getFeatures} from '../i18n/content';
+import type {Lang} from '../i18n/ui';
+
+interface Props {
+  lang: Lang;
+}
+const {lang} = Astro.props;
+const t = useTranslations(lang);
+const items = getFeatures(lang);
+---
+
+<h1>{t('nav.features')}</h1>
+<div class="grid">
+  {
+    items.map(f => (
+      <article class="card">
+        <h2>{f.title}</h2>
+        <p>{f.desc}</p>
+      </article>
+    ))
+  }
+</div>
+
+<style>
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+    gap: 1rem 1.5rem;
+    margin-top: 1.5rem;
+  }
+  .card {
+    padding: 1rem 1.2rem;
+    border: 1px solid #e5e7eb;
+    border-radius: 0.6rem;
+  }
+  .card h2 {
+    margin: 0 0 0.4rem;
+    font-size: 1.15rem;
+  }
+  .card p {
+    margin: 0;
+    color: #4b5563;
+  }
+</style>

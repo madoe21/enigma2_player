@@ -10,7 +10,13 @@ import {useTranslations} from '../i18n/utils';
 import {sections, type Section} from '../i18n/ui';
 
 export function getStaticPaths() {
-  return sections.map(page => ({params: {page}}));
+  // Sections that have their own dedicated content page are excluded here to
+  // avoid a route collision; the rest render this placeholder. (Declared inside
+  // getStaticPaths because Astro hoists this function above the frontmatter.)
+  const built = new Set<Section>(['features']);
+  return sections
+    .filter(page => !built.has(page))
+    .map(page => ({params: {page}}));
 }
 
 const {page} = Astro.params as {page: Section};
