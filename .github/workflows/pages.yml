@@ -26,6 +26,12 @@ jobs:
         uses: withastro/action@v3
         # withastro/action installs deps, runs `astro build` and uploads the
         # `dist/` artifact for the deploy job. `base`/`site` come from config.
+        # Public (non-secret) build config for the pricing/portal API. Set these
+        # as repo Actions *variables* (Settings → Secrets and variables →
+        # Actions → Variables); unset = pricing shows "coming soon".
+        env:
+          PUBLIC_LICENSE_API_BASE: ${{ vars.PUBLIC_LICENSE_API_BASE }}
+          PUBLIC_APP_API_KEY: ${{ vars.PUBLIC_APP_API_KEY }}
 
   deploy:
     needs: build
