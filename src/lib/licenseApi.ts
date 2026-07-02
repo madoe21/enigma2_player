@@ -156,3 +156,71 @@ export async function authed<T>(
     },
   });
 }
+
+// ---- Portal (account dashboard) --------------------------------------------
+
+export interface License {
+  id: string;
+  status: string;
+  period: string;
+  period_end: string | null;
+  application: {name: string} | null;
+  model: {display_name: string; device_count: number; price: number; currency: string} | null;
+}
+
+export interface Device {
+  id: string;
+  device_id: string;
+  name: string | null;
+  os: string | null;
+  registered_at: string;
+  license: {application: {name: string} | null} | null;
+}
+
+export interface Invoice {
+  id: string;
+  number: string;
+  gross: number;
+  currency: string;
+  status: string;
+  issued_at: string;
+}
+
+/** Active licenses of the signed-in user (#15). */
+export const getLicenses = (): Promise<License[]> =>
+  authed('/portal/licenses');
+
+/** Active devices of the signed-in user (#16). */
+export const getDevices = (): Promise<Device[]> => authed('/portal/devices');
+
+/** Removes one of the user's devices; the history entry is kept server-side. */
+export const removeDevice = (id: string): Promise<void> =>
+  authed(`/portal/devices/${id}`, {method: 'DELETE'});
+
+/** Invoices of the signed-in user (#17). */
+export const getInvoices = (): Promise<Invoice[]> =>
+  authed('/portal/invoices');
+
+/** Short-lived signed URL to download an invoice PDF. */
+export const invoiceDownloadUrl = (id: string): Promise<{url: string}> =>
+  authed(`/portal/invoices/${id}/download`);
+
+/** Changes the account password (#20). */
+export const changePassword = (
+  currentPassword: string,
+  newPassword: string
+): Promise<void> =>
+  authed('/auth/password', {
+    method: 'POST',
+    body: JSON.stringify({currentPassword, newPassword}),
+  });
+
+/** Permanently deletes the account (#19); requires explicit confirmation. */
+export async function deleteAccount(): Promise<void> {
+  await authed('/auth/account', {
+    method: 'DELETE',
+    body: JSON.stringify({confirm: 'DELETE'}),
+  });
+  session = null;
+  emit();
+}

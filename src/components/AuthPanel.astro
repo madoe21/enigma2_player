@@ -19,6 +19,12 @@ const messages = {
   registerDone: t('auth.register.done'),
   resetDone: t('auth.reset.done'),
   loggedInAs: t('auth.loggedInAs'),
+  emptyLicenses: t('account.empty.licenses'),
+  emptyDevices: t('account.empty.devices'),
+  emptyInvoices: t('account.empty.invoices'),
+  deviceRemove: t('account.device.remove'),
+  invoiceDownload: t('account.invoice.download'),
+  passwordDone: t('account.password.done'),
 };
 ---
 
@@ -26,8 +32,37 @@ const messages = {
   <p id="auth-unconfigured" class="note" hidden>{t('auth.notConfigured')}</p>
 
   <div id="auth-signedin" hidden>
-    <p>{t('auth.loggedInAs')} <strong id="auth-email"></strong></p>
-    <button id="auth-logout" class="btn">{t('auth.logout')}</button>
+    <p>
+      {t('auth.loggedInAs')} <strong id="auth-email"></strong>
+      <button id="auth-logout" class="btn">{t('auth.logout')}</button>
+    </p>
+
+    <section class="dash">
+      <h2>{t('account.licenses.title')}</h2>
+      <div id="dash-licenses" class="rows"></div>
+
+      <h2>{t('account.devices.title')}</h2>
+      <div id="dash-devices" class="rows"></div>
+
+      <h2>{t('account.invoices.title')}</h2>
+      <div id="dash-invoices" class="rows"></div>
+
+      <h2>{t('account.password.title')}</h2>
+      <form id="pw-form" class="form">
+        <label>{t('account.password.current')}<input name="currentPassword" type="password" required autocomplete="current-password" /></label>
+        <label>{t('account.password.new')}<input name="newPassword" type="password" required autocomplete="new-password" minlength="10" /></label>
+        <button class="btn primary" type="submit">{t('account.password.submit')}</button>
+        <p id="pw-msg" role="status" aria-live="polite"></p>
+      </form>
+
+      <h2 class="danger-h">{t('account.delete.title')}</h2>
+      <p class="note">{t('account.delete.warn')}</p>
+      <form id="del-form" class="form">
+        <label>{t('account.delete.confirm')}<input name="confirm" autocomplete="off" /></label>
+        <button class="btn danger" type="submit">{t('account.delete.button')}</button>
+        <p id="del-msg" role="status" aria-live="polite"></p>
+      </form>
+    </section>
   </div>
 
   <div id="auth-forms">
@@ -78,6 +113,16 @@ const messages = {
     isConfigured,
     onAuthChange,
     ApiError,
+    getLicenses,
+    getDevices,
+    removeDevice,
+    getInvoices,
+    invoiceDownloadUrl,
+    changePassword,
+    deleteAccount,
+    type License,
+    type Device,
+    type Invoice,
   } from '../lib/licenseApi';
 
   const msgs = JSON.parse(
@@ -96,6 +141,8 @@ const messages = {
     msg.dataset.kind = kind;
   }
 
+  let loadedFor: string | null = null;
+
   function render(): void {
     if (!root) return;
     const configured = isConfigured();
@@ -104,7 +151,149 @@ const messages = {
     signedIn!.hidden = !user;
     forms!.hidden = !!user || !configured;
     if (user && emailOut) emailOut.textContent = user.email;
+    if (user && loadedFor !== user.email) {
+      loadedFor = user.email;
+      loadDashboard();
+    }
+    if (!user) loadedFor = null;
   }
+
+  function esc(s: unknown): string {
+    return String(s ?? '').replace(
+      /[&<>"]/g,
+      c => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;'})[c]!
+    );
+  }
+
+  function money(v: number, currency: string): string {
+    try {
+      return new Intl.NumberFormat(undefined, {style: 'currency', currency}).format(v);
+    } catch {
+      return `${v} ${currency}`;
+    }
+  }
+
+  async function loadDashboard(): Promise<void> {
+    const licEl = document.getElementById('dash-licenses');
+    const devEl = document.getElementById('dash-devices');
+    const invEl = document.getElementById('dash-invoices');
+
+    try {
+      const licenses = await getLicenses();
+      if (licEl)
+        licEl.innerHTML = licenses.length
+          ? licenses
+              .map(
+                (l: License) =>
+                  `<div class="row"><span>${esc(l.model?.display_name ?? l.application?.name ?? '—')}</span>` +
+                  `<span class="muted">${esc(l.status)}${l.period_end ? ' · ' + esc(l.period_end.slice(0, 10)) : ''}</span></div>`
+              )
+              .join('')
+          : `<p class="muted">${esc(msgs.emptyLicenses)}</p>`;
+    } catch {
+      if (licEl) licEl.innerHTML = `<p class="muted">${esc(msgs.emptyLicenses)}</p>`;
+    }
+
+    async function refreshDevices(): Promise<void> {
+      try {
+        const devices = await getDevices();
+        if (!devEl) return;
+        if (!devices.length) {
+          devEl.innerHTML = `<p class="muted">${esc(msgs.emptyDevices)}</p>`;
+          return;
+        }
+        devEl.innerHTML = devices
+          .map(
+            (d: Device) =>
+              `<div class="row"><span>${esc(d.name || d.device_id)}</span>` +
+              `<span class="muted">${esc(d.os ?? '')}</span>` +
+              `<button class="btn small" data-remove="${esc(d.id)}">${esc(msgs.deviceRemove)}</button></div>`
+          )
+          .join('');
+        devEl.querySelectorAll<HTMLButtonElement>('[data-remove]').forEach(b =>
+          b.addEventListener('click', async () => {
+            b.disabled = true;
+            try {
+              await removeDevice(b.dataset.remove!);
+              await refreshDevices();
+            } catch {
+              b.disabled = false;
+            }
+          })
+        );
+      } catch {
+        if (devEl) devEl.innerHTML = `<p class="muted">${esc(msgs.emptyDevices)}</p>`;
+      }
+    }
+    await refreshDevices();
+
+    try {
+      const invoices = await getInvoices();
+      if (invEl)
+        invEl.innerHTML = invoices.length
+          ? invoices
+              .map(
+                (i: Invoice) =>
+                  `<div class="row"><span>${esc(i.number)}</span>` +
+                  `<span class="muted">${money(i.gross, i.currency)} · ${esc(i.issued_at.slice(0, 10))}</span>` +
+                  `<button class="btn small" data-invoice="${esc(i.id)}">${esc(msgs.invoiceDownload)}</button></div>`
+              )
+              .join('')
+          : `<p class="muted">${esc(msgs.emptyInvoices)}</p>`;
+      invEl?.querySelectorAll<HTMLButtonElement>('[data-invoice]').forEach(b =>
+        b.addEventListener('click', async () => {
+          try {
+            const {url} = await invoiceDownloadUrl(b.dataset.invoice!);
+            window.open(url, '_blank', 'noopener');
+          } catch {
+            /* ignore */
+          }
+        })
+      );
+    } catch {
+      if (invEl) invEl.innerHTML = `<p class="muted">${esc(msgs.emptyInvoices)}</p>`;
+    }
+  }
+
+  document.getElementById('pw-form')?.addEventListener('submit', e => {
+    e.preventDefault();
+    const f = e.currentTarget as HTMLFormElement;
+    const d = fields(f);
+    const out = document.getElementById('pw-msg')!;
+    const btn = f.querySelector('button[type=submit]') as HTMLButtonElement;
+    btn.disabled = true;
+    out.textContent = '';
+    changePassword(d.currentPassword, d.newPassword)
+      .then(() => {
+        out.textContent = msgs.passwordDone;
+        out.dataset.kind = 'ok';
+        f.reset();
+      })
+      .catch((err: unknown) => {
+        out.textContent = err instanceof ApiError ? err.message : msgs.error;
+        out.dataset.kind = 'error';
+      })
+      .finally(() => (btn.disabled = false));
+  });
+
+  document.getElementById('del-form')?.addEventListener('submit', e => {
+    e.preventDefault();
+    const f = e.currentTarget as HTMLFormElement;
+    const d = fields(f);
+    const out = document.getElementById('del-msg')!;
+    if (d.confirm !== 'DELETE') {
+      out.textContent = 'DELETE';
+      out.dataset.kind = 'error';
+      return;
+    }
+    const btn = f.querySelector('button[type=submit]') as HTMLButtonElement;
+    btn.disabled = true;
+    deleteAccount().catch((err: unknown) => {
+      out.textContent = err instanceof ApiError ? err.message : msgs.error;
+      out.dataset.kind = 'error';
+      btn.disabled = false;
+    });
+  });
 
   function selectTab(name: string): void {
     document.querySelectorAll<HTMLElement>('.tab').forEach(b => {
@@ -243,10 +432,52 @@ const messages = {
     color: #6b7280;
     font-size: 0.95rem;
   }
-  #auth-msg[data-kind='error'] {
+  #auth-msg[data-kind='error'],
+  [role='status'][data-kind='error'] {
     color: #b91c1c;
   }
-  #auth-msg[data-kind='ok'] {
+  #auth-msg[data-kind='ok'],
+  [role='status'][data-kind='ok'] {
     color: #15803d;
+  }
+  .dash {
+    margin-top: 1rem;
+  }
+  .dash h2 {
+    font-size: 1.15rem;
+    margin: 1.75rem 0 0.5rem;
+  }
+  .rows {
+    display: grid;
+    gap: 0.5rem;
+  }
+  .row {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.6rem 0.8rem;
+    border: 1px solid #e5e7eb;
+    border-radius: 0.5rem;
+  }
+  .row > span:first-child {
+    font-weight: 600;
+  }
+  .muted {
+    color: #6b7280;
+  }
+  .row .btn {
+    margin-left: auto;
+  }
+  .btn.small {
+    padding: 0.3rem 0.7rem;
+    font-size: 0.9rem;
+  }
+  .btn.danger {
+    border-color: #b91c1c;
+    color: #b91c1c;
+    justify-self: start;
+  }
+  .danger-h {
+    color: #b91c1c;
   }
 </style>
