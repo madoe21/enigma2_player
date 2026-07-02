@@ -1,0 +1,10 @@
+---
+import Base from '../../layouts/Base.astro';
+import Changelog from '../../components/Changelog.astro';
+import {useTranslations} from '../../i18n/utils';
+const t = useTranslations('es');
+---
+
+<Base title={t('nav.changelog')}>
+  <Changelog lang="es" />
+</Base>

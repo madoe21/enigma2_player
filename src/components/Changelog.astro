@@ -1,0 +1,100 @@
+---
+/**
+ * Changelog (#8): renders the product's GitHub releases (tag + date + notes).
+ * Release bodies are HTML-escaped and shown with preserved line breaks (no
+ * markdown parser → no HTML injection). Degrades to "no release notes yet".
+ */
+import {useTranslations} from '../i18n/utils';
+import type {Lang} from '../i18n/ui';
+
+interface Props {
+  lang: Lang;
+}
+const {lang} = Astro.props;
+const t = useTranslations(lang);
+
+const repo = 'madoe21/enigma2_player';
+const config = {repo, lang, empty: t('changelog.empty')};
+---
+
+<h1>{t('nav.changelog')}</h1>
+<p>{t('changelog.intro')}</p>
+<div id="cl-list">{t('changelog.loading')}</div>
+
+<script
+  type="application/json"
+  id="cl-config"
+  is:inline
+  set:html={JSON.stringify(config)}
+/>
+
+<script>
+  interface Release {
+    tag_name: string;
+    name: string | null;
+    published_at: string | null;
+    html_url: string;
+    body: string | null;
+    prerelease: boolean;
+  }
+
+  const cfg = JSON.parse(document.getElementById('cl-config')!.textContent!);
+  const list = document.getElementById('cl-list')!;
+
+  function esc(s: unknown): string {
+    return String(s ?? '').replace(
+      /[&<>"]/g,
+      c => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;'})[c]!
+    );
+  }
+
+  async function load(): Promise<void> {
+    try {
+      const res = await fetch(
+        `https://api.github.com/repos/${cfg.repo}/releases?per_page=20`,
+        {headers: {accept: 'application/vnd.github+json'}}
+      );
+      if (!res.ok) return void (list.textContent = cfg.empty);
+      const releases: Release[] = await res.json();
+      const published = releases.filter(r => !r.prerelease);
+      if (!published.length) return void (list.textContent = cfg.empty);
+      list.innerHTML = published
+        .map(r => {
+          const date = r.published_at
+            ? new Date(r.published_at).toLocaleDateString(cfg.lang)
+            : '';
+          return (
+            `<article class="entry">` +
+            `<h2><a href="${esc(r.html_url)}">${esc(r.name || r.tag_name)}</a> <span class="muted">${esc(date)}</span></h2>` +
+            `<div class="body">${esc(r.body).trim() || '—'}</div>` +
+            `</article>`
+          );
+        })
+        .join('');
+    } catch {
+      list.textContent = cfg.empty;
+    }
+  }
+
+  load();
+</script>
+
+<style>
+  .entry {
+    padding: 1.25rem 0;
+    border-bottom: 1px solid #e5e7eb;
+  }
+  .entry h2 {
+    font-size: 1.2rem;
+    margin: 0 0 0.5rem;
+  }
+  .muted {
+    color: #6b7280;
+    font-weight: 400;
+    font-size: 0.95rem;
+  }
+  .body {
+    white-space: pre-wrap;
+    color: #374151;
+  }
+</style>

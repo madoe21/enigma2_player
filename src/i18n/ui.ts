@@ -116,6 +116,9 @@ export const ui = {
     'downloads.cta': 'Herunterladen',
     'downloads.viewAll': 'Alle Releases ansehen',
     'downloads.stores': 'Demnächst im App Store & Google Play.',
+    'changelog.intro': 'Was sich in jeder Version geändert hat.',
+    'changelog.loading': 'Changelog wird geladen…',
+    'changelog.empty': 'Noch keine Versionshinweise.',
     'footer.note': 'Enigma2 Player — von madoe21.',
   },
   en: {
@@ -202,6 +205,9 @@ export const ui = {
     'downloads.cta': 'Download',
     'downloads.viewAll': 'View all releases',
     'downloads.stores': 'Coming soon to the App Store & Google Play.',
+    'changelog.intro': 'What changed in each version.',
+    'changelog.loading': 'Loading changelog…',
+    'changelog.empty': 'No release notes yet.',
     'footer.note': 'Enigma2 Player — by madoe21.',
   },
   es: {
@@ -288,6 +294,9 @@ export const ui = {
     'downloads.cta': 'Descargar',
     'downloads.viewAll': 'Ver todas las versiones',
     'downloads.stores': 'Próximamente en App Store y Google Play.',
+    'changelog.intro': 'Qué cambió en cada versión.',
+    'changelog.loading': 'Cargando el registro de cambios…',
+    'changelog.empty': 'Aún no hay notas de versión.',
     'footer.note': 'Enigma2 Player — por madoe21.',
   },
 } as const;
