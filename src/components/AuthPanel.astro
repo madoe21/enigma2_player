@@ -1,0 +1,252 @@
+---
+/**
+ * Account auth panel (#14): sign in / sign up / forgot-password forms and the
+ * signed-in view. Talks to the license server via src/lib/licenseApi (in-memory
+ * session, #13). Degrades to a "backend not connected" note when the API base
+ * is unset.
+ */
+import {useTranslations} from '../i18n/utils';
+import type {Lang} from '../i18n/ui';
+
+interface Props {
+  lang: Lang;
+}
+const {lang} = Astro.props;
+const t = useTranslations(lang);
+
+const messages = {
+  error: t('auth.error'),
+  registerDone: t('auth.register.done'),
+  resetDone: t('auth.reset.done'),
+  loggedInAs: t('auth.loggedInAs'),
+};
+---
+
+<div id="auth">
+  <p id="auth-unconfigured" class="note" hidden>{t('auth.notConfigured')}</p>
+
+  <div id="auth-signedin" hidden>
+    <p>{t('auth.loggedInAs')} <strong id="auth-email"></strong></p>
+    <button id="auth-logout" class="btn">{t('auth.logout')}</button>
+  </div>
+
+  <div id="auth-forms">
+    <div class="tabs" role="tablist">
+      <button class="tab" data-tab="login" aria-selected="true">{t('auth.tab.login')}</button>
+      <button class="tab" data-tab="register">{t('auth.tab.register')}</button>
+      <button class="tab" data-tab="forgot">{t('auth.tab.forgot')}</button>
+    </div>
+
+    <form data-form="login" class="form">
+      <label>{t('auth.email')}<input name="email" type="email" required autocomplete="email" /></label>
+      <label>{t('auth.password')}<input name="password" type="password" required autocomplete="current-password" /></label>
+      <button class="btn primary" type="submit">{t('auth.submit.login')}</button>
+    </form>
+
+    <form data-form="register" class="form" hidden>
+      <label>{t('auth.firstName')}<input name="firstName" type="text" autocomplete="given-name" /></label>
+      <label>{t('auth.lastName')}<input name="lastName" type="text" autocomplete="family-name" /></label>
+      <label>{t('auth.email')}<input name="email" type="email" required autocomplete="email" /></label>
+      <label>{t('auth.password')}<input name="password" type="password" required autocomplete="new-password" minlength="10" /></label>
+      <button class="btn primary" type="submit">{t('auth.submit.register')}</button>
+    </form>
+
+    <form data-form="forgot" class="form" hidden>
+      <label>{t('auth.email')}<input name="email" type="email" required autocomplete="email" /></label>
+      <p class="note">{t('auth.forgot.hint')}</p>
+      <button class="btn primary" type="submit">{t('auth.submit.forgot')}</button>
+    </form>
+
+    <p id="auth-msg" role="status" aria-live="polite"></p>
+  </div>
+</div>
+
+<script
+  type="application/json"
+  id="auth-i18n"
+  is:inline
+  set:html={JSON.stringify(messages)}
+/>
+
+<script>
+  import {
+    login,
+    register,
+    requestPasswordReset,
+    logout,
+    currentUser,
+    isConfigured,
+    onAuthChange,
+    ApiError,
+  } from '../lib/licenseApi';
+
+  const msgs = JSON.parse(
+    document.getElementById('auth-i18n')?.textContent ?? '{}'
+  );
+  const root = document.getElementById('auth');
+  const signedIn = document.getElementById('auth-signedin');
+  const forms = document.getElementById('auth-forms');
+  const unconfigured = document.getElementById('auth-unconfigured');
+  const emailOut = document.getElementById('auth-email');
+  const msg = document.getElementById('auth-msg');
+
+  function setMsg(text: string, kind: 'error' | 'ok' | '' = ''): void {
+    if (!msg) return;
+    msg.textContent = text;
+    msg.dataset.kind = kind;
+  }
+
+  function render(): void {
+    if (!root) return;
+    const configured = isConfigured();
+    unconfigured!.hidden = configured;
+    const user = currentUser();
+    signedIn!.hidden = !user;
+    forms!.hidden = !!user || !configured;
+    if (user && emailOut) emailOut.textContent = user.email;
+  }
+
+  function selectTab(name: string): void {
+    document.querySelectorAll<HTMLElement>('.tab').forEach(b => {
+      b.setAttribute('aria-selected', String(b.dataset.tab === name));
+    });
+    document.querySelectorAll<HTMLElement>('[data-form]').forEach(f => {
+      f.hidden = f.dataset.form !== name;
+    });
+    setMsg('');
+  }
+
+  document.querySelectorAll<HTMLElement>('.tab').forEach(b => {
+    b.addEventListener('click', () => selectTab(b.dataset.tab!));
+  });
+
+  function fields(form: HTMLFormElement): Record<string, string> {
+    const data: Record<string, string> = {};
+    new FormData(form).forEach((v, k) => (data[k] = String(v)));
+    return data;
+  }
+
+  async function submit(
+    form: HTMLFormElement,
+    fn: () => Promise<void>
+  ): Promise<void> {
+    const btn = form.querySelector('button[type=submit]') as HTMLButtonElement;
+    btn.disabled = true;
+    setMsg('');
+    try {
+      await fn();
+    } catch (e) {
+      setMsg(e instanceof ApiError ? e.message : msgs.error, 'error');
+    } finally {
+      btn.disabled = false;
+    }
+  }
+
+  document
+    .querySelector<HTMLFormElement>('[data-form=login]')!
+    .addEventListener('submit', e => {
+      e.preventDefault();
+      const f = e.currentTarget as HTMLFormElement;
+      const d = fields(f);
+      submit(f, () => login(d.email, d.password));
+    });
+
+  document
+    .querySelector<HTMLFormElement>('[data-form=register]')!
+    .addEventListener('submit', e => {
+      e.preventDefault();
+      const f = e.currentTarget as HTMLFormElement;
+      const d = fields(f);
+      submit(f, async () => {
+        await register({
+          email: d.email,
+          password: d.password,
+          firstName: d.firstName || undefined,
+          lastName: d.lastName || undefined,
+        });
+        setMsg(msgs.registerDone, 'ok');
+        f.reset();
+      });
+    });
+
+  document
+    .querySelector<HTMLFormElement>('[data-form=forgot]')!
+    .addEventListener('submit', e => {
+      e.preventDefault();
+      const f = e.currentTarget as HTMLFormElement;
+      const d = fields(f);
+      submit(f, async () => {
+        await requestPasswordReset(d.email);
+        setMsg(msgs.resetDone, 'ok');
+        f.reset();
+      });
+    });
+
+  document
+    .getElementById('auth-logout')!
+    .addEventListener('click', () => logout());
+
+  onAuthChange(render);
+  render();
+</script>
+
+<style>
+  .tabs {
+    display: flex;
+    gap: 0.5rem;
+    margin: 1.5rem 0 1rem;
+    flex-wrap: wrap;
+  }
+  .tab {
+    padding: 0.4rem 0.9rem;
+    border: 1px solid #e5e7eb;
+    border-radius: 0.5rem;
+    background: transparent;
+    cursor: pointer;
+  }
+  .tab[aria-selected='true'] {
+    border-color: #2563eb;
+    color: #2563eb;
+    font-weight: 600;
+  }
+  .form {
+    display: grid;
+    gap: 0.75rem;
+    max-width: 22rem;
+  }
+  .form label {
+    display: grid;
+    gap: 0.25rem;
+    font-size: 0.95rem;
+  }
+  .form input {
+    padding: 0.5rem 0.6rem;
+    border: 1px solid #cbd5e1;
+    border-radius: 0.4rem;
+    font: inherit;
+  }
+  .btn {
+    padding: 0.55rem 1rem;
+    border-radius: 0.5rem;
+    border: 1px solid #2563eb;
+    background: transparent;
+    color: #2563eb;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  .btn.primary {
+    background: #2563eb;
+    color: #fff;
+    justify-self: start;
+  }
+  .note {
+    color: #6b7280;
+    font-size: 0.95rem;
+  }
+  #auth-msg[data-kind='error'] {
+    color: #b91c1c;
+  }
+  #auth-msg[data-kind='ok'] {
+    color: #15803d;
+  }
+</style>
