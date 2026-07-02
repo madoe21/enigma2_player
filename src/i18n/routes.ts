@@ -15,6 +15,7 @@ export const builtSections = new Set<Section>([
   'screenshots',
   'pricing',
   'account',
+  'downloads',
 ]);
 
 /** Sections still served by the placeholder route, in all locales. */

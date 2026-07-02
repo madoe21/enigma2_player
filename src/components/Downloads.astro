@@ -1,0 +1,142 @@
+---
+/**
+ * Downloads (#6/#7): fetches the latest public GitHub release of the product
+ * repo and maps its assets to per-platform download buttons. Auto-updates with
+ * every release (no manual link editing). Degrades to "coming soon" when there
+ * is no release yet. Mobile store links are placeholders until published.
+ */
+import {useTranslations} from '../i18n/utils';
+import type {Lang} from '../i18n/ui';
+
+interface Props {
+  lang: Lang;
+}
+const {lang} = Astro.props;
+const t = useTranslations(lang);
+
+// The PUBLIC product repo hosts the releases (source builds publish here).
+const repo = 'madoe21/enigma2_player';
+const config = {
+  repo,
+  labels: {
+    cta: t('downloads.cta'),
+    empty: t('downloads.empty'),
+    latest: t('downloads.latest'),
+  },
+};
+---
+
+<h1>{t('nav.downloads')}</h1>
+<p>{t('downloads.intro')}</p>
+
+<p id="dl-version" class="muted"></p>
+<div id="dl-list" class="rows">{t('downloads.loading')}</div>
+
+<p>
+  <a href={`https://github.com/${repo}/releases`}>{t('downloads.viewAll')}</a>
+</p>
+<p class="muted">{t('downloads.stores')}</p>
+
+<script
+  type="application/json"
+  id="dl-config"
+  is:inline
+  set:html={JSON.stringify(config)}
+/>
+
+<script>
+  interface Asset {
+    name: string;
+    browser_download_url: string;
+  }
+  interface Release {
+    tag_name: string;
+    html_url: string;
+    assets: Asset[];
+  }
+
+  const PLATFORMS: {label: string; match: RegExp}[] = [
+    {label: 'Windows', match: /\.exe$/i},
+    {label: 'macOS', match: /\.dmg$/i},
+    {label: 'Linux (.deb)', match: /\.deb$/i},
+    {label: 'Linux (.rpm)', match: /\.rpm$/i},
+    {label: 'Android (arm64)', match: /arm64-v8a.*\.apk$/i},
+    {label: 'Android (armeabi-v7a)', match: /armeabi-v7a.*\.apk$/i},
+    {label: 'iOS', match: /\.ipa$/i},
+  ];
+
+  const cfg = JSON.parse(document.getElementById('dl-config')!.textContent!);
+  const list = document.getElementById('dl-list')!;
+  const versionEl = document.getElementById('dl-version')!;
+
+  function esc(s: unknown): string {
+    return String(s ?? '').replace(
+      /[&<>"]/g,
+      c => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;'})[c]!
+    );
+  }
+
+  function empty(): void {
+    list.textContent = cfg.labels.empty;
+  }
+
+  async function load(): Promise<void> {
+    try {
+      const res = await fetch(
+        `https://api.github.com/repos/${cfg.repo}/releases/latest`,
+        {headers: {accept: 'application/vnd.github+json'}}
+      );
+      if (!res.ok) return empty();
+      const rel: Release = await res.json();
+      const rows = PLATFORMS.flatMap(p => {
+        const asset = rel.assets.find(a => p.match.test(a.name));
+        if (!asset) return [];
+        return [
+          `<div class="row"><span>${esc(p.label)}</span>` +
+            `<a class="btn small" href="${esc(asset.browser_download_url)}">${esc(cfg.labels.cta)}</a></div>`,
+        ];
+      });
+      if (!rows.length) return empty();
+      versionEl.textContent = `${cfg.labels.latest}: ${rel.tag_name}`;
+      list.innerHTML = rows.join('');
+    } catch {
+      empty();
+    }
+  }
+
+  load();
+</script>
+
+<style>
+  .rows {
+    display: grid;
+    gap: 0.5rem;
+    margin-top: 1rem;
+    max-width: 32rem;
+  }
+  .row {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.6rem 0.9rem;
+    border: 1px solid #e5e7eb;
+    border-radius: 0.5rem;
+  }
+  .row > span {
+    font-weight: 600;
+  }
+  .row .btn {
+    margin-left: auto;
+  }
+  .btn.small {
+    padding: 0.35rem 0.8rem;
+    border-radius: 0.4rem;
+    background: #2563eb;
+    color: #fff;
+    text-decoration: none;
+    font-weight: 600;
+  }
+  .muted {
+    color: #6b7280;
+  }
+</style>
