@@ -94,3 +94,93 @@ const features: Record<Lang, FeatureItem[]> = {
 export function getFeatures(lang: Lang): FeatureItem[] {
   return features[lang] ?? features[defaultLang];
 }
+
+export interface QaItem {
+  q: string;
+  a: string;
+}
+
+const faq: Record<Lang, QaItem[]> = {
+  de: [
+    {
+      q: 'Welche Receiver werden unterstützt?',
+      a: 'Enigma2-Receiver mit aktiviertem OpenWebIF (z. B. Dreambox, VU+, Zgemma und andere OpenATV-/Images).',
+    },
+    {
+      q: 'Auf welchen Plattformen läuft die App?',
+      a: 'Windows, macOS, Linux, Android (inkl. TV-Boxen/Fire TV) und iOS.',
+    },
+    {
+      q: 'Ist die App kostenlos?',
+      a: 'Es gibt eine kostenlose Nutzung; Premium-Funktionen erfordern eine Lizenz. Details auf der Preise-Seite.',
+    },
+    {
+      q: 'Wie funktionieren Updates?',
+      a: 'Desktop prüft beim Start auf neue Versionen. Mobile Builds werden per Neuinstallation aktualisiert (App-Store-Verteilung folgt).',
+    },
+    {
+      q: 'Werden Untertitel und Videotext unterstützt?',
+      a: 'Ja. DVB-Untertitel und Videotext werden direkt in der App aus dem Transportstrom dekodiert.',
+    },
+    {
+      q: 'Kann ich von unterwegs zugreifen?',
+      a: 'Ja, über einen extern erreichbaren Host/Port deines Receivers (Portweiterleitung/VPN). Zugangsdaten werden verschlüsselt gespeichert.',
+    },
+  ],
+  en: [
+    {
+      q: 'Which receivers are supported?',
+      a: 'Enigma2 receivers with OpenWebIF enabled (e.g. Dreambox, VU+, Zgemma and other OpenATV/images).',
+    },
+    {
+      q: 'Which platforms does the app run on?',
+      a: 'Windows, macOS, Linux, Android (incl. TV boxes/Fire TV) and iOS.',
+    },
+    {
+      q: 'Is the app free?',
+      a: 'There is a free tier; premium features require a license. See the Pricing page for details.',
+    },
+    {
+      q: 'How do updates work?',
+      a: 'Desktop checks for new versions on startup. Mobile builds update by re-installing (app-store distribution to follow).',
+    },
+    {
+      q: 'Are subtitles and teletext supported?',
+      a: 'Yes. DVB subtitles and teletext are decoded in-app straight from the transport stream.',
+    },
+    {
+      q: 'Can I access my receiver remotely?',
+      a: 'Yes, via an externally reachable host/port of your receiver (port forwarding/VPN). Credentials are stored encrypted.',
+    },
+  ],
+  es: [
+    {
+      q: '¿Qué receptores son compatibles?',
+      a: 'Receptores Enigma2 con OpenWebIF activado (p. ej. Dreambox, VU+, Zgemma y otras imágenes OpenATV).',
+    },
+    {
+      q: '¿En qué plataformas funciona la app?',
+      a: 'Windows, macOS, Linux, Android (incl. TV boxes/Fire TV) e iOS.',
+    },
+    {
+      q: '¿La app es gratuita?',
+      a: 'Hay un nivel gratuito; las funciones premium requieren una licencia. Consulta la página de Precios.',
+    },
+    {
+      q: '¿Cómo funcionan las actualizaciones?',
+      a: 'El escritorio comprueba nuevas versiones al iniciar. Las versiones móviles se actualizan reinstalando (distribución en tiendas más adelante).',
+    },
+    {
+      q: '¿Se admiten subtítulos y teletexto?',
+      a: 'Sí. Los subtítulos DVB y el teletexto se decodifican en la app desde el flujo de transporte.',
+    },
+    {
+      q: '¿Puedo acceder a mi receptor de forma remota?',
+      a: 'Sí, mediante un host/puerto accesible externamente (reenvío de puertos/VPN). Las credenciales se guardan cifradas.',
+    },
+  ],
+};
+
+export function getFaq(lang: Lang): QaItem[] {
+  return faq[lang] ?? faq[defaultLang];
+}

@@ -1,0 +1,10 @@
+---
+import Base from '../layouts/Base.astro';
+import FaqContent from '../components/FaqContent.astro';
+import {useTranslations} from '../i18n/utils';
+const t = useTranslations('de');
+---
+
+<Base title={t('nav.faq')}>
+  <FaqContent lang="de" />
+</Base>

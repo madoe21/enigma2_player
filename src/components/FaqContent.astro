@@ -1,0 +1,43 @@
+---
+/** FAQ section content, shared across locales. */
+import {useTranslations} from '../i18n/utils';
+import {getFaq} from '../i18n/content';
+import type {Lang} from '../i18n/ui';
+
+interface Props {
+  lang: Lang;
+}
+const {lang} = Astro.props;
+const t = useTranslations(lang);
+const items = getFaq(lang);
+---
+
+<h1>{t('nav.faq')}</h1>
+<dl class="faq">
+  {
+    items.map(item => (
+      <div class="qa">
+        <dt>{item.q}</dt>
+        <dd>{item.a}</dd>
+      </div>
+    ))
+  }
+</dl>
+
+<style>
+  .faq {
+    margin-top: 1.5rem;
+  }
+  .qa {
+    padding: 1rem 0;
+    border-bottom: 1px solid #e5e7eb;
+  }
+  dt {
+    font-weight: 600;
+    margin-bottom: 0.35rem;
+  }
+  dd {
+    margin: 0;
+    color: #4b5563;
+  }
+</style>
