@@ -184,3 +184,82 @@ const faq: Record<Lang, QaItem[]> = {
 export function getFaq(lang: Lang): QaItem[] {
   return faq[lang] ?? faq[defaultLang];
 }
+
+export interface InfoBlock {
+  heading: string;
+  body: string;
+}
+
+// DRAFT license terms — plain-language summary, pending legal review (bead #21).
+const licenseInfo: Record<Lang, InfoBlock[]> = {
+  de: [
+    {
+      heading: 'Was die Lizenz umfasst',
+      body: 'Eine Lizenz gewährt das Recht, Enigma2 Player mit den Premium-Funktionen auf einer begrenzten Anzahl von Geräten zu nutzen. Die genaue Geräteanzahl und Laufzeit richten sich nach dem gewählten Modell.',
+    },
+    {
+      heading: 'Geräte & Aktivierung',
+      body: 'Geräte werden beim Anmelden registriert. Du kannst registrierte Geräte in deinem Konto einsehen und entfernen; die Historie bleibt aus Sicherheitsgründen erhalten.',
+    },
+    {
+      heading: 'Laufzeit & Verlängerung',
+      body: 'Abomodelle verlängern sich gemäß Abrechnungszeitraum, bis du kündigst. Bei ausbleibender Zahlung oder Kündigung wird die Lizenz deaktiviert.',
+    },
+    {
+      heading: 'Erstattung & Widerruf',
+      body: 'Es gelten die gesetzlichen Widerrufsrechte. Details und Kontakt findest du auf der Kontakt-Seite.',
+    },
+    {
+      heading: 'Gewährleistung',
+      body: 'Die App wird „wie besehen“ bereitgestellt. Verfügbarkeit von Receiver-Funktionen hängt vom jeweiligen Enigma2-Image/OpenWebIF ab.',
+    },
+  ],
+  en: [
+    {
+      heading: 'What the license covers',
+      body: 'A license grants the right to use Enigma2 Player with premium features on a limited number of devices. The exact device count and term depend on the chosen model.',
+    },
+    {
+      heading: 'Devices & activation',
+      body: 'Devices are registered on sign-in. You can view and remove registered devices in your account; the history is retained for security reasons.',
+    },
+    {
+      heading: 'Term & renewal',
+      body: 'Subscription models renew per billing period until you cancel. On missed payment or cancellation the license is deactivated.',
+    },
+    {
+      heading: 'Refunds & withdrawal',
+      body: 'Statutory withdrawal rights apply. Details and contact are on the Contact page.',
+    },
+    {
+      heading: 'Warranty',
+      body: 'The app is provided “as is”. Availability of receiver features depends on the specific Enigma2 image/OpenWebIF.',
+    },
+  ],
+  es: [
+    {
+      heading: 'Qué cubre la licencia',
+      body: 'Una licencia otorga el derecho a usar Enigma2 Player con funciones premium en un número limitado de dispositivos. El número exacto y la duración dependen del modelo elegido.',
+    },
+    {
+      heading: 'Dispositivos y activación',
+      body: 'Los dispositivos se registran al iniciar sesión. Puedes ver y eliminar dispositivos en tu cuenta; el historial se conserva por seguridad.',
+    },
+    {
+      heading: 'Duración y renovación',
+      body: 'Los modelos de suscripción se renuevan por periodo de facturación hasta que canceles. Si falta el pago o se cancela, la licencia se desactiva.',
+    },
+    {
+      heading: 'Reembolsos y desistimiento',
+      body: 'Se aplican los derechos legales de desistimiento. Detalles y contacto en la página de Contacto.',
+    },
+    {
+      heading: 'Garantía',
+      body: 'La app se ofrece “tal cual”. La disponibilidad de funciones del receptor depende de la imagen Enigma2/OpenWebIF concreta.',
+    },
+  ],
+};
+
+export function getLicenseInfo(lang: Lang): InfoBlock[] {
+  return licenseInfo[lang] ?? licenseInfo[defaultLang];
+}

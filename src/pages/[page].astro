@@ -13,7 +13,7 @@ export function getStaticPaths() {
   // Sections that have their own dedicated content page are excluded here to
   // avoid a route collision; the rest render this placeholder. (Declared inside
   // getStaticPaths because Astro hoists this function above the frontmatter.)
-  const built = new Set<Section>(['features', 'faq']);
+  const built = new Set<Section>(['features', 'faq', 'contact', 'license']);
   return sections
     .filter(page => !built.has(page))
     .map(page => ({params: {page}}));

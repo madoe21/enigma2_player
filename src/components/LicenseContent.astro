@@ -1,0 +1,37 @@
+---
+/** License-information section content, shared across locales (draft, #21). */
+import {useTranslations} from '../i18n/utils';
+import {getLicenseInfo} from '../i18n/content';
+import type {Lang} from '../i18n/ui';
+
+interface Props {
+  lang: Lang;
+}
+const {lang} = Astro.props;
+const t = useTranslations(lang);
+const blocks = getLicenseInfo(lang);
+---
+
+<h1>{t('nav.license')}</h1>
+{
+  blocks.map(b => (
+    <section class="block">
+      <h2>{b.heading}</h2>
+      <p>{b.body}</p>
+    </section>
+  ))
+}
+
+<style>
+  .block {
+    margin-top: 1.25rem;
+  }
+  .block h2 {
+    font-size: 1.15rem;
+    margin: 0 0 0.35rem;
+  }
+  .block p {
+    margin: 0;
+    color: #4b5563;
+  }
+</style>

@@ -1,0 +1,10 @@
+---
+import Base from '../layouts/Base.astro';
+import LicenseContent from '../components/LicenseContent.astro';
+import {useTranslations} from '../i18n/utils';
+const t = useTranslations('de');
+---
+
+<Base title={t('nav.license')}>
+  <LicenseContent lang="de" />
+</Base>

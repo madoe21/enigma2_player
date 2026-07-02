@@ -1,0 +1,10 @@
+---
+import Base from '../../layouts/Base.astro';
+import ContactContent from '../../components/ContactContent.astro';
+import {useTranslations} from '../../i18n/utils';
+const t = useTranslations('es');
+---
+
+<Base title={t('nav.contact')}>
+  <ContactContent lang="es" />
+</Base>

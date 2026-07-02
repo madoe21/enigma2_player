@@ -1,0 +1,25 @@
+---
+/** Contact section content, shared across locales. */
+import {useTranslations} from '../i18n/utils';
+import type {Lang} from '../i18n/ui';
+
+interface Props {
+  lang: Lang;
+}
+const {lang} = Astro.props;
+const t = useTranslations(lang);
+
+const githubProfile = 'https://github.com/madoe21';
+const issuesUrl = 'https://github.com/madoe21/enigma2_player/issues';
+// TODO(#22): replace with the real support address once decided.
+const email = 'support@enigma2player.app';
+---
+
+<h1>{t('nav.contact')}</h1>
+<p>{t('contact.intro')}</p>
+<ul>
+  <li><a href={githubProfile}>{t('contact.github')}</a></li>
+  <li><a href={issuesUrl}>{t('contact.issues')}</a></li>
+  <li><a href={`mailto:${email}`}>{t('contact.email')}: {email}</a></li>
+</ul>
+<p>{t('contact.buy')}</p>
