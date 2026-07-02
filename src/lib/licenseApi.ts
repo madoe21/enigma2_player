@@ -8,6 +8,7 @@
  * an active session via the refresh token.
  */
 const API_BASE: string | undefined = import.meta.env.PUBLIC_LICENSE_API_BASE;
+const APP_API_KEY: string | undefined = import.meta.env.PUBLIC_APP_API_KEY;
 
 export interface AuthUser {
   email: string;
@@ -223,4 +224,50 @@ export async function deleteAccount(): Promise<void> {
   });
   session = null;
   emit();
+}
+
+// ---- Purchase (#12) --------------------------------------------------------
+
+export interface PricingModel {
+  id: string;
+  display_name: string;
+  device_count: number;
+  period: 'monthly' | 'yearly' | 'lifetime';
+  price: number;
+  currency: string;
+}
+
+/** True once both the API base and the product api_key are configured. */
+export function isPurchaseReady(): boolean {
+  return isConfigured() && typeof APP_API_KEY === 'string' && APP_API_KEY.length > 0;
+}
+
+/** Public pricing (active models) for the configured product application. */
+export const getPricing = (): Promise<{
+  applicationId: string;
+  models: PricingModel[];
+}> => request(`/pricing/${APP_API_KEY}`);
+
+interface CheckoutStart {
+  approveUrl: string;
+}
+
+/** Starts a checkout for a model and returns the PayPal approve URL. */
+export function startCheckout(
+  applicationId: string,
+  model: PricingModel,
+  returnUrl: string,
+  cancelUrl: string
+): Promise<CheckoutStart> {
+  const path =
+    model.period === 'lifetime' ? '/checkout/order' : '/checkout/subscription';
+  return authed<CheckoutStart>(path, {
+    method: 'POST',
+    body: JSON.stringify({
+      applicationId,
+      licenseModelId: model.id,
+      returnUrl,
+      cancelUrl,
+    }),
+  });
 }

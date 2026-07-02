@@ -1,0 +1,10 @@
+---
+import Base from '../../layouts/Base.astro';
+import Buy from '../../components/Buy.astro';
+import {useTranslations} from '../../i18n/utils';
+const t = useTranslations('en');
+---
+
+<Base title={t('nav.buy')}>
+  <Buy lang="en" />
+</Base>
