@@ -1,0 +1,78 @@
+---
+/** Shared landing content (hero + CTAs + feature highlights) for all locales. */
+import {useTranslations, href} from '../i18n/utils';
+import type {Lang} from '../i18n/ui';
+
+interface Props {
+  lang: Lang;
+}
+const {lang} = Astro.props;
+const t = useTranslations(lang);
+const features = [t('home.f.multi'), t('home.f.stream'), t('home.f.subs'), t('home.f.cross')];
+---
+
+<section class="hero">
+  <h1>{t('home.hero.title')}</h1>
+  <p class="sub">{t('home.hero.sub')}</p>
+  <div class="cta">
+    <a class="btn primary" href={href('downloads', lang)}>{t('home.cta.download')}</a>
+    <a class="btn" href={href('buy', lang)}>{t('home.cta.buy')}</a>
+  </div>
+</section>
+
+<section class="features">
+  <h2>{t('home.features.title')}</h2>
+  <ul>
+    {features.map(f => <li>{f}</li>)}
+  </ul>
+</section>
+
+<style>
+  .hero {
+    padding: 2rem 0 1rem;
+  }
+  .hero h1 {
+    font-size: clamp(1.8rem, 4vw, 2.75rem);
+    line-height: 1.15;
+    margin: 0 0 0.75rem;
+  }
+  .sub {
+    font-size: 1.15rem;
+    color: #4b5563;
+    max-width: 44rem;
+  }
+  .cta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-top: 1.5rem;
+  }
+  .btn {
+    display: inline-block;
+    padding: 0.6rem 1.1rem;
+    border-radius: 0.5rem;
+    border: 1px solid #2563eb;
+    color: #2563eb;
+    text-decoration: none;
+    font-weight: 600;
+  }
+  .btn.primary {
+    background: #2563eb;
+    color: #fff;
+  }
+  .features {
+    margin-top: 2.5rem;
+  }
+  .features ul {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+    gap: 0.75rem 1.5rem;
+    padding: 0;
+    list-style: none;
+  }
+  .features li {
+    padding: 0.9rem 1rem;
+    border: 1px solid #e5e7eb;
+    border-radius: 0.5rem;
+  }
+</style>

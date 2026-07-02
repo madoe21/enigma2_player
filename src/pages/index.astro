@@ -1,15 +1,9 @@
 ---
 /** German landing page (default locale, unprefixed root). */
 import Base from '../layouts/Base.astro';
-import {useTranslations, href} from '../i18n/utils';
-
-const t = useTranslations('de');
+import Landing from '../components/Landing.astro';
 ---
 
 <Base>
-  <h1>{t('site.title')}</h1>
-  <p>{t('site.tagline')}</p>
-  <p>
-    <a href={href('downloads', 'de')}>{t('home.cta')}</a>
-  </p>
+  <Landing lang="de" />
 </Base>
