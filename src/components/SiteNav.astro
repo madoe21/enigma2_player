@@ -1,0 +1,74 @@
+---
+/** Top navigation: links every content area + a locale switcher. */
+import {getLangFromUrl, useTranslations, href} from '../i18n/utils';
+import {sections, languages, type Lang} from '../i18n/ui';
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+const langs = Object.keys(languages) as Lang[];
+---
+
+<nav class="nav">
+  <a class="brand" href={href('', lang)}>{t('site.title')}</a>
+  <ul class="links">
+    <li><a href={href('', lang)}>{t('nav.home')}</a></li>
+    {
+      sections.map(s => (
+        <li>
+          <a href={href(s, lang)}>{t(`nav.${s}` as const)}</a>
+        </li>
+      ))
+    }
+  </ul>
+  <ul class="langs">
+    {
+      langs.map(l => (
+        <li>
+          <a href={href('', l)} aria-current={l === lang ? 'true' : undefined}>
+            {l.toUpperCase()}
+          </a>
+        </li>
+      ))
+    }
+  </ul>
+</nav>
+
+<style>
+  .nav {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.75rem 1.25rem;
+    border-bottom: 1px solid #e5e7eb;
+  }
+  .brand {
+    font-weight: 700;
+    font-size: 1.1rem;
+    text-decoration: none;
+    color: inherit;
+  }
+  .links,
+  .langs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  .links {
+    flex: 1;
+  }
+  .langs {
+    font-variant: small-caps;
+  }
+  a {
+    color: #2563eb;
+    text-decoration: none;
+  }
+  a[aria-current='true'] {
+    font-weight: 700;
+    color: inherit;
+  }
+</style>

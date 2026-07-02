@@ -1,0 +1,24 @@
+---
+/**
+ * Placeholder route for every content section in the default locale.
+ * One page per entry in `sections` (features, downloads, pricing, …); real
+ * content lands in the per-section beads. Localized (en/es) mirrors follow in
+ * the i18n bead (#23).
+ */
+import Base from '../layouts/Base.astro';
+import {useTranslations} from '../i18n/utils';
+import {sections, type Section} from '../i18n/ui';
+
+export function getStaticPaths() {
+  return sections.map(page => ({params: {page}}));
+}
+
+const {page} = Astro.params as {page: Section};
+const t = useTranslations('de');
+const title = t(`nav.${page}` as const);
+---
+
+<Base title={title}>
+  <h1>{title}</h1>
+  <p>{t('placeholder.body')}</p>
+</Base>

@@ -1,0 +1,15 @@
+---
+/** English landing page. Full page mirroring is tracked in bead #23. */
+import Base from '../../layouts/Base.astro';
+import {useTranslations, href} from '../../i18n/utils';
+
+const t = useTranslations('en');
+---
+
+<Base>
+  <h1>{t('site.title')}</h1>
+  <p>{t('site.tagline')}</p>
+  <p>
+    <a href={href('downloads', 'en')}>{t('home.cta')}</a>
+  </p>
+</Base>

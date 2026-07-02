@@ -1,0 +1,20 @@
+{
+  "name": "enigma2-player-site",
+  "type": "module",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Enigma2 Player product page & customer portal (static, Astro).",
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "check": "astro check"
+  },
+  "dependencies": {
+    "astro": "^5.13.0"
+  },
+  "devDependencies": {
+    "@astrojs/check": "^0.9.4",
+    "typescript": "^5.6.3"
+  }
+}

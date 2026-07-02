@@ -1,0 +1,60 @@
+---
+/** Shared HTML shell: head, nav and footer around each page's content. */
+import {getLangFromUrl, useTranslations} from '../i18n/utils';
+import SiteNav from '../components/SiteNav.astro';
+
+interface Props {
+  title?: string;
+  description?: string;
+}
+const {title, description} = Astro.props;
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+const pageTitle = title ? `${title} — ${t('site.title')}` : t('site.title');
+---
+
+<!doctype html>
+<html lang={lang}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{pageTitle}</title>
+    <meta name="description" content={description ?? t('site.tagline')} />
+    <meta name="generator" content={Astro.generator} />
+  </head>
+  <body>
+    <SiteNav />
+    <main>
+      <slot />
+    </main>
+    <footer>{t('footer.note')}</footer>
+
+    <style is:global>
+      :root {
+        color-scheme: light dark;
+        font-family:
+          system-ui,
+          -apple-system,
+          Segoe UI,
+          Roboto,
+          sans-serif;
+        line-height: 1.55;
+      }
+      body {
+        margin: 0;
+      }
+      main {
+        max-width: 60rem;
+        margin: 0 auto;
+        padding: 2rem 1.25rem;
+      }
+      footer {
+        max-width: 60rem;
+        margin: 0 auto;
+        padding: 2rem 1.25rem;
+        color: #6b7280;
+        border-top: 1px solid #e5e7eb;
+      }
+    </style>
+  </body>
+</html>
