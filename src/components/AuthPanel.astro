@@ -25,6 +25,8 @@ const messages = {
   deviceRemove: t('account.device.remove'),
   invoiceDownload: t('account.invoice.download'),
   passwordDone: t('account.password.done'),
+  changeLabel: t('account.change.label'),
+  changeSubmit: t('account.change.submit'),
 };
 ---
 
@@ -120,9 +122,13 @@ const messages = {
     invoiceDownloadUrl,
     changePassword,
     deleteAccount,
+    getPricing,
+    isPurchaseReady,
+    changeSubscription,
     type License,
     type Device,
     type Invoice,
+    type PricingModel,
   } from '../lib/licenseApi';
 
   const msgs = JSON.parse(
@@ -178,18 +184,58 @@ const messages = {
     const devEl = document.getElementById('dash-devices');
     const invEl = document.getElementById('dash-invoices');
 
+    // Models for the "switch model" control (#18), if purchasing is configured.
+    let models: PricingModel[] = [];
+    if (isPurchaseReady()) {
+      try {
+        models = (await getPricing()).models;
+      } catch {
+        models = [];
+      }
+    }
+    const modelOptions = models
+      .map(m => `<option value="${esc(m.id)}">${esc(m.display_name)}</option>`)
+      .join('');
+
     try {
       const licenses = await getLicenses();
       if (licEl)
         licEl.innerHTML = licenses.length
           ? licenses
-              .map(
-                (l: License) =>
+              .map((l: License) => {
+                const head =
                   `<div class="row"><span>${esc(l.model?.display_name ?? l.application?.name ?? '—')}</span>` +
-                  `<span class="muted">${esc(l.status)}${l.period_end ? ' · ' + esc(l.period_end.slice(0, 10)) : ''}</span></div>`
-              )
+                  `<span class="muted">${esc(l.status)}${l.period_end ? ' · ' + esc(l.period_end.slice(0, 10)) : ''}</span></div>`;
+                const change =
+                  models.length && l.status === 'active'
+                    ? `<div class="change"><label>${esc(msgs.changeLabel)} ` +
+                      `<select data-change-model="${esc(l.id)}">${modelOptions}</select></label>` +
+                      `<button class="btn small" data-change="${esc(l.id)}">${esc(msgs.changeSubmit)}</button></div>`
+                    : '';
+                return head + change;
+              })
               .join('')
           : `<p class="muted">${esc(msgs.emptyLicenses)}</p>`;
+
+      licEl?.querySelectorAll<HTMLButtonElement>('[data-change]').forEach(b =>
+        b.addEventListener('click', async () => {
+          const sel = licEl.querySelector<HTMLSelectElement>(
+            `[data-change-model="${b.dataset.change}"]`
+          );
+          if (!sel) return;
+          b.disabled = true;
+          try {
+            const {approveUrl} = await changeSubscription(
+              b.dataset.change!,
+              sel.value
+            );
+            if (approveUrl) window.location.href = approveUrl;
+            else await loadDashboard();
+          } catch {
+            b.disabled = false;
+          }
+        })
+      );
     } catch {
       if (licEl) licEl.innerHTML = `<p class="muted">${esc(msgs.emptyLicenses)}</p>`;
     }
@@ -479,5 +525,19 @@ const messages = {
   }
   .danger-h {
     color: #b91c1c;
+  }
+  .change {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem;
+    margin: 0.25rem 0 0.75rem;
+    font-size: 0.95rem;
+  }
+  .change select {
+    padding: 0.35rem 0.5rem;
+    border: 1px solid #cbd5e1;
+    border-radius: 0.4rem;
+    font: inherit;
   }
 </style>

@@ -206,6 +206,16 @@ export const getInvoices = (): Promise<Invoice[]> =>
 export const invoiceDownloadUrl = (id: string): Promise<{url: string}> =>
   authed(`/portal/invoices/${id}/download`);
 
+/** Changes an active subscription onto another model (#18/#50). */
+export const changeSubscription = (
+  licenseId: string,
+  licenseModelId: string
+): Promise<{licenseId: string; approveUrl: string | null}> =>
+  authed('/portal/subscription/change', {
+    method: 'POST',
+    body: JSON.stringify({licenseId, licenseModelId}),
+  });
+
 /** Changes the account password (#20). */
 export const changePassword = (
   currentPassword: string,
