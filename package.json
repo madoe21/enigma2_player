@@ -11,6 +11,7 @@
     "check": "astro check"
   },
   "dependencies": {
+    "@astrojs/sitemap": "^3.7.3",
     "astro": "^5.13.0"
   },
   "devDependencies": {

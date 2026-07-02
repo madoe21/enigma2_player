@@ -32,3 +32,21 @@ export function href(path: string, lang: Lang): string {
   const tail = clean ? `/${clean}` : '/';
   return `${baseUrl()}${prefix}${tail}`;
 }
+
+/**
+ * The locale-independent route key for a URL (e.g. `/enigma2_player/en/features`
+ * → `features`, home → ''). Used to build hreflang alternates.
+ */
+export function routeKey(url: URL): string {
+  const segments = url.pathname
+    .replace(baseUrl(), '')
+    .split('/')
+    .filter(Boolean);
+  if (segments[0] === 'en' || segments[0] === 'es') segments.shift();
+  return segments.join('/');
+}
+
+/** Absolute-from-base path to a file in `public/` (e.g. `favicon.svg`). */
+export function asset(path: string): string {
+  return `${baseUrl()}/${path.replace(/^\/+/, '')}`;
+}

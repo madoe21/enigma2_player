@@ -1,6 +1,7 @@
 ---
 /** Shared HTML shell: head, nav and footer around each page's content. */
-import {getLangFromUrl, useTranslations} from '../i18n/utils';
+import {getLangFromUrl, useTranslations, routeKey, href, asset} from '../i18n/utils';
+import {languages, type Lang} from '../i18n/ui';
 import SiteNav from '../components/SiteNav.astro';
 
 interface Props {
@@ -11,6 +12,18 @@ const {title, description} = Astro.props;
 const lang = getLangFromUrl(Astro.url);
 const t = useTranslations(lang);
 const pageTitle = title ? `${title} — ${t('site.title')}` : t('site.title');
+const desc = description ?? t('site.tagline');
+
+// Absolute URLs for canonical/OG/hreflang (Astro.site set in astro.config).
+const canonical = new URL(Astro.url.pathname, Astro.site);
+const key = routeKey(Astro.url);
+const langs = Object.keys(languages) as Lang[];
+const alternates = langs.map(l => ({
+  lang: l,
+  href: new URL(href(key, l), Astro.site).toString(),
+}));
+const ogImage = new URL(asset('og.svg'), Astro.site).toString();
+const ogLocale: Record<Lang, string> = {de: 'de_DE', en: 'en_US', es: 'es_ES'};
 ---
 
 <!doctype html>
@@ -19,8 +32,32 @@ const pageTitle = title ? `${title} — ${t('site.title')}` : t('site.title');
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{pageTitle}</title>
-    <meta name="description" content={description ?? t('site.tagline')} />
+    <meta name="description" content={desc} />
     <meta name="generator" content={Astro.generator} />
+    <link rel="icon" type="image/svg+xml" href={asset('favicon.svg')} />
+    <link rel="canonical" href={canonical.toString()} />
+    <meta name="robots" content="index, follow" />
+
+    {/* hreflang alternates for i18n SEO. */}
+    {
+      alternates.map(a => (
+        <link rel="alternate" hreflang={a.lang} href={a.href} />
+      ))
+    }
+    <link rel="alternate" hreflang="x-default" href={new URL(href(key, 'de'), Astro.site).toString()} />
+
+    {/* Open Graph / Twitter. */}
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content={t('site.title')} />
+    <meta property="og:title" content={pageTitle} />
+    <meta property="og:description" content={desc} />
+    <meta property="og:url" content={canonical.toString()} />
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:locale" content={ogLocale[lang]} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={pageTitle} />
+    <meta name="twitter:description" content={desc} />
+    <meta name="twitter:image" content={ogImage} />
   </head>
   <body>
     <SiteNav />
