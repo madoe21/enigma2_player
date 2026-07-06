@@ -1,0 +1,45 @@
+---
+/**
+ * Embeds the license server's per-application shop/account page (ADR-0005
+ * in the license_server repo, bead enigma2_player_page-9ou). Purchase,
+ * login and account management are implemented THERE — this site only
+ * frames it. The server must allow this origin via EMBED_ALLOWED_ORIGINS.
+ */
+const base = import.meta.env.PUBLIC_LICENSE_API_BASE;
+const apiKey = import.meta.env.PUBLIC_APP_API_KEY;
+const src = base && apiKey ? `${base}/shop/${apiKey}` : null;
+---
+
+{
+  src ? (
+    <>
+      <iframe
+        src={src}
+        class="shop-frame"
+        title="Shop & Konto"
+        loading="lazy"
+      />
+      <p class="shop-fallback">
+        <a href={src} target="_blank" rel="noopener">
+          Shop in neuem Tab öffnen ↗
+        </a>
+      </p>
+    </>
+  ) : (
+    <p>Der Shop ist noch nicht verfügbar — bald mehr.</p>
+  )
+}
+
+<style>
+  .shop-frame {
+    width: 100%;
+    min-height: 920px;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    background: #fff;
+  }
+  .shop-fallback {
+    text-align: right;
+    font-size: 0.85rem;
+  }
+</style>
