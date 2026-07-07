@@ -29,12 +29,36 @@ const features: Record<Lang, FeatureItem[]> = {
       desc: 'DVB-Untertitel und Videotext werden in der App aus dem Transportstrom dekodiert — ohne externe Bibliotheken.',
     },
     {
+      title: 'EPG & Programminfos',
+      desc: 'Elektronischer Programmführer mit Detailinfos — direkt aus dem EPG heraus Timer planen oder aufnehmen.',
+    },
+    {
+      title: 'Senderliste & Bouquets bearbeiten',
+      desc: 'Bouquet-Editor direkt in der App: Sender sortieren, verschieben, Favoriten pflegen — ohne Receiver-Menü.',
+    },
+    {
+      title: 'Aufnahme starten',
+      desc: 'Sofortaufnahme aus dem laufenden Programm oder aus dem EPG — die Box nimmt auf, du schaust weiter.',
+    },
+    {
+      title: 'Timer planen',
+      desc: 'Aufnahme-Timer, AutoTimer und Power-Timer anlegen, ändern und mit dem Receiver synchronisieren.',
+    },
+    {
+      title: 'Receiver-Einstellungen',
+      desc: 'OpenWebIF-Einstellungen des Receivers bequem aus der App vornehmen — inklusive Standby und Neustart.',
+    },
+    {
       title: 'Fernbedienung',
       desc: 'Vollständige virtuelle Fernbedienung über OpenWebIF; steuere den Receiver wie vor dem Fernseher.',
     },
     {
       title: 'Plattformübergreifend',
       desc: 'Windows, macOS, Linux, Android und iOS — eine App, überall dieselbe Oberfläche, in de/en/es.',
+    },
+    {
+      title: 'Eine Lizenz für alle Plattformen',
+      desc: 'Lizenzen gelten plattformübergreifend: ein Konto für alle Geräte — egal ob Windows, macOS, Linux, Android oder iOS. Nur die Geräteanzahl deines Lizenzmodells zählt.',
     },
   ],
   en: [
@@ -55,12 +79,36 @@ const features: Record<Lang, FeatureItem[]> = {
       desc: 'DVB subtitles and teletext are decoded in-app from the transport stream — no external libraries.',
     },
     {
+      title: 'EPG & programme info',
+      desc: 'Electronic programme guide with details — schedule timers or start recordings straight from the EPG.',
+    },
+    {
+      title: 'Edit channel lists & bouquets',
+      desc: 'Bouquet editor built in: sort and move channels, curate favourites — no receiver menu needed.',
+    },
+    {
+      title: 'Start recordings',
+      desc: 'Instant recording from the running programme or from the EPG — the box records while you keep watching.',
+    },
+    {
+      title: 'Plan timers',
+      desc: 'Create, edit and sync record timers, auto timers and power timers with the receiver.',
+    },
+    {
+      title: 'Receiver settings',
+      desc: 'Adjust the receiver’s OpenWebIF settings comfortably from the app — including standby and reboot.',
+    },
+    {
       title: 'Remote control',
       desc: 'Full virtual remote over OpenWebIF; drive the receiver just like from the couch.',
     },
     {
       title: 'Cross-platform',
       desc: 'Windows, macOS, Linux, Android and iOS — one app, the same UI everywhere, in de/en/es.',
+    },
+    {
+      title: 'One license for all platforms',
+      desc: 'Licenses are cross-platform: one account for all your devices — Windows, macOS, Linux, Android or iOS. Only your model’s device count matters.',
     },
   ],
   es: [
@@ -81,12 +129,36 @@ const features: Record<Lang, FeatureItem[]> = {
       desc: 'Los subtítulos DVB y el teletexto se decodifican en la app desde el flujo de transporte — sin librerías externas.',
     },
     {
+      title: 'EPG e información de programas',
+      desc: 'Guía electrónica de programación con detalles — programa temporizadores o graba directamente desde el EPG.',
+    },
+    {
+      title: 'Editar listas de canales y bouquets',
+      desc: 'Editor de bouquets integrado: ordena y mueve canales, gestiona favoritos — sin el menú del receptor.',
+    },
+    {
+      title: 'Iniciar grabaciones',
+      desc: 'Grabación instantánea del programa en curso o desde el EPG — el receptor graba mientras sigues viendo.',
+    },
+    {
+      title: 'Planificar temporizadores',
+      desc: 'Crea, edita y sincroniza temporizadores de grabación, automáticos y de apagado con el receptor.',
+    },
+    {
+      title: 'Ajustes del receptor',
+      desc: 'Configura los ajustes OpenWebIF del receptor cómodamente desde la app — incluido standby y reinicio.',
+    },
+    {
       title: 'Mando a distancia',
       desc: 'Mando virtual completo vía OpenWebIF; controla el receptor como desde el sofá.',
     },
     {
       title: 'Multiplataforma',
       desc: 'Windows, macOS, Linux, Android e iOS — una app, la misma interfaz, en de/en/es.',
+    },
+    {
+      title: 'Una licencia para todas las plataformas',
+      desc: 'Las licencias son multiplataforma: una cuenta para todos tus dispositivos — Windows, macOS, Linux, Android o iOS. Solo cuenta el número de dispositivos de tu modelo.',
     },
   ],
 };
