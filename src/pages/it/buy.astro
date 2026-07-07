@@ -1,0 +1,10 @@
+---
+import Base from '../../layouts/Base.astro';
+import ShopEmbed from '../../components/ShopEmbed.astro';
+import {useTranslations} from '../../i18n/utils';
+const t = useTranslations('it');
+---
+
+<Base title={t('nav.buy')}>
+  <ShopEmbed />
+</Base>

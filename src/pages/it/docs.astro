@@ -1,0 +1,10 @@
+---
+import Base from '../../layouts/Base.astro';
+import DocsContent from '../../components/DocsContent.astro';
+import {useTranslations} from '../../i18n/utils';
+const t = useTranslations('it');
+---
+
+<Base title={t('nav.docs')}>
+  <DocsContent lang="it" />
+</Base>

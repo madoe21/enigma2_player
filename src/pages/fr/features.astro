@@ -1,0 +1,10 @@
+---
+import Base from '../../layouts/Base.astro';
+import FeaturesContent from '../../components/FeaturesContent.astro';
+import {useTranslations} from '../../i18n/utils';
+const t = useTranslations('fr');
+---
+
+<Base title={t('nav.features')}>
+  <FeaturesContent lang="fr" />
+</Base>

@@ -154,11 +154,111 @@ const features: Record<Lang, FeatureItem[]> = {
     },
     {
       title: 'Multiplataforma',
-      desc: 'Windows, macOS, Linux, Android e iOS — una app, la misma interfaz, en de/en/es.',
+      desc: 'Windows, macOS, Linux, Android e iOS — una app, la misma interfaz, en de/en/es/fr/it.',
     },
     {
       title: 'Una licencia para todas las plataformas',
       desc: 'Las licencias son multiplataforma: una cuenta para todos tus dispositivos — Windows, macOS, Linux, Android o iOS. Solo cuenta el número de dispositivos de tu modelo.',
+    },
+  ],
+  fr: [
+    {
+      title: 'Plusieurs récepteurs',
+      desc: 'Configurez et gérez un nombre illimité de récepteurs Enigma2 et basculez entre eux en un instant.',
+    },
+    {
+      title: 'TV en direct et radio',
+      desc: 'Diffusez les chaînes en direct avec EPG, bouquets/favoris et picons — directement depuis le récepteur.',
+    },
+    {
+      title: 'Enregistrements et minuteries',
+      desc: 'Lisez les enregistrements et créez/gérez les minuteries d’enregistrement, d’extinction et automatiques.',
+    },
+    {
+      title: 'Sous-titres et télétexte',
+      desc: 'Les sous-titres DVB et le télétexte sont décodés dans l’app depuis le flux de transport — sans bibliothèques externes.',
+    },
+    {
+      title: 'EPG et infos programmes',
+      desc: 'Guide électronique des programmes avec détails — planifiez une minuterie ou enregistrez directement depuis l’EPG.',
+    },
+    {
+      title: 'Éditer listes de chaînes et bouquets',
+      desc: 'Éditeur de bouquets intégré : trier et déplacer les chaînes, gérer les favoris — sans le menu du récepteur.',
+    },
+    {
+      title: 'Lancer un enregistrement',
+      desc: 'Enregistrement instantané du programme en cours ou depuis l’EPG — le récepteur enregistre pendant que vous regardez.',
+    },
+    {
+      title: 'Planifier des minuteries',
+      desc: 'Créez, modifiez et synchronisez les minuteries d’enregistrement, automatiques et d’extinction avec le récepteur.',
+    },
+    {
+      title: 'Réglages du récepteur',
+      desc: 'Modifiez confortablement les réglages OpenWebIF du récepteur depuis l’app — y compris veille et redémarrage.',
+    },
+    {
+      title: 'Télécommande',
+      desc: 'Télécommande virtuelle complète via OpenWebIF ; pilotez le récepteur comme depuis le canapé.',
+    },
+    {
+      title: 'Multiplateforme',
+      desc: 'Windows, macOS, Linux, Android et iOS — une app, la même interface partout, en de/en/es/fr/it.',
+    },
+    {
+      title: 'Une licence pour toutes les plateformes',
+      desc: 'Les licences sont multiplateformes : un compte pour tous vos appareils — Windows, macOS, Linux, Android ou iOS. Seul le nombre d’appareils de votre modèle compte.',
+    },
+  ],
+  it: [
+    {
+      title: 'Più ricevitori',
+      desc: 'Configura e gestisci un numero qualsiasi di ricevitori Enigma2 e passa dall’uno all’altro in un attimo.',
+    },
+    {
+      title: 'TV in diretta e radio',
+      desc: 'Trasmetti i canali in diretta con EPG, bouquet/preferiti e picon — direttamente dal ricevitore.',
+    },
+    {
+      title: 'Registrazioni e timer',
+      desc: 'Riproduci le registrazioni e crea/gestisci timer di registrazione, spegnimento e automatici.',
+    },
+    {
+      title: 'Sottotitoli e televideo',
+      desc: 'I sottotitoli DVB e il televideo vengono decodificati nell’app dal flusso di trasporto — senza librerie esterne.',
+    },
+    {
+      title: 'EPG e info programmi',
+      desc: 'Guida elettronica ai programmi con dettagli — pianifica un timer o registra direttamente dall’EPG.',
+    },
+    {
+      title: 'Modifica liste canali e bouquet',
+      desc: 'Editor di bouquet integrato: ordina e sposta i canali, gestisci i preferiti — senza il menu del ricevitore.',
+    },
+    {
+      title: 'Avvia una registrazione',
+      desc: 'Registrazione istantanea dal programma in onda o dall’EPG — il ricevitore registra mentre continui a guardare.',
+    },
+    {
+      title: 'Pianifica timer',
+      desc: 'Crea, modifica e sincronizza timer di registrazione, automatici e di spegnimento con il ricevitore.',
+    },
+    {
+      title: 'Impostazioni del ricevitore',
+      desc: 'Modifica comodamente le impostazioni OpenWebIF del ricevitore dall’app — inclusi standby e riavvio.',
+    },
+    {
+      title: 'Telecomando',
+      desc: 'Telecomando virtuale completo via OpenWebIF; controlla il ricevitore come dal divano.',
+    },
+    {
+      title: 'Multipiattaforma',
+      desc: 'Windows, macOS, Linux, Android e iOS — una app, la stessa interfaccia ovunque, in de/en/es/fr/it.',
+    },
+    {
+      title: 'Una licenza per tutte le piattaforme',
+      desc: 'Le licenze sono multipiattaforma: un account per tutti i tuoi dispositivi — Windows, macOS, Linux, Android o iOS. Conta solo il numero di dispositivi del tuo modello.',
     },
   ],
 };
@@ -251,6 +351,58 @@ const faq: Record<Lang, QaItem[]> = {
       a: 'Sí. En tu red local indicas la IP interna del receptor. Fuera de casa hay dos opciones: (1) una VPN a tu red doméstica (recomendado: WireGuard) — así usas la IP interna como en casa, sin abrir puertos en el router; o (2) una dirección del router accesible desde fuera (IP fija o DynDNS) con un reenvío de puertos hacia el receptor. Las credenciales se guardan cifradas.',
     },
   ],
+  fr: [
+    {
+      q: 'Quels récepteurs sont pris en charge ?',
+      a: 'Les récepteurs Enigma2 avec OpenWebIF activé (p. ex. Dreambox, VU+, Zgemma et autres images OpenATV).',
+    },
+    {
+      q: 'Sur quelles plateformes l’app fonctionne-t-elle ?',
+      a: 'Windows, macOS, Linux, Android (y compris box TV/Fire TV) et iOS.',
+    },
+    {
+      q: 'L’app est-elle gratuite ?',
+      a: 'Il existe une offre gratuite ; les fonctions premium nécessitent une licence. Voir la page Tarifs.',
+    },
+    {
+      q: 'Comment fonctionnent les mises à jour ?',
+      a: 'Sur ordinateur, l’app vérifie les nouvelles versions au démarrage. Les versions mobiles se mettent à jour en réinstallant (distribution sur les stores à venir).',
+    },
+    {
+      q: 'Les sous-titres et le télétexte sont-ils pris en charge ?',
+      a: 'Oui. Les sous-titres DVB et le télétexte sont décodés dans l’app depuis le flux de transport.',
+    },
+    {
+      q: 'Puis-je accéder à mon récepteur à distance ?',
+      a: 'Oui. Sur votre réseau local, vous indiquez l’IP interne du récepteur. En déplacement, deux possibilités : (1) un VPN vers votre réseau domestique (recommandé : WireGuard) — vous utilisez alors l’IP interne comme à la maison, sans ouvrir de ports sur le routeur ; ou (2) une adresse du routeur accessible depuis l’extérieur (IP fixe ou DynDNS) avec une redirection de port vers le récepteur. Les identifiants sont stockés chiffrés.',
+    },
+  ],
+  it: [
+    {
+      q: 'Quali ricevitori sono supportati?',
+      a: 'Ricevitori Enigma2 con OpenWebIF attivo (es. Dreambox, VU+, Zgemma e altre immagini OpenATV).',
+    },
+    {
+      q: 'Su quali piattaforme funziona l’app?',
+      a: 'Windows, macOS, Linux, Android (incl. TV box/Fire TV) e iOS.',
+    },
+    {
+      q: 'L’app è gratuita?',
+      a: 'Esiste un livello gratuito; le funzioni premium richiedono una licenza. Vedi la pagina Prezzi.',
+    },
+    {
+      q: 'Come funzionano gli aggiornamenti?',
+      a: 'Su desktop l’app controlla le nuove versioni all’avvio. Le versioni mobili si aggiornano reinstallando (distribuzione sugli store in seguito).',
+    },
+    {
+      q: 'Sono supportati sottotitoli e televideo?',
+      a: 'Sì. I sottotitoli DVB e il televideo vengono decodificati nell’app dal flusso di trasporto.',
+    },
+    {
+      q: 'Posso accedere al ricevitore da remoto?',
+      a: 'Sì. Nella rete locale indichi l’IP interno del ricevitore. Fuori casa due opzioni: (1) una VPN verso la rete domestica (consigliato: WireGuard) — così usi l’IP interno come a casa, senza aprire porte sul router; oppure (2) un indirizzo del router raggiungibile dall’esterno (IP fisso o DynDNS) con un port forwarding verso il ricevitore. Le credenziali sono salvate cifrate.',
+    },
+  ],
 };
 
 export function getFaq(lang: Lang): QaItem[] {
@@ -330,6 +482,50 @@ const licenseInfo: Record<Lang, InfoBlock[]> = {
       body: 'La app se ofrece “tal cual”. La disponibilidad de funciones del receptor depende de la imagen Enigma2/OpenWebIF concreta.',
     },
   ],
+  fr: [
+    {
+      heading: 'Ce que couvre la licence',
+      body: 'Une licence donne le droit d’utiliser Enigma2 Player avec les fonctions premium sur un nombre limité d’appareils. Le nombre exact et la durée dépendent du modèle choisi.',
+    },
+    {
+      heading: 'Appareils et activation',
+      body: 'Les appareils sont enregistrés à la connexion. Vous pouvez voir et supprimer des appareils dans votre compte ; l’historique est conservé par sécurité.',
+    },
+    {
+      heading: 'Durée et renouvellement',
+      body: 'Les modèles par abonnement se renouvellent par période de facturation jusqu’à annulation. En cas de paiement manquant ou d’annulation, la licence est désactivée.',
+    },
+    {
+      heading: 'Remboursements et rétractation',
+      body: 'Les droits légaux de rétractation s’appliquent. Détails et contact sur la page Contact.',
+    },
+    {
+      heading: 'Garantie',
+      body: 'L’app est fournie « en l’état ». La disponibilité des fonctions du récepteur dépend de l’image Enigma2/OpenWebIF concrète.',
+    },
+  ],
+  it: [
+    {
+      heading: 'Cosa copre la licenza',
+      body: 'Una licenza concede il diritto di usare Enigma2 Player con le funzioni premium su un numero limitato di dispositivi. Il numero esatto e la durata dipendono dal modello scelto.',
+    },
+    {
+      heading: 'Dispositivi e attivazione',
+      body: 'I dispositivi vengono registrati all’accesso. Puoi vedere e rimuovere i dispositivi nel tuo account; lo storico è conservato per sicurezza.',
+    },
+    {
+      heading: 'Durata e rinnovo',
+      body: 'I modelli in abbonamento si rinnovano per periodo di fatturazione fino alla disdetta. In caso di pagamento mancante o disdetta, la licenza viene disattivata.',
+    },
+    {
+      heading: 'Rimborsi e recesso',
+      body: 'Si applicano i diritti legali di recesso. Dettagli e contatto nella pagina Contatti.',
+    },
+    {
+      heading: 'Garanzia',
+      body: 'L’app è fornita “così com’è”. La disponibilità delle funzioni del ricevitore dipende dalla specifica immagine Enigma2/OpenWebIF.',
+    },
+  ],
 };
 
 export function getLicenseInfo(lang: Lang): InfoBlock[] {
@@ -392,6 +588,42 @@ const docs: Record<Lang, InfoBlock[]> = {
       body: 'Explora bouquets, inicia TV en directo con EPG, reproduce grabaciones y usa temporizadores. Los subtítulos DVB y el teletexto se muestran al instante.',
     },
   ],
+  fr: [
+    {
+      heading: '1. Installer',
+      body: 'Téléchargez l’installateur pour votre plateforme depuis la page Téléchargements et lancez-le. Sur ordinateur, l’app vérifie les mises à jour au démarrage.',
+    },
+    {
+      heading: '2. Préparer le récepteur',
+      body: 'Activez le plugin OpenWebIF sur votre récepteur Enigma2. Notez l’hôte/IP, éventuellement identifiant/mot de passe, ainsi que le port web (80 par défaut) et le port de streaming (8001 par défaut).',
+    },
+    {
+      heading: '3. Ajouter le récepteur',
+      body: 'Ajoutez un récepteur dans l’app avec son hôte, ses identifiants et ses ports. Sur votre réseau local, l’hôte est l’IP interne du récepteur. Pour l’accès à distance, utilisez soit un VPN vers votre réseau domestique (recommandé : WireGuard) en gardant l’IP interne, soit une adresse de routeur accessible depuis l’extérieur (IP fixe ou DynDNS) avec une redirection de port vers le récepteur. Les identifiants sont stockés chiffrés.',
+    },
+    {
+      heading: '4. C’est parti',
+      body: 'Parcourez les bouquets, lancez la TV en direct avec l’EPG, lisez les enregistrements et utilisez les minuteries. Les sous-titres DVB et le télétexte s’affichent immédiatement.',
+    },
+  ],
+  it: [
+    {
+      heading: '1. Installa',
+      body: 'Scarica l’installer per la tua piattaforma dalla pagina Download ed eseguilo. Su desktop l’app controlla gli aggiornamenti all’avvio.',
+    },
+    {
+      heading: '2. Prepara il ricevitore',
+      body: 'Attiva il plugin OpenWebIF sul tuo ricevitore Enigma2. Annota host/IP, eventuale utente/password e la porta web (80 predefinita) e di streaming (8001 predefinita).',
+    },
+    {
+      heading: '3. Aggiungi il ricevitore',
+      body: 'Aggiungi un ricevitore nell’app con host, credenziali e porte. Nella rete locale l’host è l’IP interno del ricevitore. Per l’accesso remoto usa una VPN verso la rete domestica (consigliato: WireGuard) mantenendo l’IP interno, oppure un indirizzo del router raggiungibile dall’esterno (IP fisso o DynDNS) con port forwarding verso il ricevitore. Le credenziali sono salvate cifrate.',
+    },
+    {
+      heading: '4. Inizia',
+      body: 'Sfoglia i bouquet, avvia la TV in diretta con l’EPG, riproduci le registrazioni e usa i timer. Sottotitoli DVB e televideo si mostrano subito.',
+    },
+  ],
 };
 
 export function getDocs(lang: Lang): InfoBlock[] {
@@ -449,6 +681,36 @@ const screenshots: Record<Lang, Shot[]> = {
     {file: 'receivers.jpg', caption: 'Configura y cambia entre varios receptores'},
     {file: 'add-receiver.jpg', caption: 'Añadir un receptor'},
     {file: 'settings.jpg', caption: 'Ajustes: idioma, claro/oscuro, listas de canales, teletexto'},
+  ],
+  fr: [
+    {file: 'tv-playback.jpg', caption: 'Lecture TV : piste audio, sous-titres, télétexte et infos programme'},
+    {file: 'channel-list.jpg', caption: 'Liste des chaînes avec streaming, enregistrement et zapping'},
+    {file: 'epg.jpg', caption: 'Guide électronique des programmes (EPG)'},
+    {file: 'epg-detail.jpg', caption: 'Vue détaillée de l’EPG avec actions minuterie/enregistrement'},
+    {file: 'bouquet-editor.jpg', caption: 'Éditeur de bouquets : modifier la liste des chaînes'},
+    {file: 'timer.jpg', caption: 'Planifier des minuteries (enregistrement, auto et extinction)'},
+    {file: 'remote.jpg', caption: 'Télécommande virtuelle'},
+    {file: 'receiver-settings.jpg', caption: 'Réglages du récepteur via OpenWebIF'},
+    {file: 'sat-finder.jpg', caption: 'Chercheur de satellite / mesure du signal'},
+    {file: 'teletext.jpg', caption: 'Télétexte transparent sur l’image en direct'},
+    {file: 'receivers.jpg', caption: 'Configurer et basculer entre plusieurs récepteurs'},
+    {file: 'add-receiver.jpg', caption: 'Ajouter un récepteur'},
+    {file: 'settings.jpg', caption: 'Réglages : langue, clair/sombre, listes de chaînes, télétexte'},
+  ],
+  it: [
+    {file: 'tv-playback.jpg', caption: 'Riproduzione TV: traccia audio, sottotitoli, televideo e info programma'},
+    {file: 'channel-list.jpg', caption: 'Lista canali con streaming, registrazione e cambio'},
+    {file: 'epg.jpg', caption: 'Guida elettronica ai programmi (EPG)'},
+    {file: 'epg-detail.jpg', caption: 'Vista dettaglio EPG con azioni timer/registrazione'},
+    {file: 'bouquet-editor.jpg', caption: 'Editor di bouquet: modifica la lista canali'},
+    {file: 'timer.jpg', caption: 'Pianifica timer (registrazione, automatici e di spegnimento)'},
+    {file: 'remote.jpg', caption: 'Telecomando virtuale'},
+    {file: 'receiver-settings.jpg', caption: 'Impostazioni del ricevitore via OpenWebIF'},
+    {file: 'sat-finder.jpg', caption: 'Cerca satellite / misuratore di segnale'},
+    {file: 'teletext.jpg', caption: 'Televideo trasparente sull’immagine in diretta'},
+    {file: 'receivers.jpg', caption: 'Configura e passa tra più ricevitori'},
+    {file: 'add-receiver.jpg', caption: 'Aggiungi un ricevitore'},
+    {file: 'settings.jpg', caption: 'Impostazioni: lingua, chiaro/scuro, liste canali, televideo'},
   ],
 };
 

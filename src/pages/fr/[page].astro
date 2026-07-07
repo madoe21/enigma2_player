@@ -1,0 +1,20 @@
+---
+/** Spanish placeholder route for content sections without a dedicated page. */
+import Base from '../../layouts/Base.astro';
+import {useTranslations} from '../../i18n/utils';
+import {placeholderSections} from '../../i18n/routes';
+import type {Section} from '../../i18n/ui';
+
+export function getStaticPaths() {
+  return placeholderSections.map(page => ({params: {page}}));
+}
+
+const {page} = Astro.params as {page: Section};
+const t = useTranslations('fr');
+const title = t(`nav.${page}` as const);
+---
+
+<Base title={title}>
+  <h1>{title}</h1>
+  <p>{t('placeholder.body')}</p>
+</Base>
