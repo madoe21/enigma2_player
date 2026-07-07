@@ -196,7 +196,7 @@ const faq: Record<Lang, QaItem[]> = {
     },
     {
       q: 'Kann ich von unterwegs zugreifen?',
-      a: 'Ja. Im lokalen Netzwerk gibst du die interne IP des Receivers an; von unterwegs eine extern erreichbare Adresse (z. B. eine DynDNS-Domain), die eine Portweiterleitung im Router auf den Receiver voraussetzt. Zugangsdaten werden verschlüsselt gespeichert.',
+      a: 'Ja. Im lokalen Netzwerk gibst du die interne IP des Receivers an. Von unterwegs gibt es zwei Wege: (1) per VPN ins Heimnetz (empfohlen: WireGuard) — dann nutzt du wie zu Hause die interne IP, ohne Ports im Router zu öffnen; oder (2) eine von außen erreichbare Adresse des Routers (feste IP oder DynDNS) mit einer Portweiterleitung auf den Receiver. Zugangsdaten werden verschlüsselt gespeichert.',
     },
   ],
   en: [
@@ -222,7 +222,7 @@ const faq: Record<Lang, QaItem[]> = {
     },
     {
       q: 'Can I access my receiver remotely?',
-      a: 'Yes. On your local network you enter the receiver’s internal IP; for remote access an externally reachable address (e.g. a DynDNS domain), which requires a port forward in your router to the receiver. Credentials are stored encrypted.',
+      a: 'Yes. On your local network you enter the receiver’s internal IP. On the go there are two ways: (1) a VPN into your home network (recommended: WireGuard) — then you use the internal IP just like at home, without opening any router ports; or (2) an externally reachable address of your router (static IP or DynDNS) with a port forward to the receiver. Credentials are stored encrypted.',
     },
   ],
   es: [
@@ -248,7 +248,7 @@ const faq: Record<Lang, QaItem[]> = {
     },
     {
       q: '¿Puedo acceder a mi receptor de forma remota?',
-      a: 'Sí. En tu red local indicas la IP interna del receptor; para el acceso remoto una dirección accesible desde fuera (p. ej. un dominio DynDNS), que requiere un reenvío de puertos en el router hacia el receptor. Las credenciales se guardan cifradas.',
+      a: 'Sí. En tu red local indicas la IP interna del receptor. Fuera de casa hay dos opciones: (1) una VPN a tu red doméstica (recomendado: WireGuard) — así usas la IP interna como en casa, sin abrir puertos en el router; o (2) una dirección del router accesible desde fuera (IP fija o DynDNS) con un reenvío de puertos hacia el receptor. Las credenciales se guardan cifradas.',
     },
   ],
 };
@@ -349,7 +349,7 @@ const docs: Record<Lang, InfoBlock[]> = {
     },
     {
       heading: '3. Receiver hinzufügen',
-      body: 'Lege in der App einen Receiver mit Host, Zugangsdaten und Ports an. Im lokalen Netzwerk ist der Host die interne IP des Receivers; für den Zugriff von unterwegs eine extern erreichbare Adresse (z. B. eine DynDNS-Domain) mit passender Portweiterleitung im Router. Zugangsdaten werden verschlüsselt gespeichert.',
+      body: 'Lege in der App einen Receiver mit Host, Zugangsdaten und Ports an. Im lokalen Netzwerk ist der Host die interne IP des Receivers. Für den Zugriff von unterwegs entweder per VPN ins Heimnetz (empfohlen: WireGuard) und weiterhin die interne IP nutzen, oder eine von außen erreichbare Router-Adresse (feste IP oder DynDNS) mit Portweiterleitung auf den Receiver. Zugangsdaten werden verschlüsselt gespeichert.',
     },
     {
       heading: '4. Loslegen',
@@ -367,7 +367,7 @@ const docs: Record<Lang, InfoBlock[]> = {
     },
     {
       heading: '3. Add the receiver',
-      body: 'Add a receiver in the app with its host, credentials and ports. On your local network the host is the receiver’s internal IP; for remote access use an externally reachable address (e.g. a DynDNS domain) with a matching port forward in your router. Credentials are stored encrypted.',
+      body: 'Add a receiver in the app with its host, credentials and ports. On your local network the host is the receiver’s internal IP. For remote access either use a VPN into your home network (recommended: WireGuard) and keep using the internal IP, or an externally reachable router address (static IP or DynDNS) with a port forward to the receiver. Credentials are stored encrypted.',
     },
     {
       heading: '4. Get going',
@@ -385,7 +385,7 @@ const docs: Record<Lang, InfoBlock[]> = {
     },
     {
       heading: '3. Añadir el receptor',
-      body: 'Añade un receptor en la app con su host, credenciales y puertos. En tu red local el host es la IP interna del receptor; para el acceso remoto usa una dirección accesible desde fuera (p. ej. un dominio DynDNS) con el reenvío de puertos correspondiente en el router. Las credenciales se guardan cifradas.',
+      body: 'Añade un receptor en la app con su host, credenciales y puertos. En tu red local el host es la IP interna del receptor. Para el acceso remoto, usa una VPN a tu red doméstica (recomendado: WireGuard) y sigue usando la IP interna, o una dirección del router accesible desde fuera (IP fija o DynDNS) con reenvío de puertos hacia el receptor. Las credenciales se guardan cifradas.',
     },
     {
       heading: '4. Empezar',
@@ -398,13 +398,60 @@ export function getDocs(lang: Lang): InfoBlock[] {
   return docs[lang] ?? docs[defaultLang];
 }
 
-// Captions for the (placeholder) screenshot tiles; real images land later (#5).
-const screenshotCaptions: Record<Lang, string[]> = {
-  de: ['Live-TV', 'EPG', 'Player', 'Bouquets', 'Untertitel', 'Einstellungen'],
-  en: ['Live TV', 'EPG', 'Player', 'Bouquets', 'Subtitles', 'Settings'],
-  es: ['TV en directo', 'EPG', 'Reproductor', 'Bouquets', 'Subtítulos', 'Ajustes'],
+export interface Shot {
+  file: string;
+  caption: string;
+}
+
+// Real product screenshots (public/screenshots/*.jpg). Same order per locale.
+const screenshots: Record<Lang, Shot[]> = {
+  de: [
+    {file: 'tv-playback.jpg', caption: 'TV-Wiedergabe: Tonspur, Untertitel, Videotext und Programminfo'},
+    {file: 'channel-list.jpg', caption: 'Senderliste mit Streaming-Auswahl, Aufnahme- und Umschalt-Button'},
+    {file: 'epg.jpg', caption: 'Elektronischer Programmführer (EPG)'},
+    {file: 'epg-detail.jpg', caption: 'EPG-Detailansicht mit Timer-/Aufnahme-Aktionen'},
+    {file: 'bouquet-editor.jpg', caption: 'Bouquet-Editor: Senderliste bearbeiten'},
+    {file: 'timer.jpg', caption: 'Timer planen (Aufnahme-, Auto- und Power-Timer)'},
+    {file: 'remote.jpg', caption: 'Virtuelle Fernbedienung'},
+    {file: 'receiver-settings.jpg', caption: 'Receiver-Einstellungen über OpenWebIF'},
+    {file: 'sat-finder.jpg', caption: 'Sat-Finder / Signalanzeige'},
+    {file: 'teletext.jpg', caption: 'Transparenter Videotext über dem laufenden Bild'},
+    {file: 'receivers.jpg', caption: 'Mehrere Receiver konfigurieren und auswählen'},
+    {file: 'add-receiver.jpg', caption: 'Receiver hinzufügen'},
+    {file: 'settings.jpg', caption: 'Einstellungen: Sprache, Light/Dark, Senderlisten, Teletext'},
+  ],
+  en: [
+    {file: 'tv-playback.jpg', caption: 'TV playback: audio track, subtitles, teletext and programme info'},
+    {file: 'channel-list.jpg', caption: 'Channel list with streaming, record and zap buttons'},
+    {file: 'epg.jpg', caption: 'Electronic programme guide (EPG)'},
+    {file: 'epg-detail.jpg', caption: 'EPG detail view with timer / record actions'},
+    {file: 'bouquet-editor.jpg', caption: 'Bouquet editor: edit the channel list'},
+    {file: 'timer.jpg', caption: 'Plan timers (record, auto and power timers)'},
+    {file: 'remote.jpg', caption: 'Virtual remote control'},
+    {file: 'receiver-settings.jpg', caption: 'Receiver settings over OpenWebIF'},
+    {file: 'sat-finder.jpg', caption: 'Sat finder / signal meter'},
+    {file: 'teletext.jpg', caption: 'Transparent teletext over the live picture'},
+    {file: 'receivers.jpg', caption: 'Configure and switch between multiple receivers'},
+    {file: 'add-receiver.jpg', caption: 'Add a receiver'},
+    {file: 'settings.jpg', caption: 'Settings: language, light/dark, channel lists, teletext'},
+  ],
+  es: [
+    {file: 'tv-playback.jpg', caption: 'Reproducción de TV: audio, subtítulos, teletexto e info del programa'},
+    {file: 'channel-list.jpg', caption: 'Lista de canales con streaming, grabación y cambio'},
+    {file: 'epg.jpg', caption: 'Guía electrónica de programación (EPG)'},
+    {file: 'epg-detail.jpg', caption: 'Vista de detalle del EPG con acciones de temporizador/grabación'},
+    {file: 'bouquet-editor.jpg', caption: 'Editor de bouquets: editar la lista de canales'},
+    {file: 'timer.jpg', caption: 'Planificar temporizadores (grabación, automáticos y de apagado)'},
+    {file: 'remote.jpg', caption: 'Mando a distancia virtual'},
+    {file: 'receiver-settings.jpg', caption: 'Ajustes del receptor vía OpenWebIF'},
+    {file: 'sat-finder.jpg', caption: 'Buscador de satélite / medidor de señal'},
+    {file: 'teletext.jpg', caption: 'Teletexto transparente sobre la imagen en directo'},
+    {file: 'receivers.jpg', caption: 'Configura y cambia entre varios receptores'},
+    {file: 'add-receiver.jpg', caption: 'Añadir un receptor'},
+    {file: 'settings.jpg', caption: 'Ajustes: idioma, claro/oscuro, listas de canales, teletexto'},
+  ],
 };
 
-export function getScreenshotCaptions(lang: Lang): string[] {
-  return screenshotCaptions[lang] ?? screenshotCaptions[defaultLang];
+export function getScreenshots(lang: Lang): Shot[] {
+  return screenshots[lang] ?? screenshots[defaultLang];
 }
