@@ -54,7 +54,7 @@ const features: Record<Lang, FeatureItem[]> = {
     },
     {
       title: 'Plattformübergreifend',
-      desc: 'Windows, macOS, Linux, Android und iOS — eine App, überall dieselbe Oberfläche, in de/en/es.',
+      desc: 'Windows, macOS, Linux, Android (inkl. Android TV & Fire TV) und iOS — eine App, überall dieselbe Oberfläche, in de/en/es/fr/it.',
     },
     {
       title: 'Eine Lizenz für alle Plattformen',
@@ -104,7 +104,7 @@ const features: Record<Lang, FeatureItem[]> = {
     },
     {
       title: 'Cross-platform',
-      desc: 'Windows, macOS, Linux, Android and iOS — one app, the same UI everywhere, in de/en/es.',
+      desc: 'Windows, macOS, Linux, Android (incl. Android TV & Fire TV) and iOS — one app, the same UI everywhere, in de/en/es/fr/it.',
     },
     {
       title: 'One license for all platforms',
@@ -154,7 +154,7 @@ const features: Record<Lang, FeatureItem[]> = {
     },
     {
       title: 'Multiplataforma',
-      desc: 'Windows, macOS, Linux, Android e iOS — una app, la misma interfaz, en de/en/es/fr/it.',
+      desc: 'Windows, macOS, Linux, Android (incl. Android TV y Fire TV) e iOS — una app, la misma interfaz, en de/en/es/fr/it.',
     },
     {
       title: 'Una licencia para todas las plataformas',
@@ -204,7 +204,7 @@ const features: Record<Lang, FeatureItem[]> = {
     },
     {
       title: 'Multiplateforme',
-      desc: 'Windows, macOS, Linux, Android et iOS — une app, la même interface partout, en de/en/es/fr/it.',
+      desc: 'Windows, macOS, Linux, Android (dont Android TV & Fire TV) et iOS — une app, la même interface partout, en de/en/es/fr/it.',
     },
     {
       title: 'Une licence pour toutes les plateformes',
@@ -254,7 +254,7 @@ const features: Record<Lang, FeatureItem[]> = {
     },
     {
       title: 'Multipiattaforma',
-      desc: 'Windows, macOS, Linux, Android e iOS — una app, la stessa interfaccia ovunque, in de/en/es/fr/it.',
+      desc: 'Windows, macOS, Linux, Android (incl. Android TV e Fire TV) e iOS — una app, la stessa interfaccia ovunque, in de/en/es/fr/it.',
     },
     {
       title: 'Una licenza per tutte le piattaforme',

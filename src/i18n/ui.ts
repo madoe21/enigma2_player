@@ -54,7 +54,7 @@ export const ui = {
     'home.cta.buy': 'Lizenz kaufen',
     'home.hero.title': 'Dein Enigma2-Receiver. Auf jedem Bildschirm.',
     'home.hero.sub':
-      'Durchsuche, steuere und streame Live-TV, Radio und Aufnahmen von deinen Enigma2-Receivern (OpenWebIF) — auf Windows, macOS, Linux, Android und iOS.',
+      'Durchsuche, steuere und streame Live-TV, Radio und Aufnahmen von deinen Enigma2-Receivern (OpenWebIF) — auf Windows, macOS, Linux, Android (inkl. Android TV & Fire TV) und iOS.',
     'home.features.title': 'Warum Enigma2 Player',
     'home.f.multi': 'Mehrere Receiver verwalten und blitzschnell umschalten.',
     'home.f.stream': 'Live-TV & Aufnahmen streamen, mit EPG und Bouquets.',
@@ -154,7 +154,7 @@ export const ui = {
     'home.cta.buy': 'Buy a license',
     'home.hero.title': 'Your Enigma2 receiver. On every screen.',
     'home.hero.sub':
-      'Browse, control and stream live TV, radio and recordings from your Enigma2 receivers (OpenWebIF) — on Windows, macOS, Linux, Android and iOS.',
+      'Browse, control and stream live TV, radio and recordings from your Enigma2 receivers (OpenWebIF) — on Windows, macOS, Linux, Android (incl. Android TV & Fire TV) and iOS.',
     'home.features.title': 'Why Enigma2 Player',
     'home.f.multi': 'Manage multiple receivers and switch in an instant.',
     'home.f.stream': 'Stream live TV & recordings, with EPG and bouquets.',
@@ -254,7 +254,7 @@ export const ui = {
     'home.cta.buy': 'Comprar licencia',
     'home.hero.title': 'Tu receptor Enigma2. En cualquier pantalla.',
     'home.hero.sub':
-      'Explora, controla y transmite TV en directo, radio y grabaciones de tus receptores Enigma2 (OpenWebIF) — en Windows, macOS, Linux, Android e iOS.',
+      'Explora, controla y transmite TV en directo, radio y grabaciones de tus receptores Enigma2 (OpenWebIF) — en Windows, macOS, Linux, Android (incl. Android TV y Fire TV) e iOS.',
     'home.features.title': 'Por qué Enigma2 Player',
     'home.f.multi': 'Gestiona varios receptores y cambia al instante.',
     'home.f.stream': 'Transmite TV en directo y grabaciones, con EPG y bouquets.',
@@ -354,7 +354,7 @@ export const ui = {
     'home.cta.buy': 'Acheter une licence',
     'home.hero.title': 'Votre récepteur Enigma2. Sur tous les écrans.',
     'home.hero.sub':
-      'Parcourez, pilotez et diffusez la TV en direct, la radio et les enregistrements de vos récepteurs Enigma2 (OpenWebIF) — sur Windows, macOS, Linux, Android et iOS.',
+      'Parcourez, pilotez et diffusez la TV en direct, la radio et les enregistrements de vos récepteurs Enigma2 (OpenWebIF) — sur Windows, macOS, Linux, Android (dont Android TV & Fire TV) et iOS.',
     'home.features.title': 'Pourquoi Enigma2 Player',
     'home.f.multi': 'Gérez plusieurs récepteurs et basculez en un instant.',
     'home.f.stream': 'Diffusez la TV en direct et les enregistrements, avec EPG et bouquets.',
@@ -454,7 +454,7 @@ export const ui = {
     'home.cta.buy': 'Acquista licenza',
     'home.hero.title': 'Il tuo ricevitore Enigma2. Su ogni schermo.',
     'home.hero.sub':
-      'Sfoglia, controlla e trasmetti TV in diretta, radio e registrazioni dei tuoi ricevitori Enigma2 (OpenWebIF) — su Windows, macOS, Linux, Android e iOS.',
+      'Sfoglia, controlla e trasmetti TV in diretta, radio e registrazioni dei tuoi ricevitori Enigma2 (OpenWebIF) — su Windows, macOS, Linux, Android (incl. Android TV e Fire TV) e iOS.',
     'home.features.title': 'Perché Enigma2 Player',
     'home.f.multi': 'Gestisci più ricevitori e passa dall’uno all’altro in un attimo.',
     'home.f.stream': 'Trasmetti TV in diretta e registrazioni, con EPG e bouquet.',
