@@ -66,7 +66,7 @@ const config = {repo, lang, empty: t('changelog.empty')};
           return (
             `<article class="entry">` +
             `<h2><a href="${esc(r.html_url)}">${esc(r.name || r.tag_name)}</a> <span class="muted">${esc(date)}</span></h2>` +
-            `<div class="body">${esc(r.body).trim() || '—'}</div>` +
+            `<div class="body">${renderBody(r.body) || '—'}</div>` +
             `</article>`
           );
         })
@@ -74,6 +74,37 @@ const config = {repo, lang, empty: t('changelog.empty')};
     } catch {
       list.textContent = cfg.empty;
     }
+  }
+
+  /**
+   * Line-wise rendering of the (GitHub-Markdown) release notes: headings,
+   * bullets, quotes and table rows each become their own block instead of
+   * one collapsed text blob. Everything is escaped before markup is added.
+   */
+  function renderBody(raw: string | null): string {
+    const inline = (s: string) =>
+      esc(s)
+        .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
+        .replace(/`([^`]+)`/g, '<code>$1</code>');
+    const out: string[] = [];
+    for (const line of String(raw ?? '').replace(/\r/g, '').split('\n')) {
+      const t = line.trim();
+      if (!t) continue;
+      if (/^\|[\s:|-]+$/.test(t)) continue; // Table separator row.
+      if (t.startsWith('#')) {
+        out.push(`<h3>${inline(t.replace(/^#+\s*/, ''))}</h3>`);
+      } else if (t.startsWith('|')) {
+        const cells = t.split('|').map(c => c.trim()).filter(Boolean);
+        out.push(`<p class="row-line">${cells.map(inline).join(' — ')}</p>`);
+      } else if (/^[-*]\s+/.test(t)) {
+        out.push(`<p class="bullet">• ${inline(t.replace(/^[-*]\s+/, ''))}</p>`);
+      } else if (t.startsWith('>')) {
+        out.push(`<p class="quote">${inline(t.replace(/^>\s*/, ''))}</p>`);
+      } else {
+        out.push(`<p>${inline(t)}</p>`);
+      }
+    }
+    return out.join('');
   }
 
   load();
@@ -94,7 +125,31 @@ const config = {repo, lang, empty: t('changelog.empty')};
     font-size: 0.95rem;
   }
   .body {
-    white-space: pre-wrap;
     color: #374151;
+  }
+  .body :global(p) {
+    margin: 0.25rem 0;
+  }
+  .body :global(h3) {
+    font-size: 1rem;
+    margin: 0.9rem 0 0.3rem;
+  }
+  .body :global(.bullet) {
+    padding-left: 0.75rem;
+  }
+  .body :global(.row-line) {
+    padding-left: 0.75rem;
+    font-size: 0.92rem;
+  }
+  .body :global(.quote) {
+    border-left: 3px solid #e5e7eb;
+    padding-left: 0.6rem;
+    color: #6b7280;
+  }
+  .body :global(code) {
+    background: #f3f4f6;
+    border-radius: 4px;
+    padding: 0 4px;
+    font-size: 0.9em;
   }
 </style>
