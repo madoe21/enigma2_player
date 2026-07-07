@@ -34,7 +34,10 @@ const ogLocale: Record<Lang, string> = {de: 'de_DE', en: 'en_US', es: 'es_ES'};
     <title>{pageTitle}</title>
     <meta name="description" content={desc} />
     <meta name="generator" content={Astro.generator} />
-    <link rel="icon" type="image/svg+xml" href={asset('favicon.svg')} />
+    {/* The app's own icon (assets/images/app_icon.png in the app repo). */}
+    <link rel="icon" type="image/png" sizes="32x32" href={asset('app-icon-32.png')} />
+    <link rel="icon" type="image/png" sizes="192x192" href={asset('app-icon-192.png')} />
+    <link rel="apple-touch-icon" href={asset('app-icon-192.png')} />
     <link rel="canonical" href={canonical.toString()} />
     <meta name="robots" content="index, follow" />
 
