@@ -7,7 +7,12 @@
  */
 const base = import.meta.env.PUBLIC_LICENSE_API_BASE;
 const apiKey = import.meta.env.PUBLIC_APP_API_KEY;
-const src = base && apiKey ? `${base}/shop/${apiKey}` : null;
+// Pass the page's locale into the shop so it renders in the same language.
+// `de` is the unprefixed default; en/es/fr/it live under their prefix.
+const seg = Astro.url.pathname.split('/').filter(Boolean);
+const lang = ['en', 'es', 'fr', 'it'].includes(seg[1]) ? seg[1] : 'de';
+const src =
+  base && apiKey ? `${base}/shop/${apiKey}?lang=${lang}` : null;
 ---
 
 {
