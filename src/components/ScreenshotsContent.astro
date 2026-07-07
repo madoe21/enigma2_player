@@ -1,5 +1,5 @@
 ---
-/** Screenshots gallery — real product images from public/screenshots/ (#5). */
+/** Screenshots gallery with a lightbox (prev/next) — real product images. */
 import {useTranslations, asset} from '../i18n/utils';
 import {getScreenshots} from '../i18n/content';
 import type {Lang} from '../i18n/ui';
@@ -10,27 +10,94 @@ interface Props {
 const {lang} = Astro.props;
 const t = useTranslations(lang);
 const shots = getScreenshots(lang);
+const srcs = shots.map(s => asset(`screenshots/${s.file}`));
 ---
 
 <h1>{t('nav.screenshots')}</h1>
 <p>{t('screenshots.note')}</p>
 <div class="grid">
   {
-    shots.map(s => (
+    shots.map((s, i) => (
       <figure class="tile">
-        <a href={asset(`screenshots/${s.file}`)} target="_blank" rel="noopener">
-          <img
-            src={asset(`screenshots/${s.file}`)}
-            alt={s.caption}
-            loading="lazy"
-            width="1200"
-          />
-        </a>
+        <button class="shot" data-i={i} aria-label={s.caption}>
+          <img src={srcs[i]} alt={s.caption} loading="lazy" width="1200" />
+        </button>
         <figcaption>{s.caption}</figcaption>
       </figure>
     ))
   }
 </div>
+
+<!-- Lightbox -->
+<div id="lb" class="lb" hidden>
+  <button class="lb-close" id="lb-close" aria-label="Close">✕</button>
+  <button class="lb-nav lb-prev" id="lb-prev" aria-label="Previous">‹</button>
+  <figure class="lb-fig">
+    <img id="lb-img" src="" alt="" />
+    <figcaption id="lb-cap"></figcaption>
+  </figure>
+  <button class="lb-nav lb-next" id="lb-next" aria-label="Next">›</button>
+</div>
+
+<script
+  type="application/json"
+  id="shots-data"
+  is:inline
+  set:html={JSON.stringify(
+    shots.map((s, i) => ({src: srcs[i], caption: s.caption}))
+  )}
+/>
+
+<script>
+  const shots: {src: string; caption: string}[] = JSON.parse(
+    document.getElementById('shots-data')!.textContent!
+  );
+  const lb = document.getElementById('lb')!;
+  const img = document.getElementById('lb-img') as HTMLImageElement;
+  const cap = document.getElementById('lb-cap')!;
+  let idx = 0;
+
+  function show(i: number): void {
+    idx = (i + shots.length) % shots.length;
+    img.src = shots[idx].src;
+    img.alt = shots[idx].caption;
+    cap.textContent = shots[idx].caption;
+  }
+  function open(i: number): void {
+    show(i);
+    lb.hidden = false;
+    document.body.style.overflow = 'hidden';
+  }
+  function close(): void {
+    lb.hidden = true;
+    document.body.style.overflow = '';
+  }
+
+  document.querySelectorAll<HTMLButtonElement>('.shot').forEach(b => {
+    b.addEventListener('click', () => open(Number(b.dataset.i)));
+  });
+  document.getElementById('lb-close')!.addEventListener('click', close);
+  document.getElementById('lb-prev')!.addEventListener('click', e => {
+    e.stopPropagation();
+    show(idx - 1);
+  });
+  document.getElementById('lb-next')!.addEventListener('click', e => {
+    e.stopPropagation();
+    show(idx + 1);
+  });
+  // Click on the backdrop (not the image/nav) closes.
+  lb.addEventListener('click', e => {
+    if (e.target === lb || (e.target as HTMLElement).tagName === 'FIGURE') {
+      close();
+    }
+  });
+  document.addEventListener('keydown', e => {
+    if (lb.hidden) return;
+    if (e.key === 'Escape') close();
+    else if (e.key === 'ArrowLeft') show(idx - 1);
+    else if (e.key === 'ArrowRight') show(idx + 1);
+  });
+</script>
 
 <style>
   .grid {
@@ -42,7 +109,15 @@ const shots = getScreenshots(lang);
   .tile {
     margin: 0;
   }
-  .tile img {
+  .shot {
+    display: block;
+    width: 100%;
+    padding: 0;
+    border: 0;
+    background: none;
+    cursor: zoom-in;
+  }
+  .shot img {
     width: 100%;
     height: auto;
     display: block;
@@ -54,5 +129,70 @@ const shots = getScreenshots(lang);
     margin-top: 0.4rem;
     color: #4b5563;
     font-size: 0.95rem;
+  }
+
+  .lb {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    background: rgba(15, 23, 42, 0.9);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 1rem;
+  }
+  .lb[hidden] {
+    display: none;
+  }
+  .lb-fig {
+    margin: 0;
+    max-width: min(92vw, 1200px);
+    text-align: center;
+  }
+  .lb-fig img {
+    max-width: 100%;
+    max-height: 80vh;
+    border-radius: 0.5rem;
+    background: #fff;
+  }
+  .lb-fig figcaption {
+    color: #e2e8f0;
+    margin-top: 0.6rem;
+    font-size: 0.95rem;
+  }
+  .lb-nav,
+  .lb-close {
+    background: rgba(255, 255, 255, 0.12);
+    color: #fff;
+    border: 0;
+    border-radius: 999px;
+    cursor: pointer;
+    line-height: 1;
+  }
+  .lb-nav {
+    flex: 0 0 auto;
+    width: 3rem;
+    height: 3rem;
+    font-size: 2rem;
+  }
+  .lb-nav:hover,
+  .lb-close:hover {
+    background: rgba(255, 255, 255, 0.25);
+  }
+  .lb-close {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    width: 2.6rem;
+    height: 2.6rem;
+    font-size: 1.2rem;
+  }
+  @media (max-width: 640px) {
+    .lb-nav {
+      width: 2.4rem;
+      height: 2.4rem;
+      font-size: 1.5rem;
+    }
   }
 </style>

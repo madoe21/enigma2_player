@@ -1,0 +1,135 @@
+---
+/**
+ * Public price list (license_server-… ). Always visible, NO login: fetches
+ * the public pricing endpoint of the license server by the app's api_key.
+ * Buying and account management live in the shop (/buy, /account) and require
+ * sign-in — this page only shows what a license costs.
+ */
+import {useTranslations} from '../i18n/utils';
+import type {Lang} from '../i18n/ui';
+
+interface Props {
+  lang: Lang;
+}
+const {lang} = Astro.props;
+const t = useTranslations(lang);
+
+const base = import.meta.env.PUBLIC_LICENSE_API_BASE;
+const apiKey = import.meta.env.PUBLIC_APP_API_KEY;
+const config = {
+  url: base && apiKey ? `${base}/pricing/${apiKey}` : null,
+  buyPath: lang === 'de' ? '/enigma2_player/buy/' : `/enigma2_player/${lang}/buy/`,
+  labels: {
+    loading: t('pricing.loading'),
+    empty: t('pricing.empty'),
+    devices: t('pricing.devices'),
+    monthly: t('pricing.period.monthly'),
+    yearly: t('pricing.period.yearly'),
+    lifetime: t('pricing.period.lifetime'),
+    cta: t('nav.buy'),
+  },
+};
+---
+
+<h1>{t('nav.pricing')}</h1>
+<p>{t('pricing.intro')}</p>
+<div id="pricing-list" class="pricing">{t('pricing.loading')}</div>
+
+<script
+  type="application/json"
+  id="pricing-config"
+  is:inline
+  set:html={JSON.stringify(config)}
+/>
+
+<script>
+  interface Model {
+    id: string;
+    display_name: string;
+    device_count: number;
+    period: 'monthly' | 'yearly' | 'lifetime';
+    price: number;
+    currency: string;
+  }
+  const cfg = JSON.parse(document.getElementById('pricing-config')!.textContent!);
+  const list = document.getElementById('pricing-list')!;
+
+  function esc(s: unknown): string {
+    return String(s ?? '').replace(
+      /[&<>"]/g,
+      c => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;'})[c]!
+    );
+  }
+  function periodLabel(p: string): string {
+    return (
+      {monthly: cfg.labels.monthly, yearly: cfg.labels.yearly, lifetime: cfg.labels.lifetime}[
+        p
+      ] ?? p
+    );
+  }
+
+  async function load(): Promise<void> {
+    if (!cfg.url) return void (list.textContent = cfg.labels.empty);
+    try {
+      const res = await fetch(cfg.url);
+      if (!res.ok) return void (list.textContent = cfg.labels.empty);
+      const data = await res.json();
+      const models: Model[] = data.models ?? [];
+      if (!models.length) return void (list.textContent = cfg.labels.empty);
+      list.innerHTML = models
+        .map(
+          m =>
+            `<div class="price-card">` +
+            `<div class="pc-name">${esc(m.display_name)}</div>` +
+            `<div class="pc-amount">${Number(m.price).toFixed(2)} ${esc(m.currency)}</div>` +
+            `<div class="pc-period">${esc(periodLabel(m.period))} · ${esc(m.device_count)} ${esc(cfg.labels.devices)}</div>` +
+            `<a class="pc-cta" href="${esc(cfg.buyPath)}">${esc(cfg.labels.cta)}</a>` +
+            `</div>`
+        )
+        .join('');
+    } catch {
+      list.textContent = cfg.labels.empty;
+    }
+  }
+  load();
+</script>
+
+<style>
+  .pricing {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-top: 1.5rem;
+  }
+  .pricing :global(.price-card) {
+    flex: 1 1 14rem;
+    max-width: 18rem;
+    border: 1px solid #e2e8f0;
+    border-radius: 0.8rem;
+    padding: 1.25rem;
+    text-align: center;
+    background: #fff;
+  }
+  .pricing :global(.pc-name) {
+    font-weight: 600;
+  }
+  .pricing :global(.pc-amount) {
+    font-size: 1.6rem;
+    font-weight: 700;
+    margin: 0.4rem 0;
+  }
+  .pricing :global(.pc-period) {
+    color: #6b7280;
+    font-size: 0.9rem;
+    margin-bottom: 1rem;
+  }
+  .pricing :global(.pc-cta) {
+    display: inline-block;
+    padding: 0.45rem 1.1rem;
+    border-radius: 0.5rem;
+    background: #2563eb;
+    color: #fff;
+    text-decoration: none;
+    font-weight: 600;
+  }
+</style>

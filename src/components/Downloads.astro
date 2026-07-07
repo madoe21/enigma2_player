@@ -107,35 +107,36 @@ const config = {
 </script>
 
 <style>
-  .rows {
+  /* The rows are injected via innerHTML at runtime and therefore carry no
+     Astro scope attribute — these selectors must be :global to reach them. */
+  #dl-list {
     display: grid;
-    /* Clear breathing room between one OS row and the next download row. */
     gap: 1rem;
     margin-top: 1.25rem;
     max-width: 32rem;
   }
-  .row {
+  #dl-list :global(.row) {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 1.25rem;
+    gap: 1.5rem;
     padding: 0.8rem 1rem;
     border: 1px solid #e5e7eb;
     border-radius: 0.5rem;
   }
-  .row > span {
+  #dl-list :global(.row > span) {
     font-weight: 600;
   }
-  .row .btn {
+  #dl-list :global(.btn.small) {
+    flex: 0 0 auto;
     margin-left: auto;
-  }
-  .btn.small {
-    padding: 0.35rem 0.8rem;
+    padding: 0.4rem 0.9rem;
     border-radius: 0.4rem;
     background: #2563eb;
     color: #fff;
     text-decoration: none;
     font-weight: 600;
+    white-space: nowrap;
   }
   .muted {
     color: #6b7280;
