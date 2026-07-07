@@ -35,3 +35,22 @@ privaten Repository.
 
 Siehe [Changelog-Seite](https://madoe21.github.io/enigma2_player/changelog/)
 oder die [Releases](https://github.com/madoe21/enigma2_player/releases).
+
+## 🤝 Unterstützung
+
+Fehler gefunden oder einen Vorschlag? Gern ein Issue eröffnen. Ich freue mich
+über alle, die mich und das Projekt unterstützen!
+
+<p>
+  <a href="https://www.buymeacoffee.com/madoe21">
+    <img src="https://cdn.buymeacoffee.com/buttons/default-orange.png" height="50" alt="Buy Me a Coffee">
+  </a>
+
+  <a href="https://ko-fi.com/madoe21">
+    <img src="https://storage.ko-fi.com/cdn/kofi3.png?v=3" height="50" alt="Ko-fi">
+  </a>
+
+  <a href="https://paypal.me/MartinD809">
+    <img src="https://www.paypalobjects.com/webstatic/mktg/logo/pp_cc_mark_111x69.jpg" height="50" alt="PayPal">
+  </a>
+</p>
