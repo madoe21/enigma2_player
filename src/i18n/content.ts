@@ -196,7 +196,7 @@ const faq: Record<Lang, QaItem[]> = {
     },
     {
       q: 'Kann ich von unterwegs zugreifen?',
-      a: 'Ja, über einen extern erreichbaren Host/Port deines Receivers (Portweiterleitung/VPN). Zugangsdaten werden verschlüsselt gespeichert.',
+      a: 'Ja. Im lokalen Netzwerk gibst du die interne IP des Receivers an; von unterwegs eine extern erreichbare Adresse (z. B. eine DynDNS-Domain), die eine Portweiterleitung im Router auf den Receiver voraussetzt. Zugangsdaten werden verschlüsselt gespeichert.',
     },
   ],
   en: [
@@ -222,7 +222,7 @@ const faq: Record<Lang, QaItem[]> = {
     },
     {
       q: 'Can I access my receiver remotely?',
-      a: 'Yes, via an externally reachable host/port of your receiver (port forwarding/VPN). Credentials are stored encrypted.',
+      a: 'Yes. On your local network you enter the receiver’s internal IP; for remote access an externally reachable address (e.g. a DynDNS domain), which requires a port forward in your router to the receiver. Credentials are stored encrypted.',
     },
   ],
   es: [
@@ -248,7 +248,7 @@ const faq: Record<Lang, QaItem[]> = {
     },
     {
       q: '¿Puedo acceder a mi receptor de forma remota?',
-      a: 'Sí, mediante un host/puerto accesible externamente (reenvío de puertos/VPN). Las credenciales se guardan cifradas.',
+      a: 'Sí. En tu red local indicas la IP interna del receptor; para el acceso remoto una dirección accesible desde fuera (p. ej. un dominio DynDNS), que requiere un reenvío de puertos en el router hacia el receptor. Las credenciales se guardan cifradas.',
     },
   ],
 };
@@ -349,7 +349,7 @@ const docs: Record<Lang, InfoBlock[]> = {
     },
     {
       heading: '3. Receiver hinzufügen',
-      body: 'Lege in der App einen Receiver mit Host, Zugangsdaten und Ports an. Für den Zugriff von unterwegs kannst du einen externen Host/Port (Portweiterleitung/VPN) hinterlegen. Zugangsdaten werden verschlüsselt gespeichert.',
+      body: 'Lege in der App einen Receiver mit Host, Zugangsdaten und Ports an. Im lokalen Netzwerk ist der Host die interne IP des Receivers; für den Zugriff von unterwegs eine extern erreichbare Adresse (z. B. eine DynDNS-Domain) mit passender Portweiterleitung im Router. Zugangsdaten werden verschlüsselt gespeichert.',
     },
     {
       heading: '4. Loslegen',
@@ -367,7 +367,7 @@ const docs: Record<Lang, InfoBlock[]> = {
     },
     {
       heading: '3. Add the receiver',
-      body: 'Add a receiver in the app with its host, credentials and ports. For remote access you can set an external host/port (port forwarding/VPN). Credentials are stored encrypted.',
+      body: 'Add a receiver in the app with its host, credentials and ports. On your local network the host is the receiver’s internal IP; for remote access use an externally reachable address (e.g. a DynDNS domain) with a matching port forward in your router. Credentials are stored encrypted.',
     },
     {
       heading: '4. Get going',
@@ -385,7 +385,7 @@ const docs: Record<Lang, InfoBlock[]> = {
     },
     {
       heading: '3. Añadir el receptor',
-      body: 'Añade un receptor en la app con su host, credenciales y puertos. Para acceso remoto puedes definir un host/puerto externo (reenvío de puertos/VPN). Las credenciales se guardan cifradas.',
+      body: 'Añade un receptor en la app con su host, credenciales y puertos. En tu red local el host es la IP interna del receptor; para el acceso remoto usa una dirección accesible desde fuera (p. ej. un dominio DynDNS) con el reenvío de puertos correspondiente en el router. Las credenciales se guardan cifradas.',
     },
     {
       heading: '4. Empezar',
