@@ -55,14 +55,13 @@ const config = {
     assets: Asset[];
   }
 
+  // Desktop only: Android/iOS werden über die App-Stores verteilt (PO
+  // 2026-07-07) — die Releases im public Repo enthalten keine APK/IPA mehr.
   const PLATFORMS: {label: string; match: RegExp}[] = [
     {label: 'Windows', match: /\.exe$/i},
     {label: 'macOS', match: /\.dmg$/i},
     {label: 'Linux (.deb)', match: /\.deb$/i},
     {label: 'Linux (.rpm)', match: /\.rpm$/i},
-    {label: 'Android (arm64)', match: /arm64-v8a.*\.apk$/i},
-    {label: 'Android (armeabi-v7a)', match: /armeabi-v7a.*\.apk$/i},
-    {label: 'iOS', match: /\.ipa$/i},
   ];
 
   const cfg = JSON.parse(document.getElementById('dl-config')!.textContent!);
