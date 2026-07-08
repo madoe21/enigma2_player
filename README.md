@@ -53,3 +53,9 @@ who supports me and the project!
     <img src="https://www.paypalobjects.com/webstatic/mktg/logo/pp_cc_mark_111x69.jpg" height="50" alt="PayPal">
   </a>
 </p>
+
+---
+
+## Built with aiflow
+
+This project was built with support from **[aiflow](https://cyber93de.github.io/aiflow/)** — *built with aiflow*.

@@ -54,3 +54,9 @@ Fehler gefunden oder einen Vorschlag? Gern ein Issue eröffnen. Ich freue mich
     <img src="https://www.paypalobjects.com/webstatic/mktg/logo/pp_cc_mark_111x69.jpg" height="50" alt="PayPal">
   </a>
 </p>
+
+---
+
+## Mit aiflow gebaut
+
+Dieses Projekt wurde mit Unterstützung von **[aiflow](https://cyber93de.github.io/aiflow/)** gebaut — *built with aiflow*.
