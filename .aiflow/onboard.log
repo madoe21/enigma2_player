@@ -1,0 +1,6 @@
+note: no token in env; relying on stored Claude login.
+>> running onboarder...
+Ignoring 80 permissions.allow entries from .claude/settings.json: this workspace has not been trusted. Run Claude Code interactively here once and accept the trust dialog, or set projects["C:/dev/flutter/enigma2_player_page"].hasTrustDialogAccepted: true in C:\Users\marti\.claude.json.
+Warning: no stdin data received in 3s, proceeding without it. If piping from a slow command, redirect stdin explicitly: < /dev/null to skip, or wait longer.
+You've hit your session limit · resets 2:40am (Europe/Berlin)
+>> onboarder done.

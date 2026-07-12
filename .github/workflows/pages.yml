@@ -21,9 +21,9 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: Build with Astro
-        uses: withastro/action@v3
+        uses: withastro/action@v6
         # withastro/action installs deps, runs `astro build` and uploads the
         # `dist/` artifact for the deploy job. `base`/`site` come from config.
         # Public (non-secret) build config for the pricing/portal API. Set these
@@ -42,4 +42,4 @@ jobs:
     steps:
       - name: Deploy to GitHub Pages
         id: deployment
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@v5
