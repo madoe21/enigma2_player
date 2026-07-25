@@ -17,7 +17,9 @@ const t = useTranslations(lang);
 const base = import.meta.env.PUBLIC_LICENSE_API_BASE;
 const apiKey = import.meta.env.PUBLIC_APP_API_KEY;
 const config = {
-  url: base && apiKey ? `${base}/pricing/${apiKey}` : null,
+  // license_server ADR-0007 (v0.2.0): the REST API is now versioned under
+  // /api/v1; the old unversioned path still works but is deprecated.
+  url: base && apiKey ? `${base}/api/v1/pricing/${apiKey}` : null,
   buyPath: lang === 'de' ? '/enigma2_player/buy/' : `/enigma2_player/${lang}/buy/`,
   labels: {
     loading: t('pricing.loading'),
