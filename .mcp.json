@@ -19,7 +19,7 @@
       "args": [
         "-y",
         "@modelcontextprotocol/server-filesystem",
-        "C:/dev/flutter/enigma2_player_page"
+        "C:/dev/flutter/enigma2_player"
       ]
     },
     "graphify": {
