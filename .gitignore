@@ -13,3 +13,6 @@ dist/
 .env.*
 !.env.example
 npm-debug.log*
+
+# aiflow project-update keeps your customised file as <file>.bak before replacing it
+*.bak
