@@ -9,7 +9,11 @@
     "test": "ng test --watch=false",
     "test:e2e": "playwright test",
     "serve:dist": "node e2e/static-server.mjs dist/site 4321",
-    "check:placeholders": "node tool/check-placeholders.mjs"
+    "check:placeholders": "node tool/check-placeholders.mjs",
+    "data:refresh": "node tool/fetch-site-data.mjs",
+    "compare:astro": "node tool/compare-astro.mjs",
+    "check:literals": "node tool/check-no-literals.mjs",
+    "check": "npm run check:literals && npm run check:placeholders && npm test"
   },
   "private": true,
   "packageManager": "npm@11.11.0",

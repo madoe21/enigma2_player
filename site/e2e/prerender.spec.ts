@@ -11,11 +11,11 @@ import { expect, test } from '@playwright/test';
  * language all along and only the document did not.
  */
 const pages = [
-  { path: '', lang: 'de', text: 'Fernsehen' },
-  { path: 'en/', lang: 'en', text: 'Live TV' },
-  { path: 'es/', lang: 'es', text: 'Televisión' },
-  { path: 'fr/', lang: 'fr', text: 'Télévision' },
-  { path: 'it/', lang: 'it', text: 'TV, radio' },
+  { path: '', lang: 'de', heading: 'Dein Enigma2-Receiver. Auf jedem Bildschirm.', text: 'Durchsuche' },
+  { path: 'en/', lang: 'en', heading: 'Your Enigma2 receiver. On every screen.', text: 'Browse' },
+  { path: 'es/', lang: 'es', heading: 'Tu receptor Enigma2. En cualquier pantalla.', text: 'Explora' },
+  { path: 'fr/', lang: 'fr', heading: 'Votre récepteur Enigma2. Sur tous les écrans.', text: 'Parcourez' },
+  { path: 'it/', lang: 'it', heading: 'Il tuo ricevitore Enigma2. Su ogni schermo.', text: 'Sfoglia' },
 ];
 
 for (const entry of pages) {
@@ -26,8 +26,8 @@ for (const entry of pages) {
     // Read off the document, not off a component: this is what an assistive
     // technology and a crawler look at.
     await expect(page.locator('html')).toHaveAttribute('lang', entry.lang);
-    await expect(page.locator('h1')).toHaveText('Enigma2 Player');
-    await expect(page.getByText(entry.text)).toBeVisible();
+    await expect(page.locator('h1')).toHaveText(entry.heading);
+    await expect(page.getByText(entry.text).first()).toBeVisible();
   });
 }
 

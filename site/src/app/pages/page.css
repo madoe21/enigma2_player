@@ -1,0 +1,102 @@
+/*
+ * The shared look of a content page, ported from the Astro components' own
+ * <style> blocks (cards, blocks, grids). One file instead of twelve, because
+ * what differed between them was the content, not the layout.
+ */
+.page {
+  max-width: 60rem;
+  margin: 0 auto;
+  padding: 2rem 1.25rem;
+}
+
+.page h1 {
+  font-size: clamp(1.6rem, 3vw, 2.25rem);
+  line-height: 1.2;
+  margin: 0 0 0.75rem;
+}
+
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+  gap: 1rem 1.5rem;
+  margin-top: 1.5rem;
+}
+
+.card {
+  padding: 1rem 1.2rem;
+  border: 1px solid;
+  border-radius: 0.6rem;
+}
+
+.card h2 {
+  margin: 0 0 0.4rem;
+  font-size: 1.15rem;
+}
+
+.card p {
+  margin: 0;
+}
+
+.block {
+  margin-top: 1.25rem;
+}
+
+.block h2 {
+  font-size: 1.15rem;
+  margin: 0 0 0.35rem;
+}
+
+.block p {
+  margin: 0;
+  white-space: pre-line;
+}
+
+.qa-list {
+  margin-top: 1.5rem;
+}
+
+.qa {
+  padding: 1rem 0;
+  border-bottom: 1px solid;
+}
+
+.qa dt {
+  font-weight: 600;
+  margin-bottom: 0.35rem;
+}
+
+.qa dd {
+  margin: 0;
+}
+
+.muted {
+  opacity: 0.75;
+}
+
+/*
+ * Links and buttons that look like buttons. The 44 px minimum is WCAG 2.2
+ * success criterion 2.5.8 (target size), not a design preference.
+ */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  min-height: 2.75rem;
+  padding: 0 1.1rem;
+  border: 1px solid;
+  border-radius: 0.5rem;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.cta-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-top: 1.5rem;
+}
+
+a:focus-visible,
+button:focus-visible {
+  outline: 3px solid Highlight;
+  outline-offset: 2px;
+}

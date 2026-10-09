@@ -30,16 +30,19 @@ for (const entry of pages) {
 
 test('every page carries the three legal links in its footer, and they work', async ({
   page,
+  context,
 }) => {
+  // The decision is set in the jar rather than clicked per page. Clicking it
+  // raced hydration: the prerendered file contains the dialog, so a check for
+  // "is it visible" can be true a moment before the hydrated app removes it,
+  // and the click then waits for an element that is already gone. The point of
+  // this test is the footer, not the dialog.
+  await context.addCookies([
+    { name: 'e2p_consent', value: 'accepted', url: 'http://127.0.0.1:4321/enigma2_player/' },
+  ]);
+
   for (const path of ['', 'en/', 'it/', 'impressum', 'en/cookies']) {
     await page.goto(path);
-    // Accept first: while the dialog is open its scrim covers the footer, so a
-    // footer link cannot be clicked. That is why the dialog carries the same
-    // links - the two tests below check that half.
-    const dialog = page.getByRole('dialog');
-    if (await dialog.isVisible()) {
-      await dialog.getByRole('button').first().click();
-    }
     const footer = page.locator('footer nav');
 
     await expect(footer.getByRole('link'), `on /${path}`).toHaveCount(3);

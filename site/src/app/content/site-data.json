@@ -1,0 +1,114 @@
+{
+  "fetchedAt": "2026-10-09T19:47:39.574Z",
+  "repo": "madoe21/enigma2_player",
+  "shop": {
+    "base": "https://license-server-5d7i.onrender.com",
+    "apiKey": "app_xHEsW5mi_oR2Cs8eQPCTmgwOnN4gMBKD"
+  },
+  "release": {
+    "version": "v1.1.1",
+    "publishedAt": "2026-10-09T12:10:44Z",
+    "url": "https://github.com/madoe21/enigma2_player/releases/tag/v1.1.1",
+    "downloads": [
+      {
+        "platform": "windows",
+        "label": "Windows",
+        "file": "enigma2_player-windows-x64-setup-1.1.1.exe",
+        "url": "https://github.com/madoe21/enigma2_player/releases/download/v1.1.1/enigma2_player-windows-x64-setup-1.1.1.exe",
+        "size": 50777205
+      },
+      {
+        "platform": "macos",
+        "label": "macOS",
+        "file": "enigma2_player-macos-v1.1.1.dmg",
+        "url": "https://github.com/madoe21/enigma2_player/releases/download/v1.1.1/enigma2_player-macos-v1.1.1.dmg",
+        "size": 51664168
+      },
+      {
+        "platform": "linux",
+        "label": "Linux",
+        "file": "enigma2_player-linux-x64-1.1.1.deb",
+        "url": "https://github.com/madoe21/enigma2_player/releases/download/v1.1.1/enigma2_player-linux-x64-1.1.1.deb",
+        "size": 18745040
+      }
+    ]
+  },
+  "changelog": [
+    {
+      "tag": "v1.1.1",
+      "name": "Enigma2 Player v1.1.1",
+      "publishedAt": "2026-10-09T12:10:44Z",
+      "url": "https://github.com/madoe21/enigma2_player/releases/tag/v1.1.1",
+      "prerelease": false,
+      "body": "**Enigma2 Player v1.1.1** — browse, control and stream live TV / radio /\nrecordings from your Enigma2 receiver (OpenWebIF).\n\nDiese Version ist entstanden, weil „Zum Receiver senden\" die Senderliste der Box\nzerstören konnte. Die Dateien, die diese Anwendung geschrieben hat, waren nicht\ndie Dateien, die Enigma2 liest — und das war kein Schönheitsfehler, sondern der\nVerlust der gesamten Service-Datenbank auf dem Receiver.\n\n- **Eine Senderliste zum Receiver zu senden zerstört sie nicht mehr.** Eine\n  Leerzeile an der falschen Stelle hat die Box dazu gebracht, ihre komplette\n  Service-Datenbank zu verwerfen. Die Transponderzeilen des neueren Formats\n  standen mit dem falschen Trennzeichen da, weshalb alles ab der Symbolrate nie\n  gelesen wurde. Und die Tabellen für Fehlerkorrektur, Pilotton, Inversion und\n  Modulation passten nicht zu den Nummern, die der Receiver benutzt. Jede\n  einzelne Stelle ist gegen den Leser von Enigma2 selbst geprüft, nicht geraten:\n  die 87 Transponder aus einem echten Export gehen jetzt durch Lesen und\n  Schreiben, ohne dass sich ein einziger Parameter ändert.\n- **Gecachte PIDs und Verschlüsselungs-Kennungen werden auseinandergehalten.**\n  Das Format benutzt zwei verschiedene Kennzeichen dafür, und beide wurden als\n  dasselbe gelesen. Folge: echte Verschlüsselungs-Kennungen gingen verloren, und\n  gecachte PIDs kamen verstümmelt zurück — so bekommt ein Receiver unsinnige\n  Bild- und Ton-PIDs.\n- **Die Satellitennamen sind wieder da.** `satellites.xml` und ihre\n  Geschwister liegen auf der Box in einem anderen Ordner als die\n  Service-Datenbank. Sie wurden deshalb nie geholt, und einer exportierten\n  Senderliste fehlten die Satellitennamen für andere Editoren.\n- **PIDs, die vom Receiver geladen werden, werden umgerechnet.** Die Box\n  antwortet dezimal, die Senderliste speichert hexadezimal. Aus einem Bild-PID\n  500 wurde dadurch 0x500 — ein falscher PID, und zwar genau bei den Sendern,\n  bei denen man die gecachten PIDs eingeschaltet hatte.\n- **Ein Anführungszeichen im Sendernamen bricht seine Zeile nicht mehr ab.**\n  Enigma2 beendet einen Namen am ersten Anführungszeichen und kennt kein\n  Maskieren, deshalb wird es durch einen Apostroph ersetzt statt in etwas\n  verwandelt, das die Box nicht lesen kann.\n- **Die Receiver-Einstellungen sagen die Wahrheit.** Ein Schalter, den die Box\n  ablehnt, wird als abgelehnt gemeldet — und zwar mit „Die Box hat den Wert\n  nicht übernommen\" statt mit einem allgemeinen Fehler. Die Box bestätigt\n  nämlich auch dann, dass sie die Anfrage verarbeitet hat, wenn sie ihren\n  eigenen Wert behält; deshalb sah das monatelang wie Erfolg aus.\n- **Ein geänderter SSH-Schlüssel des Receivers fällt auf, bevor das Passwort\n  gesendet wird.** Beide Fingerabdrücke werden gezeigt, und du entscheidest:\n  eine neu aufgesetzte Box und jemand, der dazwischen mithört, sehen von außen\n  gleich aus — nur du weißt, was zutrifft.\n- **Ein Stream pro Encoder.** Der Live555-Encoder wird für eine Sitzung belegt\n  und danach wieder freigegeben, damit sich nicht zwei Zuschauer still darum\n  streiten.\n- **Eine Plugin-Schnittstelle.** Die Anwendung kann um Ansichten erweitert\n  werden, die sie selbst nicht kennt; die Schnittstelle ist mit einem Beispiel\n  dokumentiert, das sich bauen lässt.\n- **Ein Download, der nicht zu Ende geht, wird nicht halb ausgeliefert.** Ein\n  Fehler beim Dateizugriff auf der Box, der nicht „Datei nicht vorhanden\"\n  bedeutet, bricht den Download jetzt ab, statt eine unvollständige Senderliste\n  zurückzugeben.\n\nZu 1.1.0: dort sind die Installationsdateien für Windows, macOS und Linux nicht\ngebaut worden, deshalb gibt es sie erst mit dieser Version. An der Anwendung\nselbst ist zwischen 1.1.0 und 1.1.1 nichts geändert.\n\n> Needs licence server 0.4.0 or newer.\n> The bundled changelog shown under \"About\" is in German from 1.0.6 on;\n> older entries stay English.\n\n### Downloads\n| Platform | File | Notes |\n|----------|------|-------|\n| Windows  | `enigma2_player-windows-x64-setup-*.exe` | Run the installer (Start-menu + optional desktop shortcut). VC++ runtime bundled. |\n| Linux (Debian/Ubuntu) | `enigma2_player-linux-x64-*.deb` | `sudo apt install ./enigma2_player-linux-x64-*.deb`. Pulls in `libmpv`. |\n| Linux (Fedora/RHEL/openSUSE) | `enigma2_player-linux-x64-*.rpm` | `sudo dnf install ./enigma2_player-linux-x64-*.rpm`. Needs `mpv-libs`. |\n| macOS    | `enigma2_player-macos-*.dmg` | Open the DMG, drag the app to Applications. Unsigned: right-click → Open on first launch. |\n\n> **Android & iOS** builds will be distributed through the app stores — coming soon.\n\n### Languages\nBundled UI translations: Deutsch, English, Español, Français, Italiano."
+    },
+    {
+      "tag": "v1.1.0",
+      "name": "Enigma2 Player v1.1.0",
+      "publishedAt": "2026-10-09T10:22:48Z",
+      "url": "https://github.com/madoe21/enigma2_player/releases/tag/v1.1.0",
+      "prerelease": false,
+      "body": "**Enigma2 Player v1.1.0** — browse, control and stream live TV / radio /\nrecordings from your Enigma2 receiver (OpenWebIF).\n\n### What's new in 1.0.7\n- **The order of the bouquets can now be changed.** The bouquet editor could\n  only sort the channels *inside* a bouquet, not the bouquets themselves - the\n  order the receiver shows them in. They now have the same drag handle the\n  channel list has, and a bouquet's context menu offers **Move up** and **Move\n  down**, greyed out at the ends. The menu route matters: on a touch screen, and\n  for anyone who cannot hold a pointer down, the handle would otherwise be the\n  only way.\n- **Bouquet edits survive switching tabs.** Reordering channels, creating,\n  renaming or deleting a bouquet, then leaving the editor and coming back,\n  restored the state from before the edit - with no warning that work had been\n  dropped. The working set was only saved when the lamedb happened to be written\n  too, which never happens when only bouquet files are loaded.\n- **On Windows, Linux and macOS the window comes back on the tab you left it\n  on.** It used to jump to live TV every time the application had been in the\n  background. That rule comes from the Fire TV and is right there - a back press\n  closes the visible app while the process keeps running, so reopening should\n  show live TV. A desktop window was never closed; it was only behind another\n  one. Android and iOS are unchanged, and a cold start still opens on live TV.\n- **Switches in the receiver settings can finally be switched on.** In the tab\n  holding the receiver's own settings - the transcoding section, for instance -\n  every switch snapped back after being turned on, and the application said\n  \"settings saved\" first. It sent the new state in a spelling the receiver does\n  not read as \"on\", so every attempt to enable something switched it off\n  instead. The receiver still confirmed that it had processed the request, which\n  is where the success message came from.\n\n> Needs licence server 0.4.0 or newer.\n> The bundled changelog shown under \"About\" is in German from 1.0.6 on;\n> older entries stay English.\n\n### Downloads\n| Platform | File | Notes |\n|----------|------|-------|\n| Windows  | `enigma2_player-windows-x64-setup-*.exe` | Run the installer (Start-menu + optional desktop shortcut). VC++ runtime bundled. |\n| Linux (Debian/Ubuntu) | `enigma2_player-linux-x64-*.deb` | `sudo apt install ./enigma2_player-linux-x64-*.deb`. Pulls in `libmpv`. |\n| Linux (Fedora/RHEL/openSUSE) | `enigma2_player-linux-x64-*.rpm` | `sudo dnf install ./enigma2_player-linux-x64-*.rpm`. Needs `mpv-libs`. |\n| macOS    | `enigma2_player-macos-*.dmg` | Open the DMG, drag the app to Applications. Unsigned: right-click → Open on first launch. |\n\n> **Android & iOS** builds will be distributed through the app stores — coming soon.\n\n### Languages\nBundled UI translations: Deutsch, English, Español, Français, Italiano."
+    },
+    {
+      "tag": "v1.0.7",
+      "name": "Enigma2 Player v1.0.7",
+      "publishedAt": "2026-10-06T18:08:07Z",
+      "url": "https://github.com/madoe21/enigma2_player/releases/tag/v1.0.7",
+      "prerelease": false,
+      "body": "**Enigma2 Player v1.0.7** — browse, control and stream live TV / radio /\nrecordings from your Enigma2 receiver (OpenWebIF).\n\n### What's new in 1.0.7\n- **The order of the bouquets can now be changed.** The bouquet editor could\n  only sort the channels *inside* a bouquet, not the bouquets themselves - the\n  order the receiver shows them in. They now have the same drag handle the\n  channel list has, and a bouquet's context menu offers **Move up** and **Move\n  down**, greyed out at the ends. The menu route matters: on a touch screen, and\n  for anyone who cannot hold a pointer down, the handle would otherwise be the\n  only way.\n- **Bouquet edits survive switching tabs.** Reordering channels, creating,\n  renaming or deleting a bouquet, then leaving the editor and coming back,\n  restored the state from before the edit - with no warning that work had been\n  dropped. The working set was only saved when the lamedb happened to be written\n  too, which never happens when only bouquet files are loaded.\n- **On Windows, Linux and macOS the window comes back on the tab you left it\n  on.** It used to jump to live TV every time the application had been in the\n  background. That rule comes from the Fire TV and is right there - a back press\n  closes the visible app while the process keeps running, so reopening should\n  show live TV. A desktop window was never closed; it was only behind another\n  one. Android and iOS are unchanged, and a cold start still opens on live TV.\n- **Switches in the receiver settings can finally be switched on.** In the tab\n  holding the receiver's own settings - the transcoding section, for instance -\n  every switch snapped back after being turned on, and the application said\n  \"settings saved\" first. It sent the new state in a spelling the receiver does\n  not read as \"on\", so every attempt to enable something switched it off\n  instead. The receiver still confirmed that it had processed the request, which\n  is where the success message came from.\n\n> Needs licence server 0.4.0 or newer.\n> The bundled changelog shown under \"About\" is in German from 1.0.6 on;\n> older entries stay English.\n\n### Downloads\n| Platform | File | Notes |\n|----------|------|-------|\n| Windows  | `enigma2_player-windows-x64-setup-*.exe` | Run the installer (Start-menu + optional desktop shortcut). VC++ runtime bundled. |\n| Linux (Debian/Ubuntu) | `enigma2_player-linux-x64-*.deb` | `sudo apt install ./enigma2_player-linux-x64-*.deb`. Pulls in `libmpv`. |\n| Linux (Fedora/RHEL/openSUSE) | `enigma2_player-linux-x64-*.rpm` | `sudo dnf install ./enigma2_player-linux-x64-*.rpm`. Needs `mpv-libs`. |\n| macOS    | `enigma2_player-macos-*.dmg` | Open the DMG, drag the app to Applications. Unsigned: right-click → Open on first launch. |\n\n> **Android & iOS** builds will be distributed through the app stores — coming soon.\n\n### Languages\nBundled UI translations: Deutsch, English, Español, Français, Italiano."
+    },
+    {
+      "tag": "v1.0.6",
+      "name": "Enigma2 Player v1.0.6",
+      "publishedAt": "2026-10-06T15:07:55Z",
+      "url": "https://github.com/madoe21/enigma2_player/releases/tag/v1.0.6",
+      "prerelease": false,
+      "body": "**Enigma2 Player v1.0.6** — browse, control and stream live TV / radio /\nrecordings from your Enigma2 receiver (OpenWebIF).\n\n### What's new in 1.0.6\n- The streaming protocol is now a choice per receiver — **HTTP**, **HTTPS**,\n  **HLS** or **RTSP** — instead of a single HTTPS checkbox. HLS and RTSP come\n  from the receiver's optional Live555 plugin and help when the connection is\n  unsteady or the box should shrink the stream for a weak device.\n- **\"Look for Live555 on the receiver\"** probes the box on request and suggests\n  a protocol. The stored setting only changes after you confirm, and finding\n  nothing is not an error: the plugin is optional, and without it HTTP stays\n  the right answer.\n- The connection test speaks each protocol in its own language and tells three\n  cases apart, because they mean three different repairs: port unreachable,\n  wrong answer on the port, credentials rejected. A web page on the HLS port no\n  longer counts as success.\n- On HLS and RTSP, **teletext and DVB subtitles are unavailable**, and the app\n  writes the reason where the buttons used to be: both are decoded from the\n  receiver's MPEG-TS stream, which these paths do not deliver in that form.\n- **Stream relay (OSCam) likewise does not apply to HLS and RTSP.** The settings\n  are kept and take effect again as soon as HTTP or HTTPS is selected; until\n  then the fields are greyed out rather than hidden.\n- On HLS and RTSP the receiver is always zapped to the channel first and the app\n  waits for its confirmation, because the stream endpoint is fixed there.\n  Without it the stream could show the previously watched channel.\n- **No credentials are sent to the Live555 endpoints**: no authentication is\n  documented there, and a password in a URL can end up in a log.\n- Saved receivers migrate automatically (schema v8): whoever streamed over\n  HTTPS keeps streaming over HTTPS.\n- **OSCam management is no longer part of the application** and will ship as a\n  separate extension. Nothing is lost: the stored configuration path is kept and\n  read again by the extension.\n\n> Needs licence server 0.4.0 or newer.\n> The bundled changelog shown under \"About\" is in German from this version on;\n> older entries stay English.\n\n### Downloads\n| Platform | File | Notes |\n|----------|------|-------|\n| Windows  | `enigma2_player-windows-x64-setup-*.exe` | Run the installer (Start-menu + optional desktop shortcut). VC++ runtime bundled. |\n| Linux (Debian/Ubuntu) | `enigma2_player-linux-x64-*.deb` | `sudo apt install ./enigma2_player-linux-x64-*.deb`. Pulls in `libmpv`. |\n| Linux (Fedora/RHEL/openSUSE) | `enigma2_player-linux-x64-*.rpm` | `sudo dnf install ./enigma2_player-linux-x64-*.rpm`. Needs `mpv-libs`. |\n| macOS    | `enigma2_player-macos-*.dmg` | Open the DMG, drag the app to Applications. Unsigned: right-click → Open on first launch. |\n\n> **Android & iOS** builds will be distributed through the app stores — coming soon.\n\n### Languages\nBundled UI translations: Deutsch, English, Español, Français, Italiano."
+    },
+    {
+      "tag": "v1.0.4",
+      "name": "Enigma2 Player v1.0.4",
+      "publishedAt": "2026-09-23T18:52:24Z",
+      "url": "https://github.com/madoe21/enigma2_player/releases/tag/v1.0.4",
+      "prerelease": false,
+      "body": "**Enigma2 Player v1.0.4** — browse, control and stream live TV / radio /\nrecordings from your Enigma2 receiver (OpenWebIF).\n\n### Downloads\n| Platform | File | Notes |\n|----------|------|-------|\n| Windows  | `enigma2_player-windows-x64-setup-*.exe` | Run the installer (Start-menu + optional desktop shortcut). VC++ runtime bundled. |\n| Linux (Debian/Ubuntu) | `enigma2_player-linux-x64-*.deb` | `sudo apt install ./enigma2_player-linux-x64-*.deb`. Pulls in `libmpv`. |\n| Linux (Fedora/RHEL/openSUSE) | `enigma2_player-linux-x64-*.rpm` | `sudo dnf install ./enigma2_player-linux-x64-*.rpm`. Needs `mpv-libs`. |\n| macOS    | `enigma2_player-macos-*.dmg` | Open the DMG, drag the app to Applications. Unsigned: right-click → Open on first launch. |\n\n> **Android & iOS** builds will be distributed through the app stores — coming soon.\n\n### Languages\nBundled UI translations: Deutsch, English, Español, Français, Italiano."
+    },
+    {
+      "tag": "v1.0.3",
+      "name": "Enigma2 Player v1.0.3",
+      "publishedAt": "2026-09-12T14:41:55Z",
+      "url": "https://github.com/madoe21/enigma2_player/releases/tag/v1.0.3",
+      "prerelease": false,
+      "body": "**Enigma2 Player v1.0.3** — browse, control and stream live TV / radio /\nrecordings from your Enigma2 receiver (OpenWebIF).\n\n### Downloads\n| Platform | File | Notes |\n|----------|------|-------|\n| Windows  | `enigma2_player-windows-x64-setup-*.exe` | Run the installer (Start-menu + optional desktop shortcut). VC++ runtime bundled. |\n| Linux (Debian/Ubuntu) | `enigma2_player-linux-x64-*.deb` | `sudo apt install ./enigma2_player-linux-x64-*.deb`. Pulls in `libmpv`. |\n| Linux (Fedora/RHEL/openSUSE) | `enigma2_player-linux-x64-*.rpm` | `sudo dnf install ./enigma2_player-linux-x64-*.rpm`. Needs `mpv-libs`. |\n| macOS    | `enigma2_player-macos-*.dmg` | Open the DMG, drag the app to Applications. Unsigned: right-click → Open on first launch. |\n\n> **Android & iOS** builds will be distributed through the app stores — coming soon.\n\n### Languages\nBundled UI translations: Deutsch, English, Español, Français, Italiano."
+    },
+    {
+      "tag": "v1.0.2",
+      "name": "Enigma2 Player v1.0.2",
+      "publishedAt": "2026-09-10T20:45:20Z",
+      "url": "https://github.com/madoe21/enigma2_player/releases/tag/v1.0.2",
+      "prerelease": false,
+      "body": "**Enigma2 Player v1.0.2** — browse, control and stream live TV / radio /\nrecordings from your Enigma2 receiver (OpenWebIF).\n\n### Downloads\n| Platform | File | Notes |\n|----------|------|-------|\n| Windows  | `enigma2_player-windows-x64-setup-*.exe` | Run the installer (Start-menu + optional desktop shortcut). VC++ runtime bundled. |\n| Linux (Debian/Ubuntu) | `enigma2_player-linux-x64-*.deb` | `sudo apt install ./enigma2_player-linux-x64-*.deb`. Pulls in `libmpv`. |\n| Linux (Fedora/RHEL/openSUSE) | `enigma2_player-linux-x64-*.rpm` | `sudo dnf install ./enigma2_player-linux-x64-*.rpm`. Needs `mpv-libs`. |\n| macOS    | `enigma2_player-macos-*.dmg` | Open the DMG, drag the app to Applications. Unsigned: right-click → Open on first launch. |\n\n> **Android & iOS** builds will be distributed through the app stores — coming soon.\n\n### Languages\nBundled UI translations: Deutsch, English, Español, Français, Italiano."
+    },
+    {
+      "tag": "v1.0.1",
+      "name": "Enigma2 Player v1.0.1",
+      "publishedAt": "2026-09-08T13:35:42Z",
+      "url": "https://github.com/madoe21/enigma2_player/releases/tag/v1.0.1",
+      "prerelease": false,
+      "body": "**Enigma2 Player v1.0.1** — browse, control and stream live TV / radio /\nrecordings from your Enigma2 receiver (OpenWebIF).\n\n### Downloads\n| Platform | File | Notes |\n|----------|------|-------|\n| Windows  | `enigma2_player-windows-x64-setup-*.exe` | Run the installer (Start-menu + optional desktop shortcut). VC++ runtime bundled. |\n| Linux (Debian/Ubuntu) | `enigma2_player-linux-x64-*.deb` | `sudo apt install ./enigma2_player-linux-x64-*.deb`. Pulls in `libmpv`. |\n| Linux (Fedora/RHEL/openSUSE) | `enigma2_player-linux-x64-*.rpm` | `sudo dnf install ./enigma2_player-linux-x64-*.rpm`. Needs `mpv-libs`. |\n| macOS    | `enigma2_player-macos-*.dmg` | Open the DMG, drag the app to Applications. Unsigned: right-click → Open on first launch. |\n\n> **Android & iOS** builds will be distributed through the app stores — coming soon.\n\n### Languages\nBundled UI translations: Deutsch, English, Español, Français, Italiano."
+    },
+    {
+      "tag": "v1.0.0",
+      "name": "Enigma2 Player v1.0.0",
+      "publishedAt": "2026-07-07T17:27:02Z",
+      "url": "https://github.com/madoe21/enigma2_player/releases/tag/v1.0.0",
+      "prerelease": false,
+      "body": "**Enigma2 Player v1.0.0** — browse, control and stream\nlive TV / radio / recordings from your Enigma2 receiver (OpenWebIF).\n\n### Downloads\n| Platform | File | Notes |\n|----------|------|-------|\n| Windows  | `enigma2_player-windows-x64-setup-*.exe` | Run the installer (Start-menu + optional desktop shortcut). VC++ runtime bundled. |\n| Linux (Debian/Ubuntu) | `enigma2_player-linux-x64-*.deb` | `sudo apt install ./enigma2_player-linux-x64-*.deb`. Pulls in `libmpv`. |\n| Linux (Fedora/RHEL/openSUSE) | `enigma2_player-linux-x64-*.rpm` | `sudo dnf install ./enigma2_player-linux-x64-*.rpm`. Needs `mpv-libs`. |\n| macOS    | `enigma2_player-macos-*.dmg` | Open the DMG, drag the app to Applications. Unsigned: right-click → Open on first launch. |\n\n> **Android & iOS** builds will be distributed through the app\n> stores — coming soon.\n\n### Languages\nBundled UI translations: Deutsch, English, Español, Français, Italiano."
+    }
+  ],
+  "pricing": {
+    "models": [],
+    "reason": null
+  }
+}

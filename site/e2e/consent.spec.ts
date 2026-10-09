@@ -14,7 +14,10 @@ import { expect, test } from '@playwright/test';
 
 const dialog = '[role="dialog"]';
 const blocked = '[role="note"]';
-const shop = '[data-testid="shop-placeholder"]';
+// The gated region on the landing page: the way into the purchase, which
+// waits for the decision because the shop frame loads from the licence
+// server (enigma2_player-n5j).
+const shop = '.buy-teaser .btn';
 
 test.describe('the first visit', () => {
   test('asks, and keeps the shop out until it has an answer', async ({ page }) => {
@@ -137,7 +140,7 @@ test('the question is in the prerendered file, not painted in afterwards', () =>
   expect(html).toContain('role="dialog"');
   expect(html).toContain('aria-modal="true"');
   expect(html, 'the shop must not be in the file for an undecided visitor').not.toContain(
-    'data-testid="shop-placeholder"',
+    'buy-teaser__cta',
   );
 });
 

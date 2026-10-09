@@ -1,0 +1,50 @@
+/* Ported from SiteNav.astro, with the colours left to the page's own theme. */
+.nav {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.75rem 1.25rem;
+  border-bottom: 1px solid;
+}
+
+.nav__brand {
+  font-weight: 700;
+  font-size: 1.1rem;
+  text-decoration: none;
+  color: inherit;
+}
+
+.nav__links,
+.nav__langs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.nav__links {
+  flex: 1;
+}
+
+.nav__langs {
+  font-variant: small-caps;
+}
+
+.nav a {
+  /* 44 px of height for a touch target, even in a dense nav row (WCAG 2.5.8). */
+  display: inline-flex;
+  align-items: center;
+  min-height: 2.75rem;
+}
+
+.nav a[aria-current] {
+  font-weight: 700;
+}
+
+.nav a:focus-visible {
+  outline: 3px solid Highlight;
+  outline-offset: 2px;
+}

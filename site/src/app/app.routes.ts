@@ -2,30 +2,36 @@ import { Routes } from '@angular/router';
 
 import { Lang, defaultLang, locales, localePath } from './i18n/locales';
 import { legalLocales } from './legal/legal-copy';
+import { UiKey } from './content/ui';
 
 /**
  * A page of this site: what it is called in each language, and who renders it.
  *
- * The slug is per language because a legal page has to be findable under the
- * word a reader would use - `/impressum` in German and `/en/imprint` in
- * English, not `/en/impressum` (enigma2_player-esp). `languages` exists for the
- * same honesty: a page may be published in fewer languages than the site, and
- * the route tree then simply has no route for the others rather than serving
- * them something unchecked.
+ * The slug is per language where the word matters - `/impressum` in German and
+ * `/en/imprint` in English, not `/en/impressum` (enigma2_player-esp). The
+ * product pages keep the slugs the Astro site used in every language, because
+ * those URLs are linked and indexed and moving them costs placement
+ * (enigma2_player-9v1).
+ *
+ * `languages` is the same kind of honesty: a page may be published in fewer
+ * languages than the site, and the route tree then has no route for the others
+ * rather than serving them something unchecked.
  */
 export interface PageDefinition {
-  /** Stable id, used in tests and in the sitemap. */
+  /** Stable id, used by the navigation, the tests and the sitemap. */
   readonly id: string;
   /** The URL segment per language. Empty string for the landing page. */
   readonly slug: Readonly<Record<Lang, string>>;
   readonly load: () => Promise<unknown>;
   /** The languages this page exists in. Defaults to all of them. */
   readonly languages?: readonly Lang[];
-  /** Extra route data, e.g. which legal text to render. */
+  /** The UI key of its navigation label, or undefined to keep it out of the nav. */
+  readonly navKey?: UiKey;
+  /** Extra route data, e.g. which legal text or which shop view to render. */
   readonly data?: Readonly<Record<string, unknown>>;
 }
 
-/** The same slug in every language, for pages whose name does not translate. */
+/** The same slug in every language, for pages whose name stays as it is. */
 function everywhere(slug: string): Record<Lang, string> {
   return Object.fromEntries(locales.map((lang) => [lang, slug])) as Record<Lang, string>;
 }
@@ -33,17 +39,86 @@ function everywhere(slug: string): Record<Lang, string> {
 /**
  * The pages this site has, named once.
  *
- * The route tree is built from this list for every language, so a page cannot
- * exist in German and be missing in Italian by accident - which is the failure
- * the Astro site's one-directory-per-language layout invited (five copies of
- * every page, kept in step by hand). Where a page is deliberately not in every
- * language, it says so in `languages`.
+ * The route tree, the prerender list and the navigation are all built from
+ * this one list. The Astro site had three: a directory per language with a
+ * file per page, a `sections` array for the navigation, and a `builtSections`
+ * set listing which of those sections actually had a page - that third list
+ * existed only because the first two could disagree, and a nav entry could
+ * lead to a 404.
  */
 export const pageRoutes: readonly PageDefinition[] = [
   {
     id: 'landing',
     slug: everywhere(''),
     load: () => import('./pages/landing/landing').then((m) => m.Landing),
+  },
+  {
+    id: 'features',
+    slug: everywhere('features'),
+    navKey: 'nav.features',
+    load: () => import('./pages/features/features').then((m) => m.Features),
+  },
+  {
+    id: 'screenshots',
+    slug: everywhere('screenshots'),
+    navKey: 'nav.screenshots',
+    load: () => import('./pages/screenshots/screenshots').then((m) => m.Screenshots),
+  },
+  {
+    id: 'downloads',
+    slug: everywhere('downloads'),
+    navKey: 'nav.downloads',
+    load: () => import('./pages/downloads/downloads').then((m) => m.Downloads),
+  },
+  {
+    id: 'changelog',
+    slug: everywhere('changelog'),
+    navKey: 'nav.changelog',
+    load: () => import('./pages/changelog/changelog').then((m) => m.Changelog),
+  },
+  {
+    id: 'docs',
+    slug: everywhere('docs'),
+    navKey: 'nav.docs',
+    load: () => import('./pages/docs/docs').then((m) => m.Docs),
+  },
+  {
+    id: 'faq',
+    slug: everywhere('faq'),
+    navKey: 'nav.faq',
+    load: () => import('./pages/faq/faq').then((m) => m.Faq),
+  },
+  {
+    id: 'pricing',
+    slug: everywhere('pricing'),
+    navKey: 'nav.pricing',
+    load: () => import('./pages/pricing/pricing').then((m) => m.Pricing),
+  },
+  {
+    id: 'buy',
+    slug: everywhere('buy'),
+    navKey: 'nav.buy',
+    data: { view: 'buy' },
+    load: () => import('./pages/shop/shop').then((m) => m.Shop),
+  },
+  {
+    id: 'account',
+    slug: everywhere('account'),
+    navKey: 'nav.account',
+    data: { view: 'account' },
+    load: () => import('./pages/shop/shop').then((m) => m.Shop),
+  },
+  {
+    id: 'license',
+    slug: everywhere('license'),
+    navKey: 'nav.license',
+    load: () => import('./pages/license/license').then((m) => m.License),
+  },
+  {
+    id: 'contact',
+    slug: everywhere('contact'),
+    navKey: 'nav.contact',
+    load: () => import('./pages/contact/contact').then((m) => m.Contact),
   },
   {
     id: 'imprint',
@@ -90,6 +165,14 @@ export function pathOf(page: PageDefinition, lang: Lang): string {
   return localePath(page.slug[lang], lang);
 }
 
+/** The page a site path belongs to, or undefined for an unknown path. */
+export function pageOfPath(path: string): PageDefinition | undefined {
+  const normalised = `/${path.replace(/^\/+|\/+$/g, '')}`.replace(/^\/$/, '/');
+  return pageRoutes.find((page) =>
+    languagesOf(page).some((lang) => pathOf(page, lang).replace(/\/$/, '') === normalised.replace(/\/$/, '')),
+  );
+}
+
 /**
  * Every concrete path this site publishes.
  *
@@ -107,13 +190,12 @@ export function sitePaths(): readonly { readonly path: string; readonly lang: La
 /**
  * de at the root, every other language under its own prefix.
  *
- * Built from the definitions above rather than written out: the prefixed
- * branch has to validate its own segment, because `/klingon/features` must not
- * render as German under a URL that claims otherwise.
+ * Order matters: the unprefixed routes come first, so `/features` is the
+ * German page and not a language called "features". The prefixed branch
+ * validates its own segment, because `/klingon/features` must not render as
+ * German under a URL that claims otherwise.
  */
 export const routes: Routes = [
-  // The default language, unprefixed, first - so `/impressum` is the German
-  // page and not a language called "impressum".
   ...pageRoutes
     .filter((page) => languagesOf(page).includes(defaultLang))
     .map((page) => ({

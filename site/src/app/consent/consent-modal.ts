@@ -1,5 +1,5 @@
 import { A11yModule, LiveAnnouncer } from '@angular/cdk/a11y';
-import { Component, computed, effect, inject, untracked } from '@angular/core';
+import { Component, afterNextRender, computed, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
 
 import { LegalLinks } from '../legal/legal-links';
@@ -92,12 +92,15 @@ export class ConsentModal {
   protected readonly copy = computed(() => CONSENT_COPY[this.pageLanguage.lang()]);
 
   constructor() {
-    // Announced once while the question is open, and again never: an
-    // announcement that repeats on every language change or re-render talks
-    // over whatever the visitor was reading.
-    effect(() => {
+    // Announced once, in the browser, after the first render - not in an
+    // effect during it. Two reasons, and the second was a bug in the
+    // prerendered files: an effect fires before the routed page has published
+    // its language, so /en/ shipped a German announcement inside its live
+    // region. And a live region should start empty: text baked into it is text
+    // a screen reader may read at load, out of context.
+    afterNextRender(() => {
       if (!this.store.decided()) {
-        untracked(() => this.announcer.announce(this.copy().announce, 'assertive'));
+        this.announcer.announce(this.copy().announce, 'assertive');
       }
     });
   }

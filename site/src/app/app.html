@@ -1,15 +1,21 @@
 <!--
   The application shell.
 
-  The cookie dialog and the footer control live here rather than on a page,
-  because the question is the same on every page and the answer has to survive
-  navigation (enigma2_player-vmk). The navigation, the skip link and the real
-  footer arrive with their own beads (enigma2_player-n5j, -esp, -iaa).
+  The cookie dialog and the footer are here rather than on a page, because the
+  question is the same on every page and its answer has to survive navigation
+  (enigma2_player-vmk), and because the legal links have to be on every page
+  (enigma2_player-esp).
 
-  Order is deliberate: the dialog comes first in the DOM, so a screen reader
-  and a keyboard both reach the question before the page it covers.
+  Order is deliberate: the skip link first, then the dialog, then the
+  navigation. A keyboard and a screen reader both reach the question before the
+  page it covers, and anyone who does not want to tab through twelve nav links
+  on every page can jump past them (WCAG 2.4.1).
 -->
+<a class="skip-link" href="#content">{{ skipLabel() }}</a>
 <site-consent-modal />
 <site-consent-state-notice />
-<router-outlet />
+<site-nav />
+<div id="content">
+  <router-outlet />
+</div>
 <site-footer />

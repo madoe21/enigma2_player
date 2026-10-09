@@ -5,6 +5,7 @@ import { RouterLink } from '@angular/router';
 import { CONSENT_COPY } from '../consent/consent-copy';
 import { ConsentStore } from '../consent/consent-store';
 import { LegalLinks } from '../legal/legal-links';
+import { Translate } from '../content/translate';
 import { PageLanguage } from '../i18n/page-language';
 
 /**
@@ -34,6 +35,9 @@ import { PageLanguage } from '../i18n/page-language';
       <button type="button" class="site-footer__action" (click)="revoke()">
         {{ copy().revoke }}
       </button>
+      <!-- The note the Astro footer carried. Missing it was the third thing
+           the comparison against the old build caught. -->
+      <p class="site-footer__note">{{ note() }}</p>
     </footer>
   `,
   styleUrl: '../consent/consent.css',
@@ -44,6 +48,8 @@ export class SiteFooter {
   private readonly announcer = inject(LiveAnnouncer);
 
   protected readonly legal = inject(LegalLinks);
+
+  protected readonly note = inject(Translate).t('footer.note');
 
   protected readonly copy = computed(() => CONSENT_COPY[this.pageLanguage.lang()]);
 
