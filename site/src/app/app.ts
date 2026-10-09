@@ -5,6 +5,7 @@ import { ConsentModal } from './consent/consent-modal';
 import { ConsentStateNotice } from './consent/consent-state-notice';
 import { SiteFooter } from './shell/site-footer';
 import { SiteNav } from './shell/site-nav';
+import { RouteAnnouncer } from './i18n/route-announcer';
 import { Translate } from './content/translate';
 
 /**
@@ -21,4 +22,11 @@ import { Translate } from './content/translate';
 })
 export class App {
   protected readonly skipLabel = inject(Translate).t('nav.skip');
+
+  /**
+   * Injected for its side effect, which is the point of it: a single-page
+   * application changes the page without a page load, and without this a
+   * screen reader is never told that anything happened (enigma2_player-iaa).
+   */
+  private readonly announcer = inject(RouteAnnouncer);
 }

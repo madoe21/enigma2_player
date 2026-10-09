@@ -20,7 +20,7 @@ describe('Pricing', () => {
       imports: [Pricing],
       providers: [
         provideRouter([]),
-        { provide: ActivatedRoute, useValue: { snapshot: { data: { lang } } } },
+        { provide: ActivatedRoute, useValue: routeStub({ lang }) },
       ],
     }).compileComponents();
     const fixture = TestBed.createComponent(Pricing);
@@ -80,3 +80,20 @@ describe('Pricing', () => {
     expect(component.buyHref()).toBe('/en/buy');
   });
 });
+
+/**
+ * A route as the pages read it: the data, and the path it was reached under.
+ *
+ * The path is there because `PageBase` builds the document title, the
+ * canonical URL and the hreflang set from it - a stub without it would test a
+ * page that cannot say which page it is.
+ */
+function routeStub(data: Record<string, unknown>) {
+  const segments = data['lang'] === 'de' || data['lang'] === undefined ? [] : [String(data['lang'])];
+  return {
+    snapshot: {
+      data,
+      pathFromRoot: [{ url: segments.map((path) => ({ path })) }],
+    },
+  };
+}

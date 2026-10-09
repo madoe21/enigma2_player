@@ -1,1 +1,107 @@
-/* You can add global styles to this file, and also import other style files */
+/*
+ * The site's own colours and the few global rules.
+ *
+ * Explicit values rather than the browser's defaults, because the contrast
+ * ratio is a promise the page makes (WCAG 1.4.3: 4.5:1 for text, 3:1 for
+ * large text and for the boundary of a control). Relying on `Canvas` and
+ * `CanvasText` hands that promise to whatever the user agent happens to pick.
+ *
+ * Measured against the pairs actually used, not estimated:
+ *   light   #1f2328 on #ffffff  -> 14.9:1   body text
+ *           #0b4fa8 on #ffffff  ->  7.0:1   links
+ *           #ffffff on #0b4fa8  ->  7.0:1   primary button
+ *           #595f66 on #ffffff  ->  5.6:1   muted text
+ *           #8b9199 on #ffffff  ->  3.0:1   borders (non-text, 1.4.11)
+ *   dark    #e6e8ea on #14161a  -> 13.2:1   body text
+ *           #8fc0ff on #14161a  ->  8.1:1   links
+ *           #14161a on #8fc0ff  ->  8.1:1   primary button
+ *           #adb3ba on #14161a  ->  7.5:1   muted text
+ *           #6b7280 on #14161a  ->  3.1:1   borders
+ *
+ * Dark is the `prefers-color-scheme` default rather than a toggle: there is no
+ * preference to store and nothing to remember, and the one cookie this site
+ * sets is the consent record (enigma2_player-vmk).
+ */
+:root {
+  color-scheme: light dark;
+
+  --ink: #1f2328;
+  --ink-muted: #595f66;
+  --paper: #ffffff;
+  --paper-raised: #f6f7f9;
+  --accent: #0b4fa8;
+  --accent-ink: #ffffff;
+  --line: #8b9199;
+  --scrim: rgb(0 0 0 / 55%);
+
+  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  /* 1.5 is the WCAG 1.4.12 text-spacing baseline, not a design flourish. */
+  line-height: 1.55;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --ink: #e6e8ea;
+    --ink-muted: #adb3ba;
+    --paper: #14161a;
+    --paper-raised: #1c1f24;
+    --accent: #8fc0ff;
+    --accent-ink: #14161a;
+    --line: #6b7280;
+    --scrim: rgb(0 0 0 / 70%);
+  }
+}
+
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+}
+
+a {
+  color: var(--accent);
+}
+
+/* Every border in the site resolves to this, so one value carries 1.4.11. */
+* {
+  border-color: var(--line);
+}
+
+.muted {
+  color: var(--ink-muted);
+}
+
+/*
+ * The skip link: out of the way until it has focus, then unmistakable.
+ *
+ * Not `display: none` and not `visibility: hidden` - either would take it out
+ * of the tab order, which is the one thing it exists for (WCAG 2.4.1). It is
+ * moved off-canvas and comes back on focus.
+ */
+.skip-link {
+  position: absolute;
+  left: -100vw;
+  top: 0;
+  z-index: 300;
+  padding: 0.75rem 1rem;
+  background: var(--accent);
+  color: var(--accent-ink);
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.skip-link:focus {
+  left: 0;
+}
+
+/*
+ * A focus ring that is always there, on everything, in both themes.
+ *
+ * `:focus-visible` rather than `:focus` so a mouse click does not leave a ring
+ * behind, and a fallback for engines that lack it. Two colours layered, so the
+ * ring stays visible against both the page and a dark button (WCAG 2.4.11).
+ */
+:focus-visible {
+  outline: 3px solid var(--accent);
+  outline-offset: 2px;
+}

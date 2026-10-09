@@ -97,7 +97,10 @@ async function releaseNotes() {
     .filter((release) => !release.draft)
     .map((release) => ({
       tag: release.tag_name,
-      name: release.name ?? release.tag_name,
+      // A blank name, not just a missing one: GitHub returns "" for a
+      // release that was never given a title, and `??` keeps an empty
+      // string - which rendered as an empty <h2> (axe empty-heading).
+      name: release.name?.trim() || release.tag_name,
       publishedAt: release.published_at ?? null,
       url: release.html_url,
       prerelease: Boolean(release.prerelease),

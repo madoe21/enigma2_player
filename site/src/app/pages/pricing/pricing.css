@@ -9,7 +9,7 @@
   flex: 1 1 14rem;
   max-width: 18rem;
   padding: 1.25rem;
-  border: 1px solid;
+  border: 1px solid var(--line);
   border-radius: 0.8rem;
   text-align: center;
 }

@@ -76,6 +76,11 @@ export class Shop extends PageBase {
     this.view() === 'account' ? this.copy().accountIntro : this.copy().buyIntro,
   );
 
+  /** Two views behind one component, so the title cannot come from the route. */
+  protected override titleKey() {
+    return this.view() === 'account' ? ('nav.account' as const) : ('nav.buy' as const);
+  }
+
   /**
    * The licence server's view for this page and language, or null when the
    * build had no shop configured - in which case the page says so instead of

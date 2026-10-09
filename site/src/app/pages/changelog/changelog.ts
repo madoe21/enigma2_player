@@ -1,8 +1,8 @@
-import { DatePipe } from '@angular/common';
 import { Component, inject } from '@angular/core';
 
 import { PageBase } from '../page-base';
 import { SiteContent } from '../../content/site-content';
+import { formatDate } from '../../i18n/format-date';
 
 /**
  * What changed per release.
@@ -15,7 +15,6 @@ import { SiteContent } from '../../content/site-content';
  */
 @Component({
   selector: 'site-changelog',
-  imports: [DatePipe],
   template: `
     <main class="page">
       <h1>{{ copy().title }}</h1>
@@ -27,9 +26,9 @@ import { SiteContent } from '../../content/site-content';
         @for (release of releases(); track release.tag) {
           <section class="block">
             <h2>
-              {{ release.name }}
+              {{ release.name || release.tag }}
               @if (release.publishedAt) {
-                <span class="muted"> · {{ release.publishedAt | date: 'longDate' : undefined : lang() }}</span>
+                <span class="muted"> · {{ published(release.publishedAt) }}</span>
               }
               @if (release.prerelease) {
                 <span class="muted"> · {{ copy().prerelease }}</span>
@@ -45,6 +44,11 @@ import { SiteContent } from '../../content/site-content';
 })
 export class Changelog extends PageBase {
   protected readonly releases = inject(SiteContent).notes;
+
+  /** The release date in the page's language. */
+  protected published(iso: string | null): string {
+    return formatDate(iso, this.lang());
+  }
 
   protected readonly copy = this.translate.group({
     title: 'nav.changelog',

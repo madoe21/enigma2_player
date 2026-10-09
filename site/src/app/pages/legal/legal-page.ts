@@ -1,9 +1,7 @@
-import { Component, computed, inject, input } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { Component, computed, input } from '@angular/core';
 
 import { LegalLang, LEGAL_COPY, LegalPage, isLegalLang } from '../../legal/legal-copy';
-import { PageLanguage } from '../../i18n/page-language';
-import { Lang, defaultLang, langFromSegment } from '../../i18n/locales';
+import { PageBase } from '../page-base';
 
 /** Which of the three texts a route wants. */
 export type LegalPageId = 'imprint' | 'privacy' | 'cookies';
@@ -42,17 +40,9 @@ export type LegalPageId = 'imprint' | 'privacy' | 'cookies';
   `,
   styleUrl: './legal-page.css',
 })
-export class LegalPageComponent {
+export class LegalPageComponent extends PageBase {
   /** Which text to show. Set by the route, not by a parent component. */
   readonly which = input.required<LegalPageId>();
-
-  private readonly route = inject(ActivatedRoute);
-  private readonly pageLanguage = inject(PageLanguage);
-
-  /** The language the route was declared for - never guessed from the URL. */
-  readonly lang = computed<Lang>(() =>
-    langFromSegment(this.route.snapshot.data['lang'] ?? defaultLang),
-  );
 
   /**
    * Whether a legal text exists in this page's language.
@@ -82,7 +72,8 @@ export class LegalPageComponent {
     return isLegalLang(lang) ? lang : 'en';
   }
 
-  constructor() {
-    this.pageLanguage.set(this.lang());
+  /** "Impressum", "Privacy policy" - the text's own title, from its own copy. */
+  protected override titleText(): string {
+    return this.page().title;
   }
 }

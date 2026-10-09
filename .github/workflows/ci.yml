@@ -37,6 +37,19 @@ jobs:
       - name: Unit tests (Vitest)
         run: npm test
 
+      # The checks that are cheap and mechanical, before the browser is
+      # downloaded. Each one has been a real finding rather than a formality:
+      # a translatable sentence left in a template, a key missing from a
+      # maintained language or read by nobody, an unfilled legal placeholder.
+      - name: No translatable text in a template
+        run: npm run check:literals
+
+      - name: Translation dictionaries complete
+        run: npm run check:translations
+
+      - name: Legal placeholders
+        run: npm run check:placeholders
+
       - name: Browser for the end-to-end tests
         run: npx playwright install --with-deps chromium
 
@@ -44,6 +57,13 @@ jobs:
       # visitor and a crawler get is the output of the build.
       - name: End-to-end tests (Playwright)
         run: npm run test:e2e
+
+      # axe-core over all 66 pages in both consent states. It runs as its own
+      # step so a failure says "accessibility" in the job list rather than
+      # hiding inside the end-to-end run (enigma2_player-iaa). It is part of
+      # test:e2e as well; this step is the label.
+      - name: Accessibility (axe-core, WCAG 2.2 AA)
+        run: npm run test:a11y
 
   verify:
     runs-on: ubuntu-latest

@@ -78,6 +78,15 @@ export class Landing extends PageBase {
     return [copy.multi, copy.stream, copy.subs, copy.cross, copy.license];
   });
 
+  /** The start page is titled with the site name, not with a page name. */
+  protected override titleKey() {
+    return null;
+  }
+
+  protected override descriptionKey() {
+    return 'home.hero.sub' as const;
+  }
+
   protected readonly downloadsHref = computed(() => localePath('downloads', this.lang()));
   protected readonly buyHref = computed(() => localePath('buy', this.lang()));
 }

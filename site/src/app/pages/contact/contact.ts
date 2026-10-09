@@ -19,7 +19,12 @@ import { PageBase } from '../page-base';
     <main class="page">
       <h1>{{ copy().title }}</h1>
       <p>{{ copy().intro }}</p>
-      <ul>
+      <!--
+        The link-list class gives each link a 44px row. Plain list items put
+        them about 20px apart, which fails WCAG 2.2 target size (2.5.8) -
+        three links that close together is a coin toss on a touchscreen.
+      -->
+      <ul class="link-list">
         <li><a [href]="profile">{{ copy().github }}</a></li>
         <li><a [href]="issues">{{ copy().issues }}</a></li>
         <li><a [href]="'mailto:' + email">{{ copy().email }}: {{ email }}</a></li>

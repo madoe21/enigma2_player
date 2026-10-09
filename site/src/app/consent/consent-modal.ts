@@ -52,13 +52,17 @@ import { ConsentStore } from './consent-store';
             footer does not exist. The end-to-end test found that by trying to
             click the footer link through the scrim (enigma2_player-esp).
           -->
-          <nav class="consent-dialog__legal" [attr.aria-label]="copy().legalNav">
-            <ul>
-              @for (link of legal.links(); track link.id) {
-                <li><a [routerLink]="link.href">{{ link.label }}</a></li>
-              }
-            </ul>
-          </nav>
+          <!--
+            A list and not a <nav>: the footer already has a navigation
+            landmark called "Rechtliches", and two landmarks with the same name
+            are indistinguishable when a screen reader lists them (axe
+            landmark-unique). Inside a dialog the list semantics are enough.
+          -->
+          <ul class="consent-dialog__legal">
+            @for (link of legal.links(); track link.id) {
+              <li><a [routerLink]="link.href">{{ link.label }}</a></li>
+            }
+          </ul>
           <p class="consent-dialog__policy">
             <a [routerLink]="policy().href">{{ copy().policyLink }}</a>
           </p>
