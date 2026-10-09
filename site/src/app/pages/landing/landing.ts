@@ -1,6 +1,7 @@
 import { Component, computed, inject } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 
+import { ConsentGate } from '../../consent/consent-gate';
 import { Lang, defaultLang, langFromSegment } from '../../i18n/locales';
 import { PageLanguage } from '../../i18n/page-language';
 
@@ -20,10 +21,21 @@ import { PageLanguage } from '../../i18n/page-language';
  */
 @Component({
   selector: 'site-landing',
+  imports: [ConsentGate],
   template: `
     <main>
       <h1>{{ copy().headline }}</h1>
       <p>{{ copy().intro }}</p>
+
+      <!--
+        A placeholder for the shop embed, gated so the mechanism is exercised
+        against the built site and not only in unit tests. The real ShopEmbed
+        and the other paths into a purchase arrive with enigma2_player-n5j and
+        go inside this same gate (enigma2_player-vmk).
+      -->
+      <site-consent-gate>
+        <p data-testid="shop-placeholder">{{ copy().shopPlaceholder }}</p>
+      </site-consent-gate>
     </main>
   `,
 })
@@ -52,6 +64,8 @@ export class Landing {
 interface LandingCopy {
   headline: string;
   intro: string;
+  /** Stands in for the shop embed, which arrives with enigma2_player-n5j. */
+  shopPlaceholder: string;
 }
 
 /**
@@ -66,21 +80,26 @@ const COPY: Record<Lang, LandingCopy> = {
   de: {
     headline: 'Enigma2 Player',
     intro: 'Fernsehen, Radio und Aufnahmen von deinem Enigma2-Receiver.',
+    shopPlaceholder: 'Hier steht der Shop.',
   },
   en: {
     headline: 'Enigma2 Player',
     intro: 'Live TV, radio and recordings from your Enigma2 receiver.',
+    shopPlaceholder: 'The shop goes here.',
   },
   es: {
     headline: 'Enigma2 Player',
     intro: 'Televisión, radio y grabaciones de tu receptor Enigma2.',
+    shopPlaceholder: 'Aquí irá la tienda.',
   },
   fr: {
     headline: 'Enigma2 Player',
     intro: 'Télévision, radio et enregistrements de votre récepteur Enigma2.',
+    shopPlaceholder: 'La boutique prendra place ici.',
   },
   it: {
     headline: 'Enigma2 Player',
     intro: 'TV, radio e registrazioni dal tuo ricevitore Enigma2.',
+    shopPlaceholder: 'Qui andrà il negozio.',
   },
 };

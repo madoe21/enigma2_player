@@ -1,8 +1,15 @@
 <!--
-  The application shell. Deliberately almost empty for now: the navigation,
-  the footer, the skip link and the cookie banner arrive with their own beads
-  (enigma2_player_source-n5j, -iaa, -vmk), and a shell that carries Angular's
-  welcome markup gives every page a second <h1> - which Playwright caught here
-  before a human would have.
+  The application shell.
+
+  The cookie dialog and the footer control live here rather than on a page,
+  because the question is the same on every page and the answer has to survive
+  navigation (enigma2_player-vmk). The navigation, the skip link and the real
+  footer arrive with their own beads (enigma2_player-n5j, -esp, -iaa).
+
+  Order is deliberate: the dialog comes first in the DOM, so a screen reader
+  and a keyboard both reach the question before the page it covers.
 -->
+<site-consent-modal />
+<site-consent-state-notice />
 <router-outlet />
+<site-footer />

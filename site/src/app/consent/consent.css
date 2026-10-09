@@ -1,0 +1,128 @@
+/*
+ * Styles shared by the consent surfaces and the footer control.
+ *
+ * Plain CSS and no framework: the site's payload is its text, and a dialog
+ * with two buttons does not need a design system. The values that are not
+ * cosmetic are marked as such - they are accessibility requirements, not
+ * taste, and a later redesign has to keep them.
+ */
+
+.consent-scrim {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  /* Not pure black: the page behind stays legible, which is the point of a
+     scrim rather than a curtain. */
+  background: rgb(0 0 0 / 55%);
+  z-index: 100;
+}
+
+.consent-dialog {
+  max-width: 34rem;
+  padding: 1.5rem;
+  border-radius: 0.5rem;
+  /* Explicit colours on both sides: the dialog must not inherit a transparent
+     background from a theme and leave its text on top of the scrim. */
+  background: Canvas;
+  color: CanvasText;
+  box-shadow: 0 0.5rem 2rem rgb(0 0 0 / 35%);
+}
+
+.consent-dialog__title {
+  margin: 0 0 0.75rem;
+  font-size: 1.25rem;
+}
+
+.consent-dialog__body {
+  margin: 0 0 1.25rem;
+  line-height: 1.5;
+}
+
+.consent-dialog__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.consent-button {
+  /* 44 px high and wide enough for its label: WCAG 2.2 success criterion
+     2.5.8, target size. A 24 px button is a miss on a touchscreen and a
+     problem for anyone whose hands are not steady. */
+  min-height: 2.75rem;
+  padding: 0 1.25rem;
+  border: 1px solid currentcolor;
+  border-radius: 0.375rem;
+  background: CanvasText;
+  color: Canvas;
+  font: inherit;
+  cursor: pointer;
+}
+
+.consent-button--quiet {
+  background: Canvas;
+  color: CanvasText;
+}
+
+.consent-button:focus-visible,
+.site-footer__action:focus-visible {
+  /* Never `outline: none`. The keyboard user has nothing else to go by, and
+     this dialog traps focus - losing the ring inside it means losing the
+     cursor entirely. */
+  outline: 3px solid Highlight;
+  outline-offset: 2px;
+}
+
+.consent-blocked,
+.consent-notice {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 1rem;
+  border: 1px dashed currentcolor;
+  border-radius: 0.375rem;
+}
+
+.consent-blocked__reason,
+.consent-notice__body {
+  margin: 0;
+  line-height: 1.5;
+}
+
+.consent-notice__title {
+  margin: 0;
+  font-size: 1.1rem;
+}
+
+.site-footer {
+  margin-top: 2rem;
+  padding: 1rem 0;
+  border-top: 1px solid currentcolor;
+}
+
+.site-footer__action {
+  min-height: 2.75rem;
+  padding: 0 0.75rem;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .consent-dialog {
+    animation: consent-appear 150ms ease-out;
+  }
+}
+
+@keyframes consent-appear {
+  from {
+    opacity: 0;
+    transform: translateY(0.5rem);
+  }
+}

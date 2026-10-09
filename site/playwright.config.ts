@@ -18,6 +18,14 @@ export default defineConfig({
   testDir: './e2e',
   fullyParallel: true,
   forbidOnly: !!process.env['CI'],
+  // Two, measured rather than guessed. The default on a 16-core machine is
+  // half the cores, and at that width this suite collapses: 8 workers produced
+  // `net::ERR_ABORTED` on most navigations, 4 workers took 34 s with two
+  // failures, 2 workers take 4 s and 1 worker 5.5 s. The static server is not
+  // the limit - it answers 120 parallel requests in 383 ms with no failures -
+  // so what runs out is the room for that many Chromium instances. A suite of
+  // fast tests against files on disk gains nothing from more width anyway.
+  workers: 2,
   retries: process.env['CI'] ? 1 : 0,
   reporter: process.env['CI'] ? [['github'], ['list']] : [['list']],
   use: {

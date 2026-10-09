@@ -52,7 +52,7 @@ function resolve(urlPath) {
   return candidate;
 }
 
-createServer((request, response) => {
+const server = createServer((request, response) => {
   const file = resolve(request.url ?? '/');
   if (file === null || !existsSync(file)) {
     response.writeHead(404, { 'content-type': 'text/plain' });
@@ -62,7 +62,20 @@ createServer((request, response) => {
   response.writeHead(200, {
     'content-type': types.get(extname(file)) ?? 'application/octet-stream',
   });
-  createReadStream(file).pipe(response);
-}).listen(port, '127.0.0.1', () => {
+  const stream = createReadStream(file);
+  // A browser that navigates away mid-response aborts the socket, and the
+  // stream then errors. Unhandled, that error takes the whole server process
+  // down - and every later test fails with ERR_ABORTED on a server that is no
+  // longer there. Playwright running tests in parallel hits this reliably; it
+  // cost a run that looked like eight broken tests and was one dead server.
+  stream.on('error', () => response.destroy());
+  response.on('close', () => stream.destroy());
+  stream.pipe(response);
+});
+
+// Same reasoning one level down: a reset connection must not be fatal.
+server.on('clientError', (_error, socket) => socket.destroy());
+
+server.listen(port, '127.0.0.1', () => {
   console.log(`serving ${root} on http://127.0.0.1:${port}/`);
 });
