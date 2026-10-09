@@ -1,5 +1,6 @@
 import { LiveAnnouncer } from '@angular/cdk/a11y';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { provideRouter } from '@angular/router';
 
 import { PageLanguage } from '../i18n/page-language';
 import { ConsentModal } from './consent-modal';
@@ -20,6 +21,7 @@ describe('ConsentModal', () => {
     await TestBed.configureTestingModule({
       imports: [ConsentModal],
       providers: [
+        provideRouter([]),
         {
           provide: LiveAnnouncer,
           useValue: { announce: (message: string) => void announced.push(message) },

@@ -1,0 +1,36 @@
+/*
+ * Reading layout for a long text.
+ *
+ * The one value here that is not taste: the measure. A legal text at full
+ * window width on a wide screen is a line a reader loses their place in, and
+ * WCAG 1.4.8 names 80 characters as the limit for a block of text.
+ */
+.legal {
+  max-width: 70ch;
+  margin: 0 auto;
+  padding: 1rem;
+  line-height: 1.6;
+}
+
+.legal__lead {
+  font-size: 1.05rem;
+}
+
+.legal__section {
+  margin-block: 1.75rem;
+}
+
+.legal__section h2 {
+  font-size: 1.15rem;
+  margin-bottom: 0.5rem;
+}
+
+.legal__section p {
+  margin: 0 0 0.5rem;
+}
+
+.legal__note {
+  margin-top: 2rem;
+  padding: 0.75rem;
+  border-left: 3px solid currentcolor;
+}

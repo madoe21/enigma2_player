@@ -1,6 +1,8 @@
 import { A11yModule, LiveAnnouncer } from '@angular/cdk/a11y';
 import { Component, computed, effect, inject, untracked } from '@angular/core';
+import { RouterLink } from '@angular/router';
 
+import { LegalLinks } from '../legal/legal-links';
 import { PageLanguage } from '../i18n/page-language';
 import { CONSENT_COPY } from './consent-copy';
 import { ConsentStore } from './consent-store';
@@ -24,7 +26,7 @@ import { ConsentStore } from './consent-store';
  */
 @Component({
   selector: 'site-consent-modal',
-  imports: [A11yModule],
+  imports: [A11yModule, RouterLink],
   template: `
     @if (!store.decided()) {
       <div class="consent-scrim">
@@ -39,6 +41,27 @@ import { ConsentStore } from './consent-store';
         >
           <h2 class="consent-dialog__title" [id]="titleId">{{ copy().title }}</h2>
           <p class="consent-dialog__body" [id]="bodyId">{{ copy().body }}</p>
+          <!--
+            The legal texts, reachable BEFORE the answer is given: consent to
+            something the visitor cannot read first is not informed consent,
+            and §5 DDG wants the imprint directly accessible.
+
+            They are repeated here rather than left to the footer because this
+            dialog is modal - its scrim covers the footer and its focus trap
+            keeps the keyboard out of it, so for an undecided visitor the
+            footer does not exist. The end-to-end test found that by trying to
+            click the footer link through the scrim (enigma2_player-esp).
+          -->
+          <nav class="consent-dialog__legal" [attr.aria-label]="copy().legalNav">
+            <ul>
+              @for (link of legal.links(); track link.id) {
+                <li><a [routerLink]="link.href">{{ link.label }}</a></li>
+              }
+            </ul>
+          </nav>
+          <p class="consent-dialog__policy">
+            <a [routerLink]="policy().href">{{ copy().policyLink }}</a>
+          </p>
           <div class="consent-dialog__actions">
             <button type="button" class="consent-button" (click)="store.accept()">
               {{ copy().accept }}
@@ -58,6 +81,10 @@ export class ConsentModal {
   protected readonly store = inject(ConsentStore);
   private readonly pageLanguage = inject(PageLanguage);
   private readonly announcer = inject(LiveAnnouncer);
+
+  protected readonly legal = inject(LegalLinks);
+
+  protected readonly policy = this.legal.cookiePolicy;
 
   protected readonly titleId = 'consent-dialog-title';
   protected readonly bodyId = 'consent-dialog-body';

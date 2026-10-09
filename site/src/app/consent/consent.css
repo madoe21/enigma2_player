@@ -126,3 +126,29 @@
     transform: translateY(0.5rem);
   }
 }
+
+/*
+ * The legal links inside the dialog.
+ *
+ * They are in the dialog because the dialog is modal: the scrim covers the
+ * footer and the focus trap keeps the keyboard out of it, so for an undecided
+ * visitor the footer's links do not exist - and the imprint has to be
+ * reachable before the decision, not after it.
+ */
+.consent-dialog__legal ul,
+.site-footer__links ul {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 1rem;
+  margin: 0 0 1rem;
+  padding: 0;
+  list-style: none;
+}
+
+.site-footer__links ul {
+  margin-bottom: 0.5rem;
+}
+
+.consent-dialog__policy {
+  margin: 0 0 1.25rem;
+}

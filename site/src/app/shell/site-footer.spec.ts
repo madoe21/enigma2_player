@@ -1,5 +1,6 @@
 import { LiveAnnouncer } from '@angular/cdk/a11y';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { provideRouter } from '@angular/router';
 
 import { CONSENT_COOKIE, ConsentStore } from '../consent/consent-store';
 import { SiteFooter } from './site-footer';
@@ -19,6 +20,7 @@ describe('SiteFooter', () => {
     await TestBed.configureTestingModule({
       imports: [SiteFooter],
       providers: [
+        provideRouter([]),
         {
           provide: LiveAnnouncer,
           useValue: { announce: (message: string) => void announced.push(message) },

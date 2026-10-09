@@ -19,6 +19,10 @@ export interface ConsentCopy {
   readonly revoke: string;
   /** Confirmation that the decision was taken back. */
   readonly revoked: string;
+  /** Accessible name of the footer's legal navigation. */
+  readonly legalNav: string;
+  /** Link text in the dialog, pointing at the policy it is asking about. */
+  readonly policyLink: string;
 }
 
 /**
@@ -54,6 +58,8 @@ export const CONSENT_COPY: Record<Lang, ConsentCopy> = {
       'notwendigen Cookie. Ohne sie wird hier nichts geladen.',
     revoke: 'Cookie-Entscheidung ändern',
     revoked: 'Ihre Entscheidung ist zurückgenommen. Sie werden erneut gefragt.',
+    legalNav: 'Rechtliches',
+    policyLink: 'Was genau gespeichert wird: Cookie-Richtlinie',
   },
   en: {
     title: 'Cookies',
@@ -74,6 +80,8 @@ export const CONSENT_COPY: Record<Lang, ConsentCopy> = {
       'Without it, nothing is loaded here.',
     revoke: 'Change cookie decision',
     revoked: 'Your decision has been withdrawn. You will be asked again.',
+    legalNav: 'Legal',
+    policyLink: 'What exactly is stored: cookie policy',
   },
   es: {
     title: 'Cookies',
@@ -94,6 +102,8 @@ export const CONSENT_COPY: Record<Lang, ConsentCopy> = {
       'necesaria. Sin él, aquí no se carga nada.',
     revoke: 'Cambiar la decisión sobre cookies',
     revoked: 'Su decisión ha sido retirada. Se le volverá a preguntar.',
+    legalNav: 'Aviso legal',
+    policyLink: 'Qué se almacena exactamente: política de cookies',
   },
   fr: {
     title: 'Cookies',
@@ -115,6 +125,8 @@ export const CONSENT_COPY: Record<Lang, ConsentCopy> = {
       'nécessaire. Sans lui, rien n’est chargé ici.',
     revoke: 'Modifier la décision sur les cookies',
     revoked: 'Votre décision est retirée. La question vous sera posée à nouveau.',
+    legalNav: 'Mentions légales',
+    policyLink: 'Ce qui est stocké exactement : politique de cookies',
   },
   it: {
     title: 'Cookie',
@@ -135,5 +147,7 @@ export const CONSENT_COPY: Record<Lang, ConsentCopy> = {
       'necessario. Senza di esso qui non viene caricato nulla.',
     revoke: 'Modifica la decisione sui cookie',
     revoked: 'La sua decisione è stata ritirata. Le sarà chiesto di nuovo.',
+    legalNav: 'Note legali',
+    policyLink: 'Cosa viene memorizzato esattamente: informativa sui cookie',
   },
 };

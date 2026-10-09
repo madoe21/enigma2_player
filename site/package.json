@@ -8,7 +8,8 @@
     "watch": "ng build --watch --configuration development",
     "test": "ng test --watch=false",
     "test:e2e": "playwright test",
-    "serve:dist": "node e2e/static-server.mjs dist/site 4321"
+    "serve:dist": "node e2e/static-server.mjs dist/site 4321",
+    "check:placeholders": "node tool/check-placeholders.mjs"
   },
   "private": true,
   "packageManager": "npm@11.11.0",
