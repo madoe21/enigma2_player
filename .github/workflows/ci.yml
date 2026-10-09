@@ -6,6 +6,45 @@ on:
   pull_request:
 
 jobs:
+  # The Angular site under site/ (enigma2_player_source-bdb). Its own job, not
+  # a step in `verify`: that one auto-detects a stack from the repository root,
+  # where the Astro site still lives until its content has moved over
+  # (enigma2_player_source-n5j). Two stacks in one repository for the duration
+  # of the migration, and each one checked on its own terms.
+  site:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: site
+    steps:
+      - uses: actions/checkout@v7
+
+      # The version is read from site/.node-version rather than written here,
+      # so the pin lives next to the code that needs it. The Angular 22 CLI
+      # refuses anything below 24.15.0 and says so only at build time.
+      - uses: actions/setup-node@v6
+        with:
+          node-version-file: site/.node-version
+          cache: npm
+          cache-dependency-path: site/package-lock.json
+
+      - name: Install
+        run: npm ci
+
+      - name: Build (prerendered, five languages)
+        run: npm run build
+
+      - name: Unit tests (Vitest)
+        run: npm test
+
+      - name: Browser for the end-to-end tests
+        run: npx playwright install --with-deps chromium
+
+      # Against the built files, because this site has no backend: what a
+      # visitor and a crawler get is the output of the build.
+      - name: End-to-end tests (Playwright)
+        run: npm run test:e2e
+
   verify:
     runs-on: ubuntu-latest
     steps:
