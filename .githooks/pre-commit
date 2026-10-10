@@ -17,6 +17,38 @@ echo "• pre-commit: format + lint + tests"
 # the worktree — they need the installed toolchain (node_modules, venv, build cache) that a
 # temp checkout does not have.
 
+# Prettier gets resolved, not just looked up: unlike the other formatters below it is pinned
+# EXACTLY by this repository (3.9.10, no caret, in both package.json files) and CI checks with
+# that version as a hard gate (enigma2_player-63s). A `prettier` from PATH is a different and
+# unknowable version, and a formatter patch release can change its output - the commit then looks
+# right locally and fails CI with a diff its author never wrote. So the project-local binary
+# decides what correct looks like, and when there is none the hook SAYS so: the old test was
+# `have prettier`, which is plainly false on a machine with no global install, so this step
+# formatted nothing and mentioned nothing, and only CI ever brought it up (enigma2_player-38r).
+# Resolved once rather than per file - both branches cost Node startup, and the loop below runs
+# once per staged file. Which config applies is still prettier's own decision: it reads the
+# `.prettierrc` and `.prettierignore` nearest the file, so a file under `site/` is formatted by
+# that tree's rules even though the binary came from the root.
+prettier_cmd=""
+if [ -x node_modules/.bin/prettier ]; then
+  prettier_cmd="node_modules/.bin/prettier"
+elif have npx && npx --no-install prettier --version >/dev/null 2>&1; then
+  prettier_cmd="npx"
+fi
+prettier_warned=0
+prettier_write() {
+  case "$prettier_cmd" in
+    npx) npx --no-install prettier --write --log-level error "$1" ;;
+    "")
+      # Once per commit, not once per file.
+      [ "$prettier_warned" -eq 1 ] && return 0
+      prettier_warned=1
+      echo "  note: no project-local prettier - nothing formatted; run 'npm ci' (CI checks it as a hard gate)" >&2
+      ;;
+    *) "$prettier_cmd" --write --log-level error "$1" ;;
+  esac
+}
+
 # 1) Format staged files in place (Google style), then re-stage.
 # quotePath=false: git otherwise renders a non-ASCII path as "\303\274ber", whose leading quote
 # defeats every match below - the file would silently skip formatting and the roster check.
@@ -32,7 +64,7 @@ while IFS= read -r f; do
   fi
   case "$f" in
     *.py)  have black && black -q "$f"; have isort && isort -q "$f" ;;
-    *.js|*.jsx|*.ts|*.tsx|*.json|*.css|*.md|*.yml|*.yaml) have prettier && prettier --write --log-level error "$f" ;;
+    *.js|*.jsx|*.ts|*.tsx|*.json|*.css|*.md|*.yml|*.yaml) prettier_write "$f" ;;
     *.go)  have gofmt && gofmt -w "$f" ;;
     *.java) have google-java-format && google-java-format -i "$f" ;;
     *.dart) have dart && dart format "$f" >/dev/null 2>&1 ;;
