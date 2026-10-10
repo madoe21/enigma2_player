@@ -139,8 +139,17 @@ and `content` depend on nothing internal.
   public product API key (bead #13) — it currently sits in the tracked
   `site-data.json` rather than in an Actions variable, which is filed as
   `enigma2_player-9c9`.
-- **Error handling**: TODO — re-derive for the Angular tree; the Astro-era
-  `ApiError` client no longer exists.
+- **Error handling**: there is no error layer, because there is no runtime I/O —
+  the Astro-era `ApiError` client is gone and nothing replaced it (derived from
+  the code, `enigma2_player-0ii`). What exists instead: `absent data is a state,
+  not an error` (no release → no download list, no price models → "soon", no
+  `shop.base` → a notice instead of an iframe), defensive parsing where input is
+  outside the code's control (an unrecognised consent cookie counts as
+  undecided; `formatDate` falls back to the ISO day), and exactly one `throw` —
+  a legal link pointing at a route that no longer exists, which is a defect that
+  must be loud rather than silently land on the start page.
+  `provideBrowserGlobalErrorListeners()` is in the app config; the build-time
+  tools fail hard (`process.exit(1)`) instead of emitting a half-built site.
 - **i18n**: fallback-to-`de` translator (`content/translate.ts`); hreflang
   alternates per page; `x-default` → de; `tool/check-translations.mjs` fails on
   a key missing from a maintained language or read by nobody.

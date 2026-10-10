@@ -1,62 +1,129 @@
-# Conventions — as observed in the code (onboarder, 2026-07-06)
+# Conventions — as observed in the code (2026-10-11, `enigma2_player-0ii`)
 
-> **STALE in part — observed in the Astro tree, which no longer exists.** The
-> `.astro` patterns, the `astro check` verify step and the 80-column Prettier
-> settings below were read off the tree the cutover removed on 2026-10-10
-> (`enigma2_player-hsf.1`). What holds now: Angular 22 in `site/`, one Prettier
-> at the repository root (printWidth 100, single quotes, Angular HTML parser),
-> verified with `npm run build` + `npm test` + `npm run test:e2e` in `site/`.
-> Re-derivation filed as `enigma2_player-0ii`.
-
-Match these when writing code here; they follow Google TS style.
+Read off the Angular 22 tree in `site/`, which is the whole site since the
+cutover (`enigma2_player-hsf.1`). Match these when writing code here; they
+follow Google TS style where the two have an opinion each. Structural map:
+`codebase-map.md`.
 
 ## Language & formatting
 
-- TypeScript strict, ESM (`"type": "module"`). 2-space indent, single quotes,
-  no space inside braces in imports/objects (`{defineConfig}`), semicolons,
-  ~80-col lines, trailing commas in multiline literals.
-- Naming: `lowerCamelCase` functions/vars, `PascalCase` types/interfaces and
-  `.astro` components, `SCREAMING_SNAKE` module constants (`API_BASE`).
-- Every exported symbol has a `/** JSDoc */` — one-liners for simple functions;
-  comments explain *why* (often referencing bead ids like `(#13)`).
+- TypeScript, ESM, **standalone Angular 22 with signals**. 2-space indent,
+  single quotes, LF, final newline, no trailing whitespace (`.editorconfig`).
+- **Prettier lives once, at the repository root** — `printWidth: 100`,
+  `singleQuote: true`, `endOfLine: "auto"`, Angular parser for `*.html`. Run
+  `npm run format` at the root; `site/` has no Prettier of its own and must not
+  get one back.
+- Naming: `lowerCamelCase` members and functions, `PascalCase` types and
+  classes, `SCREAMING_SNAKE` for module constants (`CONSENT_COOKIE`, `ENTITY`,
+  `SHOP_CONFIG`, `OG_LOCALE`). Files `kebab-case.ts`, one concept per file,
+  `*.spec.ts` next to the thing it tests.
+- **Class names carry no `Component`/`Service` suffix** — `Landing`, `SiteNav`,
+  `Translate`, `ConsentStore`. (`LegalPageComponent` is the single exception;
+  don't copy it.) Component selectors are prefixed **`site-`**; only the shell is
+  `app-root`, and `angular.json`'s `prefix: "app"` is a scaffold leftover.
+- Doc comment on every exported symbol, and **comments say *why*, naming the
+  defect they prevent and the bead it came from** — e.g. "`/fr` was served as
+  German, which makes a screen reader read French with a German voice
+  (`enigma2_player-w83`)". This is the house style and the most useful thing in
+  the tree: when you change such code, update the reason, don't delete it.
+- No dead code, no commented-out blocks. Where something was removed, the reason
+  is written down (see the header of `content/ui.ts`) instead of the code being
+  kept "just in case".
 
-## Astro patterns
+## Angular patterns
 
-- Pages are **thin wrappers**: frontmatter imports `Base` + one shared content
-  component, `useTranslations(lang)` for the title, done. Content is written
-  once per section in `src/components/`, parameterised by `lang` prop.
-- Interactivity = plain inline `<script>` in the component (vanilla DOM:
-  `getElementById`, `data-*` attributes, `hidden` attr toggling) — **no client
-  framework, no external JS deps**. Server-rendered translated strings are
-  passed to scripts via a frontmatter `messages` object.
-- Styling: scoped `<style>` per component + small global block in
-  `Base.astro`; system font stack, `color-scheme: light dark`.
-- Accessibility touches present: `role="status"` + `aria-live="polite"` for
-  async messages, `role="tablist"`/`aria-selected` for tabs, proper
-  `autocomplete` on auth inputs. Keep that bar.
+- **Standalone, no NgModule.** Dependencies in the component's own `imports:`.
+- **Inline `template:` backticks** in the `.ts` file; only `app.ts` uses
+  `templateUrl`. Styles via `styleUrl`/`styleUrls`, with the shared
+  `pages/page.css` first and a per-page file after it.
+- `inject()`, never constructor parameter injection. **Visibility is the
+  contract**: `protected readonly` = the template reads it, `private readonly` =
+  internal, public `readonly` = other code may.
+- `signal` / `computed` / `effect`, `toSignal` for router events. No manual
+  subscriptions in components, no `async` pipe needed.
+- Built-in control flow `@if` / `@for (… ; track …)`, not `NgIf`/`NgFor`.
+- Services are `@Injectable({ providedIn: 'root' })`. When a module **constant**
+  has to be substitutable in a test, it gets an `InjectionToken` with a factory
+  defaulting to the constant (`DEMO_MODE` → `DEMO_MODE_FLAG`) — Angular's test
+  runner refuses `vi.mock` for relative imports, so DI is the only seam.
+- A page is a component extending **`PageBase`** plus one `PageDefinition` in
+  `app.routes.ts`. Never read the language from the URL — it comes from route
+  `data.lang`; guessing it is the defect `PageBase` exists to prevent.
+- Anything that crosses a boundary goes through something substitutable: baked-in
+  data is read through `SiteContent` signals, not imported into pages directly.
+- **Accessibility is part of the component, not a later pass**: accessible names
+  come from `ui.ts` keys, `routerLinkActive` + `ariaCurrentWhenActive="page"`
+  marks the current entry, the dialog traps focus and restores it, route changes
+  are announced via the CDK announcer, and a standing notice is *not* a live
+  region. WCAG 2.2 AA is the bar.
 
 ## i18n rules
 
-- Never hardcode user-facing strings — add keys to `src/i18n/ui.ts` (short) or
-  `content.ts` (long-form) in all three locales (de mandatory; en/es may fall
-  back).
-- Never hand-build URLs/asset paths — use `href(key, lang)` and `asset(path)`
-  from `i18n/utils.ts` (they encode base path `/enigma2_player` + locale
-  prefix rules).
+- **Never put reader-visible text in a template.** All five languages come from
+  `content/ui.ts` (short) or `content/content.ts` (long-form);
+  `npm run check:literals` fails the build on text between tags or in `title`,
+  `aria-label`, `alt`, `placeholder`.
+- **Never name a language outside `i18n/locales.ts`.** That file exists because
+  the predecessor kept the list in three places and one disagreed.
+- **Never hand-build a URL or a path.** `localePath(route, lang)` and
+  `pathOf(page, lang)`; the base href is added by Angular, so it must not appear
+  in a path (that is how you get `/enigma2_player/enigma2_player/features`).
+- Missing keys fall back to `de` on purpose. `es`/`fr`/`it` are unreviewed
+  machine translations (`enigma2_player-60g`; the similar-looking
+  `enigma2_player_source-4dx` is about the app's `.lng` files, not these), so
+  `check:translations` **fails** only on a key missing from **de/en** or present
+  in a language but not in `de`. Unread keys are *reported* and do not fail —
+  despite the script's header claiming otherwise, and it currently reports three
+  false positives (`legal.imprint/privacy/cookies`, read via the computed key
+  `legal.${id}` in `legal-links.ts`, which a text scan cannot see).
+  `enigma2_player-7qz`.
+- A surface may be published in fewer languages than the site (the legal texts
+  are de/en): declare it in `languages` and the route tree simply has no route
+  for the others — never serve an unchecked translation of a legal text.
 
-## API / security
+## Tests
 
-- All license-server traffic goes through `src/lib/licenseApi.ts` — never
-  `fetch` the API from a component directly.
-- No secrets in the browser: only `PUBLIC_*` build-time env vars; session
-  tokens in memory only (no localStorage/cookies). Errors as
-  `ApiError(status, message)`; UI shows translated notes.
-- Everything must degrade gracefully when `PUBLIC_LICENSE_API_BASE` /
-  `PUBLIC_APP_API_KEY` are unset (render a note, don't break).
+- **Vitest** for units, specs beside the code. `describe`/`it` with behaviour
+  sentences as titles ("says so when there is nothing to sell yet"). Globals are
+  configured; pure-TS specs import from `vitest` explicitly.
+- Components through `TestBed.configureTestingModule({ imports: [X] })` →
+  `compileComponents()` → `createComponent` → `await fixture.whenStable()`.
+  Pages need a route stub with both `snapshot.data` **and**
+  `snapshot.pathFromRoot`, because `PageBase` builds the title and canonical URL
+  from the path.
+- Test the states the committed data does *not* contain by setting the
+  `SiteContent` signals — a page whose only test is "empty today" leaves its
+  interesting half unproven.
+- **e2e asserts the built files**, never `ng serve`: a static site *is* its
+  output, and the defects worth catching (`<html lang>`, base href, consent in
+  the prerendered HTML, a page missing from `dist`) are invisible to a dev-server
+  test. Playwright serves `dist/site` via `e2e/static-server.mjs` with the real
+  sub path; `workers: 2` is measured, not a guess.
+- a11y runs axe-core over every page in every language, in **both** consent
+  states, plus keyboard-only reachability, per-page titles and announcements.
+- Each spec file opens with a doc comment saying what it is for and which defect
+  it pins.
 
-## Repo/process
+## Repo / process
 
-- Conventional Commits + bead id, e.g. `feat(site): buy flow (#12)`; beads
-  (`bd`) for all tracking; branching per `docs/branching.md`.
-- Verify before done: `npm run check` (astro check) + `npm run build`.
-  No lint/test scripts exist yet.
+- Conventional Commits + bead id: `feat(site): … (enigma2_player-<id>)`. Beads
+  (`bd`) for all tracking; branch per task; `docs/branching.md` binds.
+- **A bead id in a comment is a promise, and `pre-commit` checks it.** The hook
+  warns when staged content names a bead this tracker does not have — take the
+  warning seriously: it is how four comments were caught citing `…-4dx` with
+  *this* repo's prefix, when that bead lives in the sibling repo — and is about
+  the app's `.lng` files, not this site (`enigma2_player-60g`). Ids are written
+  here unprefixed or as `<id>` on purpose, so the hook does not read an example
+  as a reference.
+- **Before done, in `site/`**: `npm run check` (literals → translations →
+  placeholders → unit), `npm run build`, `npm run test:e2e`, `npm run test:a11y`;
+  `npm run format`/`check:format` at the root.
+- The production **bundle budget is a hard error** (initial 375 kB): a change
+  that pulls content into the shell fails the build rather than slowly getting
+  heavier. That is how importing `legal-copy.ts` for three footer labels was
+  caught.
+- `npm run data:refresh` is the only thing that touches the network, and its
+  output (`site-data.json`) is committed — a build must never need the network.
+- Placeholders `⟨UPPER_SNAKE⟩` mark values that cannot exist yet;
+  `check:placeholders` reports them and only fails once
+  `legal/entity.ts` declares `ENTITY_STATUS = 'FILLED'`.
