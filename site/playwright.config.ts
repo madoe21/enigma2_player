@@ -32,9 +32,7 @@ export default defineConfig({
     baseURL: 'http://127.0.0.1:4321/enigma2_player/',
     trace: 'on-first-retry',
   },
-  projects: [
-    { name: 'chromium', use: { ...devices['Desktop Chrome'] } },
-  ],
+  projects: [{ name: 'chromium', use: { ...devices['Desktop Chrome'] } }],
   webServer: {
     // Node's own http, via e2e/static-server.mjs: it listens immediately and
     // depends on nothing that has to be fetched first. `npx --yes http-server`

@@ -25,9 +25,15 @@ import { PageBase } from '../page-base';
         three links that close together is a coin toss on a touchscreen.
       -->
       <ul class="link-list">
-        <li><a [href]="profile">{{ copy().github }}</a></li>
-        <li><a [href]="issues">{{ copy().issues }}</a></li>
-        <li><a [href]="'mailto:' + email">{{ copy().email }}: {{ email }}</a></li>
+        <li>
+          <a [href]="profile">{{ copy().github }}</a>
+        </li>
+        <li>
+          <a [href]="issues">{{ copy().issues }}</a>
+        </li>
+        <li>
+          <a [href]="'mailto:' + email">{{ copy().email }}: {{ email }}</a>
+        </li>
       </ul>
       <p>{{ copy().buy }}</p>
     </main>

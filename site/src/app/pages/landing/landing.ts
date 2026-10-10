@@ -48,7 +48,9 @@ import { SiteContent } from '../../content/site-content';
       <section class="buy-teaser">
         <h2>{{ copy().ctaBuy }}</h2>
         <site-consent-gate>
-          <p><a class="btn btn--primary" [routerLink]="buyHref()">{{ copy().ctaBuy }}</a></p>
+          <p>
+            <a class="btn btn--primary" [routerLink]="buyHref()">{{ copy().ctaBuy }}</a>
+          </p>
         </site-consent-gate>
       </section>
     </main>

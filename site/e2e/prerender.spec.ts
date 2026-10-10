@@ -11,11 +11,31 @@ import { expect, test } from '@playwright/test';
  * language all along and only the document did not.
  */
 const pages = [
-  { path: '', lang: 'de', heading: 'Dein Enigma2-Receiver. Auf jedem Bildschirm.', text: 'Durchsuche' },
+  {
+    path: '',
+    lang: 'de',
+    heading: 'Dein Enigma2-Receiver. Auf jedem Bildschirm.',
+    text: 'Durchsuche',
+  },
   { path: 'en/', lang: 'en', heading: 'Your Enigma2 receiver. On every screen.', text: 'Browse' },
-  { path: 'es/', lang: 'es', heading: 'Tu receptor Enigma2. En cualquier pantalla.', text: 'Explora' },
-  { path: 'fr/', lang: 'fr', heading: 'Votre récepteur Enigma2. Sur tous les écrans.', text: 'Parcourez' },
-  { path: 'it/', lang: 'it', heading: 'Il tuo ricevitore Enigma2. Su ogni schermo.', text: 'Sfoglia' },
+  {
+    path: 'es/',
+    lang: 'es',
+    heading: 'Tu receptor Enigma2. En cualquier pantalla.',
+    text: 'Explora',
+  },
+  {
+    path: 'fr/',
+    lang: 'fr',
+    heading: 'Votre récepteur Enigma2. Sur tous les écrans.',
+    text: 'Parcourez',
+  },
+  {
+    path: 'it/',
+    lang: 'it',
+    heading: 'Il tuo ricevitore Enigma2. Su ogni schermo.',
+    text: 'Sfoglia',
+  },
 ];
 
 for (const entry of pages) {
@@ -31,14 +51,9 @@ for (const entry of pages) {
   });
 }
 
-test('the base href is the sub path the site is deployed under', async ({
-  page,
-}) => {
+test('the base href is the sub path the site is deployed under', async ({ page }) => {
   // Forgetting this produces a build that works locally and loses every asset
   // once deployed - visible only after deploying.
   await page.goto('');
-  await expect(page.locator('base')).toHaveAttribute(
-    'href',
-    '/enigma2_player/',
-  );
+  await expect(page.locator('base')).toHaveAttribute('href', '/enigma2_player/');
 });

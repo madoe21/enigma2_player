@@ -16,8 +16,20 @@ import { Page, expect, test } from '@playwright/test';
  * that fires here has been a real finding rather than noise.
  */
 
-const PAGES = ['', 'features', 'screenshots', 'downloads', 'changelog', 'docs', 'faq', 'pricing',
-  'buy', 'account', 'license', 'contact'];
+const PAGES = [
+  '',
+  'features',
+  'screenshots',
+  'downloads',
+  'changelog',
+  'docs',
+  'faq',
+  'pricing',
+  'buy',
+  'account',
+  'license',
+  'contact',
+];
 const LANGS = ['de', 'en', 'es', 'fr', 'it'] as const;
 
 const TAGS = ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa', 'best-practice'];
@@ -73,8 +85,14 @@ test('the legal pages pass axe in both languages', async ({ page, context }) => 
   await context.addCookies([
     { name: 'e2p_consent', value: 'accepted', url: 'http://127.0.0.1:4321/enigma2_player/' },
   ]);
-  for (const path of ['impressum', 'datenschutz', 'cookies', 'en/imprint', 'en/privacy',
-    'en/cookies']) {
+  for (const path of [
+    'impressum',
+    'datenschutz',
+    'cookies',
+    'en/imprint',
+    'en/privacy',
+    'en/cookies',
+  ]) {
     await page.goto(path);
     const results = await scan(page);
 
@@ -131,8 +149,7 @@ test('every page is reachable by keyboard alone, with the focus visible', async 
         element.focus();
         const style = getComputedStyle(element);
         const hasOutline = style.outlineStyle !== 'none' && parseFloat(style.outlineWidth) > 0;
-        const hasOtherCue =
-          style.textDecorationLine !== 'none' || style.boxShadow !== 'none';
+        const hasOtherCue = style.textDecorationLine !== 'none' || style.boxShadow !== 'none';
         return !hasOutline && !hasOtherCue;
       })
       .map((element) => element.outerHTML.slice(0, 60));

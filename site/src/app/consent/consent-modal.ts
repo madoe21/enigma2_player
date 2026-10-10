@@ -60,7 +60,9 @@ import { ConsentStore } from './consent-store';
           -->
           <ul class="consent-dialog__legal">
             @for (link of legal.links(); track link.id) {
-              <li><a [routerLink]="link.href">{{ link.label }}</a></li>
+              <li>
+                <a [routerLink]="link.href">{{ link.label }}</a>
+              </li>
             }
           </ul>
           <p class="consent-dialog__policy">
@@ -70,8 +72,11 @@ import { ConsentStore } from './consent-store';
             <button type="button" class="consent-button" (click)="store.accept()">
               {{ copy().accept }}
             </button>
-            <button type="button" class="consent-button consent-button--quiet"
-                    (click)="store.reject()">
+            <button
+              type="button"
+              class="consent-button consent-button--quiet"
+              (click)="store.reject()"
+            >
               {{ copy().reject }}
             </button>
           </div>

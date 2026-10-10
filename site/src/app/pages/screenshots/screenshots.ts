@@ -56,17 +56,32 @@ import { getScreenshots } from '../../content/content';
           (keydown.arrowleft)="step(-1)"
           (keydown.arrowright)="step(1)"
         >
-          <button type="button" class="lightbox__control" (click)="close()" [attr.aria-label]="copy().close">
+          <button
+            type="button"
+            class="lightbox__control"
+            (click)="close()"
+            [attr.aria-label]="copy().close"
+          >
             ✕
           </button>
-          <button type="button" class="lightbox__control" (click)="step(-1)" [attr.aria-label]="copy().previous">
+          <button
+            type="button"
+            class="lightbox__control"
+            (click)="step(-1)"
+            [attr.aria-label]="copy().previous"
+          >
             ‹
           </button>
           <figure class="lightbox__figure">
             <img [src]="source(current()!.file)" [alt]="current()!.caption" />
             <figcaption>{{ current()!.caption }}</figcaption>
           </figure>
-          <button type="button" class="lightbox__control" (click)="step(1)" [attr.aria-label]="copy().next">
+          <button
+            type="button"
+            class="lightbox__control"
+            (click)="step(1)"
+            [attr.aria-label]="copy().next"
+          >
             ›
           </button>
         </div>

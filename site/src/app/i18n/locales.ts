@@ -23,9 +23,7 @@ export type Lang = (typeof locales)[number];
 export const defaultLang: Lang = 'de';
 
 /** The languages that live under a prefix: everything except [defaultLang]. */
-export const prefixedLocales: readonly Lang[] = locales.filter(
-  (lang) => lang !== defaultLang,
-);
+export const prefixedLocales: readonly Lang[] = locales.filter((lang) => lang !== defaultLang);
 
 /** Whether `value` is one of the languages this site publishes. */
 export function isLang(value: string | null | undefined): value is Lang {

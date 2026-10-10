@@ -5,14 +5,14 @@ import { ENTITY, ENTITY_STATUS } from '../../legal/entity';
 import { LegalPageComponent, LegalPageId } from './legal-page';
 
 describe('LegalPageComponent', () => {
-  async function render(which: LegalPageId, lang = 'de'): Promise<ComponentFixture<LegalPageComponent>> {
+  async function render(
+    which: LegalPageId,
+    lang = 'de',
+  ): Promise<ComponentFixture<LegalPageComponent>> {
     TestBed.resetTestingModule();
     await TestBed.configureTestingModule({
       imports: [LegalPageComponent],
-      providers: [
-        provideRouter([]),
-        { provide: ActivatedRoute, useValue: routeStub({ lang }) },
-      ],
+      providers: [provideRouter([]), { provide: ActivatedRoute, useValue: routeStub({ lang }) }],
     }).compileComponents();
 
     const fixture = TestBed.createComponent(LegalPageComponent);
@@ -106,7 +106,8 @@ describe('LegalPageComponent', () => {
  * page that cannot say which page it is.
  */
 function routeStub(data: Record<string, unknown>) {
-  const segments = data['lang'] === 'de' || data['lang'] === undefined ? [] : [String(data['lang'])];
+  const segments =
+    data['lang'] === 'de' || data['lang'] === undefined ? [] : [String(data['lang'])];
   return {
     snapshot: {
       data,

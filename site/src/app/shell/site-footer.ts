@@ -28,7 +28,9 @@ import { PageLanguage } from '../i18n/page-language';
       <nav class="site-footer__links" [attr.aria-label]="copy().legalNav">
         <ul>
           @for (link of legal.links(); track link.id) {
-            <li><a [routerLink]="link.href">{{ link.label }}</a></li>
+            <li>
+              <a [routerLink]="link.href">{{ link.label }}</a>
+            </li>
           }
         </ul>
       </nav>

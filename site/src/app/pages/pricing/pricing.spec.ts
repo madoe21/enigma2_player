@@ -18,10 +18,7 @@ describe('Pricing', () => {
     TestBed.resetTestingModule();
     await TestBed.configureTestingModule({
       imports: [Pricing],
-      providers: [
-        provideRouter([]),
-        { provide: ActivatedRoute, useValue: routeStub({ lang }) },
-      ],
+      providers: [provideRouter([]), { provide: ActivatedRoute, useValue: routeStub({ lang }) }],
     }).compileComponents();
     const fixture = TestBed.createComponent(Pricing);
     await fixture.whenStable();
@@ -89,7 +86,8 @@ describe('Pricing', () => {
  * page that cannot say which page it is.
  */
 function routeStub(data: Record<string, unknown>) {
-  const segments = data['lang'] === 'de' || data['lang'] === undefined ? [] : [String(data['lang'])];
+  const segments =
+    data['lang'] === 'de' || data['lang'] === undefined ? [] : [String(data['lang'])];
   return {
     snapshot: {
       data,

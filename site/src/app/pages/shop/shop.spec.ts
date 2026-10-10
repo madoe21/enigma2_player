@@ -106,7 +106,8 @@ describe('Shop', () => {
  * page that cannot say which page it is.
  */
 function routeStub(data: Record<string, unknown>) {
-  const segments = data['lang'] === 'de' || data['lang'] === undefined ? [] : [String(data['lang'])];
+  const segments =
+    data['lang'] === 'de' || data['lang'] === undefined ? [] : [String(data['lang'])];
   return {
     snapshot: {
       data,

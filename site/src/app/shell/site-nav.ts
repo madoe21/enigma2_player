@@ -112,14 +112,17 @@ export class SiteNav {
       href: localePath('', lang),
       label: this.translate.of('nav.home', lang),
     };
-    return [home, ...pageRoutes
-      .filter((page) => page.id !== 'landing' && (page.languages ?? locales).includes(lang))
-      .filter((page) => page.navKey !== undefined)
-      .map((page) => ({
-        id: page.id,
-        href: pathOf(page, lang),
-        label: this.translate.of(page.navKey as UiKey, lang),
-      }))];
+    return [
+      home,
+      ...pageRoutes
+        .filter((page) => page.id !== 'landing' && (page.languages ?? locales).includes(lang))
+        .filter((page) => page.navKey !== undefined)
+        .map((page) => ({
+          id: page.id,
+          href: pathOf(page, lang),
+          label: this.translate.of(page.navKey as UiKey, lang),
+        })),
+    ];
   });
 
   /**

@@ -65,8 +65,7 @@ export class PageMeta {
   /** Sets the head for a page. Called by every page through `PageBase`. */
   set(input: PageMetaInput): void {
     const siteName = this.translate.of('site.title', input.lang);
-    const description =
-      input.description ?? this.translate.of('site.tagline' as UiKey, input.lang);
+    const description = input.description ?? this.translate.of('site.tagline' as UiKey, input.lang);
     const full = input.title === siteName ? siteName : `${input.title} — ${siteName}`;
     const canonical = this.absolute(input.path);
 

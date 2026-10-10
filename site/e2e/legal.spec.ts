@@ -83,9 +83,7 @@ test('the cookie dialog links to the policy it is asking about', async ({ page }
   // By its name, not by position: the dialog also carries the three legal
   // links, and "the first link" would be a test that passes for the wrong
   // reason the moment that list changes.
-  const link = page
-    .getByRole('dialog')
-    .getByRole('link', { name: /Was genau gespeichert wird/ });
+  const link = page.getByRole('dialog').getByRole('link', { name: /Was genau gespeichert wird/ });
   await expect(link).toHaveAttribute('href', '/enigma2_player/cookies');
 
   // Reachable before the answer is given: consent to something that cannot be

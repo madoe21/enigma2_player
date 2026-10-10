@@ -25,8 +25,20 @@ const ASTRO = '../dist';
 const ANGULAR = 'dist/site/enigma2_player';
 
 /** The pages both sites have, by their shared slug. */
-const PAGES = ['', 'features', 'screenshots', 'downloads', 'changelog', 'docs', 'faq', 'pricing',
-  'buy', 'account', 'license', 'contact'];
+const PAGES = [
+  '',
+  'features',
+  'screenshots',
+  'downloads',
+  'changelog',
+  'docs',
+  'faq',
+  'pricing',
+  'buy',
+  'account',
+  'license',
+  'contact',
+];
 const LANGS = ['de', 'en'];
 
 /**
@@ -36,34 +48,64 @@ const LANGS = ['de', 'en'];
  */
 const EXPECTED = [
   // enigma2_player-vmk: the cookie question, its policy links and the state notice.
-  /Cookies?$/i, /einziges Cookie/i, /single cookie/i, /Einverstanden/, /Ablehnen/,
-  /Accept/, /Decline/, /Cookie-Entscheidung/, /Change cookie decision/,
-  /Was genau gespeichert wird/, /What exactly is stored/,
+  /Cookies?$/i,
+  /einziges Cookie/i,
+  /single cookie/i,
+  /Einverstanden/,
+  /Ablehnen/,
+  /Accept/,
+  /Decline/,
+  /Cookie-Entscheidung/,
+  /Change cookie decision/,
+  /Was genau gespeichert wird/,
+  /What exactly is stored/,
   // enigma2_player-esp: the legal links in the shell.
-  /^Impressum$/, /^Datenschutz$/, /^Cookie-Richtlinie$/, /^Imprint$/, /^Privacy$/,
-  /^Cookie policy$/, /^Rechtliches$/, /^Legal$/,
+  /^Impressum$/,
+  /^Datenschutz$/,
+  /^Cookie-Richtlinie$/,
+  /^Imprint$/,
+  /^Privacy$/,
+  /^Cookie policy$/,
+  /^Rechtliches$/,
+  /^Legal$/,
   // The skip link and the accessible nav names (WCAG 2.4.1, 1.3.1).
-  /Direkt zum Inhalt/, /Skip to content/, /Hauptnavigation/, /Main navigation/,
-  /Sprache wählen/, /Choose a language/,
+  /Direkt zum Inhalt/,
+  /Skip to content/,
+  /Hauptnavigation/,
+  /Main navigation/,
+  /Sprache wählen/,
+  /Choose a language/,
   // The language switcher now shows the language names instead of DE/EN/ES.
   /^(Deutsch|English|Español|Français|Italiano)$/,
   // The data is baked in: the old pages show their loading text here.
-  /^(Lade|Loading)/i, /Lädt/, /…$/,
+  /^(Lade|Loading)/i,
+  /Lädt/,
+  /…$/,
   // Gated regions explain themselves instead of being empty (vmk).
-  /braucht Ihre Zustimmung/, /needs your consent/,
-  /Shop in neuem Tab öffnen/, /Open the shop in a new tab/,
+  /braucht Ihre Zustimmung/,
+  /needs your consent/,
+  /Shop in neuem Tab öffnen/,
+  /Open the shop in a new tab/,
   // Baked-in release data the old page could not show before its fetch.
-  /^v?\d+\.\d+\.\d+/, /^Enigma2Player-/, /\.(exe|dmg|AppImage|deb|rpm|msi|tar\.gz)$/,
-  /Letzte Version|Aktuelle Version/, /Latest version/, /Vorab-Version/, /Pre-release/,
-  /^(Windows|macOS|Linux)$/, /^(Herunterladen|Download)$/,
+  /^v?\d+\.\d+\.\d+/,
+  /^Enigma2Player-/,
+  /\.(exe|dmg|AppImage|deb|rpm|msi|tar\.gz)$/,
+  /Letzte Version|Aktuelle Version/,
+  /Latest version/,
+  /Vorab-Version/,
+  /Pre-release/,
+  /^(Windows|macOS|Linux)$/,
+  /^(Herunterladen|Download)$/,
   // The language switcher shows each language in its own name now, not DE/EN/ES:
   // a visitor looking for their language recognises "Deutsch", not "DE".
   /^(DE|EN|ES|FR|IT)$/,
   // The shop: the Astro build had no licence server configured, so every /buy
   // and /account page said "not available yet". This build has one, so those
   // pages frame the shop behind the consent gate instead.
-  /Der Shop ist noch nicht verfügbar/, /The shop is not available yet/,
-  /Il negozio non è ancora disponibile/, /La boutique n’est pas encore disponible/,
+  /Der Shop ist noch nicht verfügbar/,
+  /The shop is not available yet/,
+  /Il negozio non è ancora disponibile/,
+  /La boutique n’est pas encore disponible/,
   /La tienda aún no está disponible/,
   // THE OLD SITE'S OWN DEFECT, not content to preserve: every prefixed
   // language was served with the German navigation and <html lang="de">,
@@ -84,22 +126,24 @@ async function textOf(file) {
   } catch {
     return null;
   }
-  return html
-    // Everything that is not shown to a reader.
-    .replace(/<script[\s\S]*?<\/script>/gi, ' ')
-    .replace(/<style[\s\S]*?<\/style>/gi, ' ')
-    .replace(/<!--[\s\S]*?-->/g, ' ')
-    .replace(/<head[\s\S]*?<\/head>/i, ' ')
-    .replace(/<[^>]+>/g, '\n')
-    .replace(/&nbsp;/g, ' ')
-    .replace(/&amp;/g, '&')
-    .replace(/&quot;/g, '"')
-    .replace(/&#39;|&apos;/g, "'")
-    .replace(/&lt;/g, '<')
-    .replace(/&gt;/g, '>')
-    .split('\n')
-    .map((line) => line.replace(/\s+/g, ' ').trim())
-    .filter((line) => line.length > 1);
+  return (
+    html
+      // Everything that is not shown to a reader.
+      .replace(/<script[\s\S]*?<\/script>/gi, ' ')
+      .replace(/<style[\s\S]*?<\/style>/gi, ' ')
+      .replace(/<!--[\s\S]*?-->/g, ' ')
+      .replace(/<head[\s\S]*?<\/head>/i, ' ')
+      .replace(/<[^>]+>/g, '\n')
+      .replace(/&nbsp;/g, ' ')
+      .replace(/&amp;/g, '&')
+      .replace(/&quot;/g, '"')
+      .replace(/&#39;|&apos;/g, "'")
+      .replace(/&lt;/g, '<')
+      .replace(/&gt;/g, '>')
+      .split('\n')
+      .map((line) => line.replace(/\s+/g, ' ').trim())
+      .filter((line) => line.length > 1)
+  );
 }
 
 function expected(line) {
@@ -115,10 +159,15 @@ for (const lang of LANGS) {
   for (const page of PAGES) {
     const sub = lang === 'de' ? page : `${lang}/${page}`;
     const path = sub ? `${sub}/index.html` : 'index.html';
-    const [old, now] = await Promise.all([textOf(`${ASTRO}/${path}`), textOf(`${ANGULAR}/${path}`)]);
+    const [old, now] = await Promise.all([
+      textOf(`${ASTRO}/${path}`),
+      textOf(`${ANGULAR}/${path}`),
+    ]);
     if (old === null || now === null) {
-      console.log(`? /${sub || ''}: ${old === null ? 'not in the Astro build' : ''}` +
-        `${now === null ? 'not in the Angular build' : ''}`);
+      console.log(
+        `? /${sub || ''}: ${old === null ? 'not in the Astro build' : ''}` +
+          `${now === null ? 'not in the Angular build' : ''}`,
+      );
       continue;
     }
     const oldSet = new Set(old);

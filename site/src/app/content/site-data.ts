@@ -43,7 +43,10 @@ export interface SiteData {
   readonly repo?: string;
   readonly release: ReleaseData | null;
   readonly changelog: readonly ReleaseNote[] | null;
-  readonly pricing: { readonly models: readonly PriceModel[]; readonly reason: string | null } | null;
+  readonly pricing: {
+    readonly models: readonly PriceModel[];
+    readonly reason: string | null;
+  } | null;
 }
 
 /**

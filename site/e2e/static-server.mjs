@@ -42,8 +42,7 @@ function resolve(urlPath) {
   // would be served, and a test server that can read outside its folder is a
   // bad habit even when it only ever runs locally.
   const candidate = normalize(join(root, decoded));
-  if (!candidate.startsWith(normalize(root) + sep) &&
-      normalize(candidate) !== normalize(root)) {
+  if (!candidate.startsWith(normalize(root) + sep) && normalize(candidate) !== normalize(root)) {
     return null;
   }
   if (existsSync(candidate) && statSync(candidate).isDirectory()) {

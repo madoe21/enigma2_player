@@ -34,7 +34,12 @@
   --line: #8b9199;
   --scrim: rgb(0 0 0 / 55%);
 
-  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  font-family:
+    system-ui,
+    -apple-system,
+    'Segoe UI',
+    Roboto,
+    sans-serif;
   /* 1.5 is the WCAG 1.4.12 text-spacing baseline, not a design flourish. */
   line-height: 1.55;
 }
