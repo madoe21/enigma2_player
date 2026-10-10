@@ -60,15 +60,19 @@ export const ui = {
     'home.f.stream': 'Live-TV & Aufnahmen streamen, mit EPG und Bouquets.',
     'home.f.subs': 'DVB-Untertitel & Videotext direkt in der App dekodiert.',
     'home.f.cross': 'Ein Player für Desktop und Mobil, in de/en/es/fr/it.',
-    'home.f.license': 'Lizenzen gelten plattformübergreifend — ein Konto für alle deine Geräte.',
+    'home.f.license':
+      'Lizenzen gelten plattformübergreifend — ein Konto für alle deine Geräte.',
     'placeholder.body': 'Inhalt folgt in Kürze.',
     'contact.intro': 'Fragen, Feedback oder ein Problem? So erreichst du uns:',
     'contact.github': 'GitHub-Profil',
     'contact.issues': 'Problem melden (GitHub Issues)',
     'contact.email': 'E-Mail',
-    'contact.buy': 'Für Kauf-/Lizenzfragen siehe „Lizenz kaufen“ und dein Konto.',
-    'screenshots.note': 'Ein Blick in die App — auf allen Plattformen dieselbe Oberfläche. Zum Vergrößern anklicken.',
-    'pricing.intro': 'Wähle das Modell, das zu dir passt. Alle Preise inkl. USt.',
+    'contact.buy':
+      'Für Kauf-/Lizenzfragen siehe „Lizenz kaufen“ und dein Konto.',
+    'screenshots.note':
+      'Ein Blick in die App — auf allen Plattformen dieselbe Oberfläche. Zum Vergrößern anklicken.',
+    'pricing.intro':
+      'Wähle das Modell, das zu dir passt. Alle Preise inkl. USt.',
     'pricing.loading': 'Preise werden geladen…',
     'pricing.empty': 'Preise sind bald verfügbar.',
     'pricing.devices': 'Geräte',
@@ -93,7 +97,8 @@ export const ui = {
     'auth.logout': 'Abmelden',
     'auth.notConfigured': 'Das Konto-Backend ist noch nicht verbunden.',
     'auth.error': 'Etwas ist schiefgelaufen. Bitte erneut versuchen.',
-    'account.intro': 'Melde dich an, um Lizenzen, Geräte und Rechnungen zu verwalten.',
+    'account.intro':
+      'Melde dich an, um Lizenzen, Geräte und Rechnungen zu verwalten.',
     'account.licenses.title': 'Deine Lizenzen',
     'account.devices.title': 'Deine Geräte',
     'account.invoices.title': 'Rechnungen',
@@ -124,7 +129,8 @@ export const ui = {
     'changelog.intro': 'Was sich in jeder Version geändert hat.',
     'changelog.loading': 'Changelog wird geladen…',
     'changelog.empty': 'Noch keine Versionshinweise.',
-    'buy.intro': 'Wähle dein Modell und schließe die Zahlung sicher über PayPal ab.',
+    'buy.intro':
+      'Wähle dein Modell und schließe die Zahlung sicher über PayPal ab.',
     'buy.loading': 'Modelle werden geladen…',
     'buy.empty': 'Derzeit sind keine Modelle verfügbar.',
     'buy.select': 'Wählen',
@@ -160,14 +166,18 @@ export const ui = {
     'home.f.stream': 'Stream live TV & recordings, with EPG and bouquets.',
     'home.f.subs': 'DVB subtitles & teletext decoded right in the app.',
     'home.f.cross': 'One player for desktop and mobile, in de/en/es/fr/it.',
-    'home.f.license': 'Licenses are cross-platform — one account for all your devices.',
+    'home.f.license':
+      'Licenses are cross-platform — one account for all your devices.',
     'placeholder.body': 'Content coming soon.',
-    'contact.intro': 'Questions, feedback or a problem? Here is how to reach us:',
+    'contact.intro':
+      'Questions, feedback or a problem? Here is how to reach us:',
     'contact.github': 'GitHub profile',
     'contact.issues': 'Report a problem (GitHub Issues)',
     'contact.email': 'Email',
-    'contact.buy': 'For purchase/license questions see “Buy a license” and your account.',
-    'screenshots.note': 'A look inside the app — the same UI on every platform. Click to enlarge.',
+    'contact.buy':
+      'For purchase/license questions see “Buy a license” and your account.',
+    'screenshots.note':
+      'A look inside the app — the same UI on every platform. Click to enlarge.',
     'pricing.intro': 'Pick the model that fits you. All prices incl. VAT.',
     'pricing.loading': 'Loading prices…',
     'pricing.empty': 'Pricing will be available soon.',
@@ -257,17 +267,23 @@ export const ui = {
       'Explora, controla y transmite TV en directo, radio y grabaciones de tus receptores Enigma2 (OpenWebIF) — en Windows, macOS, Linux, Android (incl. Android TV y Fire TV) e iOS.',
     'home.features.title': 'Por qué Enigma2 Player',
     'home.f.multi': 'Gestiona varios receptores y cambia al instante.',
-    'home.f.stream': 'Transmite TV en directo y grabaciones, con EPG y bouquets.',
+    'home.f.stream':
+      'Transmite TV en directo y grabaciones, con EPG y bouquets.',
     'home.f.subs': 'Subtítulos DVB y teletexto decodificados en la app.',
-    'home.f.cross': 'Un reproductor para escritorio y móvil, en de/en/es/fr/it.',
-    'home.f.license': 'Las licencias son multiplataforma — una cuenta para todos tus dispositivos.',
+    'home.f.cross':
+      'Un reproductor para escritorio y móvil, en de/en/es/fr/it.',
+    'home.f.license':
+      'Las licencias son multiplataforma — una cuenta para todos tus dispositivos.',
     'placeholder.body': 'Contenido próximamente.',
-    'contact.intro': '¿Preguntas, comentarios o un problema? Así puedes contactarnos:',
+    'contact.intro':
+      '¿Preguntas, comentarios o un problema? Así puedes contactarnos:',
     'contact.github': 'Perfil de GitHub',
     'contact.issues': 'Informar de un problema (GitHub Issues)',
     'contact.email': 'Correo',
-    'contact.buy': 'Para compras/licencias consulta “Comprar licencia” y tu cuenta.',
-    'screenshots.note': 'Un vistazo a la app — la misma interfaz en todas las plataformas. Haz clic para ampliar.',
+    'contact.buy':
+      'Para compras/licencias consulta “Comprar licencia” y tu cuenta.',
+    'screenshots.note':
+      'Un vistazo a la app — la misma interfaz en todas las plataformas. Haz clic para ampliar.',
     'pricing.intro': 'Elige el modelo que mejor se adapte a ti. IVA incluido.',
     'pricing.loading': 'Cargando precios…',
     'pricing.empty': 'Los precios estarán disponibles pronto.',
@@ -293,7 +309,8 @@ export const ui = {
     'auth.logout': 'Cerrar sesión',
     'auth.notConfigured': 'El backend de cuentas aún no está conectado.',
     'auth.error': 'Algo salió mal. Inténtalo de nuevo.',
-    'account.intro': 'Inicia sesión para gestionar licencias, dispositivos y facturas.',
+    'account.intro':
+      'Inicia sesión para gestionar licencias, dispositivos y facturas.',
     'account.licenses.title': 'Tus licencias',
     'account.devices.title': 'Tus dispositivos',
     'account.invoices.title': 'Facturas',
@@ -357,17 +374,22 @@ export const ui = {
       'Parcourez, pilotez et diffusez la TV en direct, la radio et les enregistrements de vos récepteurs Enigma2 (OpenWebIF) — sur Windows, macOS, Linux, Android (dont Android TV & Fire TV) et iOS.',
     'home.features.title': 'Pourquoi Enigma2 Player',
     'home.f.multi': 'Gérez plusieurs récepteurs et basculez en un instant.',
-    'home.f.stream': 'Diffusez la TV en direct et les enregistrements, avec EPG et bouquets.',
+    'home.f.stream':
+      'Diffusez la TV en direct et les enregistrements, avec EPG et bouquets.',
     'home.f.subs': 'Sous-titres DVB et télétexte décodés dans l’app.',
     'home.f.cross': 'Un lecteur pour ordinateur et mobile, en de/en/es/fr/it.',
-    'home.f.license': 'Les licences sont multiplateformes — un compte pour tous vos appareils.',
+    'home.f.license':
+      'Les licences sont multiplateformes — un compte pour tous vos appareils.',
     'placeholder.body': 'Contenu à venir.',
-    'contact.intro': 'Questions, retours ou un problème ? Voici comment nous joindre :',
+    'contact.intro':
+      'Questions, retours ou un problème ? Voici comment nous joindre :',
     'contact.github': 'Profil GitHub',
     'contact.issues': 'Signaler un problème (GitHub Issues)',
     'contact.email': 'E-mail',
-    'contact.buy': 'Pour les achats/licences, voir « Acheter une licence » et votre compte.',
-    'screenshots.note': 'Un aperçu de l’app — la même interface sur toutes les plateformes. Cliquez pour agrandir.',
+    'contact.buy':
+      'Pour les achats/licences, voir « Acheter une licence » et votre compte.',
+    'screenshots.note':
+      'Un aperçu de l’app — la même interface sur toutes les plateformes. Cliquez pour agrandir.',
     'pricing.intro': 'Choisissez le modèle qui vous convient. TVA incluse.',
     'pricing.loading': 'Chargement des tarifs…',
     'pricing.empty': 'Les tarifs seront bientôt disponibles.',
@@ -393,7 +415,8 @@ export const ui = {
     'auth.logout': 'Se déconnecter',
     'auth.notConfigured': 'Le backend des comptes n’est pas encore connecté.',
     'auth.error': 'Une erreur est survenue. Réessayez.',
-    'account.intro': 'Connectez-vous pour gérer licences, appareils et factures.',
+    'account.intro':
+      'Connectez-vous pour gérer licences, appareils et factures.',
     'account.licenses.title': 'Vos licences',
     'account.devices.title': 'Vos appareils',
     'account.invoices.title': 'Factures',
@@ -424,7 +447,8 @@ export const ui = {
     'changelog.intro': 'Ce qui a changé à chaque version.',
     'changelog.loading': 'Chargement des nouveautés…',
     'changelog.empty': 'Pas encore de notes de version.',
-    'buy.intro': 'Choisissez votre modèle et payez en toute sécurité avec PayPal.',
+    'buy.intro':
+      'Choisissez votre modèle et payez en toute sécurité avec PayPal.',
     'buy.loading': 'Chargement des modèles…',
     'buy.empty': 'Aucun modèle disponible pour le moment.',
     'buy.select': 'Choisir',
@@ -456,18 +480,24 @@ export const ui = {
     'home.hero.sub':
       'Sfoglia, controlla e trasmetti TV in diretta, radio e registrazioni dei tuoi ricevitori Enigma2 (OpenWebIF) — su Windows, macOS, Linux, Android (incl. Android TV e Fire TV) e iOS.',
     'home.features.title': 'Perché Enigma2 Player',
-    'home.f.multi': 'Gestisci più ricevitori e passa dall’uno all’altro in un attimo.',
-    'home.f.stream': 'Trasmetti TV in diretta e registrazioni, con EPG e bouquet.',
+    'home.f.multi':
+      'Gestisci più ricevitori e passa dall’uno all’altro in un attimo.',
+    'home.f.stream':
+      'Trasmetti TV in diretta e registrazioni, con EPG e bouquet.',
     'home.f.subs': 'Sottotitoli DVB e televideo decodificati nell’app.',
     'home.f.cross': 'Un player per desktop e mobile, in de/en/es/fr/it.',
-    'home.f.license': 'Le licenze sono multipiattaforma — un account per tutti i tuoi dispositivi.',
+    'home.f.license':
+      'Le licenze sono multipiattaforma — un account per tutti i tuoi dispositivi.',
     'placeholder.body': 'Contenuto in arrivo.',
-    'contact.intro': 'Domande, suggerimenti o un problema? Ecco come contattarci:',
+    'contact.intro':
+      'Domande, suggerimenti o un problema? Ecco come contattarci:',
     'contact.github': 'Profilo GitHub',
     'contact.issues': 'Segnala un problema (GitHub Issues)',
     'contact.email': 'E-mail',
-    'contact.buy': 'Per acquisti/licenze vedi “Acquista licenza” e il tuo account.',
-    'screenshots.note': 'Uno sguardo all’app — la stessa interfaccia su ogni piattaforma. Clicca per ingrandire.',
+    'contact.buy':
+      'Per acquisti/licenze vedi “Acquista licenza” e il tuo account.',
+    'screenshots.note':
+      'Uno sguardo all’app — la stessa interfaccia su ogni piattaforma. Clicca per ingrandire.',
     'pricing.intro': 'Scegli il modello più adatto a te. IVA inclusa.',
     'pricing.loading': 'Caricamento prezzi…',
     'pricing.empty': 'I prezzi saranno presto disponibili.',

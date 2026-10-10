@@ -1,0 +1,24 @@
+# What Prettier has no business reformatting.
+#
+# Without this, `prettier --check .` reports 109 files and is therefore read by
+# nobody - the same failure mode as the missing `.prettierrc` it accompanies
+# (enigma2_player-bxw). Everything below is either generated, owned by a tool,
+# or checked by its own job.
+
+# Build output.
+dist/
+site/dist/
+site/.angular/
+site/test-results/
+
+# Generated: written by a script, so formatting it by hand is undone next run.
+TODO.md
+package-lock.json
+site/package-lock.json
+
+# Tool-owned. `.claude/agents/*.md` is the dangerous one: an agent whose YAML
+# frontmatter stops parsing is dropped from the roster SILENTLY (AGENTS.md §5),
+# and reflowing a description across lines is exactly how that happens.
+.claude/
+.aiflow/
+.beads/

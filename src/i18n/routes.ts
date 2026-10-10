@@ -22,5 +22,5 @@ export const builtSections = new Set<Section>([
 
 /** Sections still served by the placeholder route, in all locales. */
 export const placeholderSections: Section[] = sections.filter(
-  s => !builtSections.has(s)
+  s => !builtSections.has(s),
 );

@@ -22,16 +22,16 @@
  *   node .github/scripts/audit-gate.mjs <dir>
  *   node .github/scripts/audit-gate.mjs . --allow astro,sharp
  */
-import { execSync } from "node:child_process";
+import {execSync} from 'node:child_process';
 
-const BLOCKING = new Set(["high", "critical"]);
+const BLOCKING = new Set(['high', 'critical']);
 
-const [dir = ".", ...rest] = process.argv.slice(2);
-const allowIndex = rest.indexOf("--allow");
+const [dir = '.', ...rest] = process.argv.slice(2);
+const allowIndex = rest.indexOf('--allow');
 const allowed = new Set(
   allowIndex === -1
     ? []
-    : (rest[allowIndex + 1] ?? "").split(",").filter(Boolean),
+    : (rest[allowIndex + 1] ?? '').split(',').filter(Boolean),
 );
 
 /**
@@ -49,11 +49,11 @@ function audit() {
     // and passing an args array THROUGH a shell is what DEP0190 warns about.
     // Nothing is interpolated into the string - `dir` is the cwd, not an
     // argument - so there is no injection surface either way.
-    out = execSync("npm audit --json", {
+    out = execSync('npm audit --json', {
       cwd: dir,
-      encoding: "utf8",
+      encoding: 'utf8',
       maxBuffer: 32 * 1024 * 1024,
-      stdio: ["ignore", "pipe", "pipe"],
+      stdio: ['ignore', 'pipe', 'pipe'],
     });
   } catch (error) {
     out = error.stdout;
@@ -76,11 +76,11 @@ const blocking = vulnerabilities.filter(([name]) => !allowed.has(name));
 
 for (const [name, value] of vulnerabilities) {
   const titles = (value.via ?? [])
-    .map((via) => (typeof via === "string" ? via : via.title))
+    .map(via => (typeof via === 'string' ? via : via.title))
     .filter(Boolean);
-  const mark = allowed.has(name) ? "allowed" : "BLOCKING";
+  const mark = allowed.has(name) ? 'allowed' : 'BLOCKING';
   console.log(
-    `${value.severity.toUpperCase()} ${name} ${value.range ?? ""} [${mark}]`,
+    `${value.severity.toUpperCase()} ${name} ${value.range ?? ''} [${mark}]`,
   );
   for (const title of titles) {
     console.log(`    ${title}`);
@@ -91,13 +91,13 @@ const counts = report.metadata?.vulnerabilities ?? {};
 console.log(
   `\n${dir}: ${counts.critical ?? 0} critical, ${counts.high ?? 0} high, ` +
     `${counts.moderate ?? 0} moderate, ${counts.low ?? 0} low` +
-    (allowed.size > 0 ? ` (allowed: ${[...allowed].join(", ")})` : ""),
+    (allowed.size > 0 ? ` (allowed: ${[...allowed].join(', ')})` : ''),
 );
 
 if (blocking.length > 0) {
   console.error(
     `\naudit-gate: ${blocking.length} unaccepted high/critical advisory(s) in ${dir}: ` +
-      `${blocking.map(([name]) => name).join(", ")}`,
+      `${blocking.map(([name]) => name).join(', ')}`,
   );
   process.exit(1);
 }
@@ -105,12 +105,12 @@ if (blocking.length > 0) {
 // An allow list that outlives its reason is worse than no allow list: it keeps
 // passing after the advisory is gone and nobody notices it is still there.
 const stale = [...allowed].filter(
-  (name) => !vulnerabilities.some(([vuln]) => vuln === name),
+  name => !vulnerabilities.some(([vuln]) => vuln === name),
 );
 if (stale.length > 0) {
   console.error(
     `\naudit-gate: these packages are allowed but no longer report a high or ` +
-      `critical advisory - remove them from --allow: ${stale.join(", ")}`,
+      `critical advisory - remove them from --allow: ${stale.join(', ')}`,
   );
   process.exit(1);
 }
