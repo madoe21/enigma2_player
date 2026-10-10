@@ -12,7 +12,11 @@ site/.angular/
 site/test-results/
 
 # Generated: written by a script, so formatting it by hand is undone next run.
+# `.mcp.json` says so in its own `$comment`: aiflow rewrites it from
+# .aiflow/config.json, PowerShell-serialised, and a gate that fails on a file
+# nobody edited is a gate that gets switched off.
 TODO.md
+.mcp.json
 package-lock.json
 site/package-lock.json
 
@@ -22,3 +26,16 @@ site/package-lock.json
 .claude/
 .aiflow/
 .beads/
+.agents/
+
+# Prose, not code (enigma2_player-63s). Prettier's value in Markdown is
+# cosmetic - list markers, table padding - and its cost here is not: AGENTS.md
+# alone is 1723 changed lines, because every paragraph in this repository's
+# rulebook is hand-wrapped and every table hand-aligned. Reflowing it would
+# make `git blame` on the rules useless to settle an argument about them, and
+# the same holds for the ADRs, the arc42 document and the READMEs. Line breaks
+# in prose are an editorial decision, so they stay with the author.
+#
+# Code and configuration are the opposite case and are NOT excluded: there the
+# formatter settles arguments instead of starting them.
+*.md

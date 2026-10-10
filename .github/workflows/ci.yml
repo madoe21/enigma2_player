@@ -31,6 +31,14 @@ jobs:
       - name: Install
         run: npm ci
 
+      # This job had no style step at all, which is why 36 of its files had
+      # drifted from its own `.prettierrc` (enigma2_player-63s). Prettier is a
+      # pinned devDependency here and the version is exact, not a caret range:
+      # a formatter patch release can change its output, and then the gate
+      # fails on a file nobody touched.
+      - name: Code style (Prettier)
+        run: npm run check:format
+
       # A hard gate, no allow list: this tree is new, it reports nothing, and
       # the moment it reports a high or critical the build stops. The Astro
       # tree accumulated sixteen advisories unseen because nobody ever
@@ -81,13 +89,23 @@ jobs:
       - name: Node
         if: hashFiles('package.json') != ''
         uses: actions/setup-node@v6
-        with: { node-version: "22" }
+        with: {node-version: '22'}
       - name: Node verify
         if: hashFiles('package.json') != ''
         run: |
           npm ci || npm install
-          npx --yes prettier --check . || echo "::warning::prettier issues"
           npm test --if-present
+
+      # Its own step, and hard. It used to be
+      # `npx --yes prettier --check . || echo "::warning::prettier issues"`
+      # buried in the step above: a warning in a log nobody opens, which is
+      # how 53 files drifted from a style the repository claims to enforce
+      # (enigma2_player-63s). `npx prettier`, not `npx --yes prettier`: the
+      # pinned local version decides what correct looks like, never whatever
+      # the registry published this morning.
+      - name: Code style (Prettier)
+        if: hashFiles('package.json') != ''
+        run: npx prettier --check .
 
       # The Astro site's own check, and it needs the build: the bug it guards
       # only appears once the configured base path is in the URL, so it is
@@ -115,7 +133,7 @@ jobs:
       - name: Python
         if: hashFiles('pyproject.toml','requirements.txt') != ''
         uses: actions/setup-python@v6
-        with: { python-version: "3.12" }
+        with: {python-version: '3.12'}
       - name: Python verify
         if: hashFiles('pyproject.toml','requirements.txt') != ''
         run: |
@@ -127,7 +145,7 @@ jobs:
       - name: Go
         if: hashFiles('go.mod') != ''
         uses: actions/setup-go@v6
-        with: { go-version: "stable" }
+        with: {go-version: 'stable'}
       - name: Go verify
         if: hashFiles('go.mod') != ''
         run: |

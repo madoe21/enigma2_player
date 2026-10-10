@@ -1,0 +1,21 @@
+# What Prettier has no business reformatting in this tree.
+#
+# A second copy of the repository-root `.prettierignore` on purpose: Prettier
+# reads exactly one ignore file, the one in the directory it is invoked from,
+# and this tree is checked from `site/` by its own CI job and its own pinned
+# Prettier. Nothing is inherited from the parent directory - without this file
+# a check started here would walk `dist/` and `.angular/` (enigma2_player-63s).
+# At the cutover this tree becomes the only one, and this file the only copy.
+
+# Build output.
+dist/
+.angular/
+test-results/
+playwright-report/
+
+# Generated: written by a script, so formatting it by hand is undone next run.
+package-lock.json
+
+# Prose, not code. Line breaks in prose are an editorial decision, so they stay
+# with the author - the reasoning is spelled out in the root copy.
+*.md
