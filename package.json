@@ -1,25 +1,14 @@
 {
-  "name": "enigma2-player-site",
+  "name": "enigma2-player-repo",
   "type": "module",
   "version": "0.1.0",
   "private": true,
-  "description": "Enigma2 Player product page & customer portal (static, Astro).",
+  "description": "Repository-level toolchain. The site itself lives in site/ (Angular 22, prerendered).",
   "scripts": {
-    "dev": "astro dev",
-    "build": "astro build",
-    "preview": "astro preview",
-    "check": "astro check",
-    "check:lang": "node tool/check-lang.mjs",
     "check:format": "prettier --check .",
     "format": "prettier --write ."
   },
-  "dependencies": {
-    "@astrojs/sitemap": "^3.7.3",
-    "astro": "^5.13.0"
-  },
   "devDependencies": {
-    "@astrojs/check": "^0.9.4",
-    "prettier": "3.9.10",
-    "typescript": "^5.6.3"
+    "prettier": "3.9.10"
   }
 }

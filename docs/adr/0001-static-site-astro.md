@@ -4,7 +4,13 @@ Date: 2026-07-01
 
 ## Status
 
-Accepted
+Superseded on 2026-10-10 by
+[ADR 0002](0002-product-site-angular-prerender.md) — the site is an Angular 22
+prerender now, for a reason outside this decision: the PO requires one framework
+across both of the product's web projects. The constraints recorded below did
+not change and still bind the Angular setup; the tooling choice did.
+
+Accepted 2026-07-01, and it held until the cutover.
 
 ## Context
 

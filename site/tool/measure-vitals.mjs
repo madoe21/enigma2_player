@@ -1,11 +1,13 @@
 /**
- * Measures the start page of both builds and prints the numbers.
+ * Measures the start page of the build and prints the numbers.
  *
- * `enigma2_player-9v1` asks for Core Web Vitals before and after the
- * migration. This is a LAB measurement on one machine over a local static
- * server - not field data, and it cannot be: the site is not deployed yet.
- * What it can answer is the question the bead actually has, which is whether
- * the framework change made the start page worse.
+ * `enigma2_player-9v1` asked for Core Web Vitals before and after the
+ * migration, and this measured both builds side by side while both existed.
+ * The Astro baseline (`../dist`) went with the Astro tree at the cutover
+ * (`enigma2_player-hsf.1`), so what is left is the ongoing measurement of the
+ * site itself. This is a LAB measurement on one machine over a local static
+ * server - not field data: it answers whether a change made the start page
+ * worse, not what visitors experience.
  *
  * Measured per build, median of five loads:
  *  - LCP, Largest Contentful Paint (the "good" threshold is 2500 ms)
@@ -17,9 +19,8 @@
  * and cannot be faked in a loop. The keyboard tests cover whether the
  * interactions work; how fast they feel is a field measurement.
  *
- * Usage, both builds first:
- *   npx astro build        # in the repository root
- *   npm run build          # in site/
+ * Usage, build first:
+ *   npm run build
  *   npm run vitals
  */
 import { createReadStream, existsSync, statSync } from 'node:fs';
@@ -28,10 +29,7 @@ import { extname, join, normalize, sep } from 'node:path';
 
 import { chromium } from '@playwright/test';
 
-const TARGETS = [
-  { name: 'Astro (before)', root: '../dist', path: '/' },
-  { name: 'Angular (after)', root: 'dist/site', path: '/enigma2_player/' },
-];
+const TARGETS = [{ name: 'Angular', root: 'dist/site', path: '/enigma2_player/' }];
 const RUNS = 5;
 const PORT = 4399;
 

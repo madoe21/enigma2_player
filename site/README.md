@@ -1,12 +1,17 @@
 # Product page — Angular 22
 
-The Angular version of the product page, replacing the Astro site in the
-repository root (bead `enigma2_player_source-hsf`). Both live here for the
-duration of the migration, and that is deliberate rather than untidy:
-`pages.yml` keeps deploying the Astro site until the content has moved
-(`enigma2_player_source-n5j`), so the published page never shows a half-built
-replacement. The switch happens in one commit that changes the deployment and
-removes Astro together.
+The product page (bead `enigma2_player_source-hsf`). This is the only site in
+the repository: the Astro site that used to live in the repository root was
+removed at the cutover, together with the deployment switch, in
+`enigma2_player-hsf.1`. Both trees existed side by side until then, which was
+deliberate rather than untidy — `pages.yml` kept deploying the old site until
+the content had moved (`enigma2_player_source-n5j`), so the published page never
+showed a half-built replacement.
+
+The repository root now holds repo-level tooling only: the single pinned
+Prettier, with the one `.prettierrc` and `.prettierignore` that cover this tree
+as well. Run `npm run format` there, not here. Whether this tree moves up to the
+root is an open question — see `docs/adr/0002-product-site-angular-prerender.md`.
 
 ## What is decided, and why
 

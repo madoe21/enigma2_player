@@ -1,7 +1,14 @@
 name: pages
 
-# Builds the Astro site and deploys it to GitHub Pages on every push to main.
+# Builds the site and deploys it to GitHub Pages on every push to main.
 # One-time repo setup: Settings → Pages → Source = "GitHub Actions".
+#
+# Until the cutover (enigma2_player-hsf.1) this was `withastro/action`, which
+# installed, built and uploaded in one opaque step. The site is an Angular 22
+# prerender now, so the three steps are spelled out - and the build is run from
+# `site/` with the Node version that tree pins, exactly as the `site` job in
+# ci.yml does. One build command for both, so a green CI means a deployable
+# artifact rather than two slightly different builds.
 on:
   push:
     branches: [main]
@@ -20,18 +27,38 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: site
     steps:
       - uses: actions/checkout@v7
-      - name: Build with Astro
-        uses: withastro/action@v6
-        # withastro/action installs deps, runs `astro build` and uploads the
-        # `dist/` artifact for the deploy job. `base`/`site` come from config.
-        # Public (non-secret) build config for the pricing/portal API. Set these
-        # as repo Actions *variables* (Settings → Secrets and variables →
-        # Actions → Variables); unset = pricing shows "coming soon".
-        env:
-          PUBLIC_LICENSE_API_BASE: ${{ vars.PUBLIC_LICENSE_API_BASE }}
-          PUBLIC_APP_API_KEY: ${{ vars.PUBLIC_APP_API_KEY }}
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version-file: site/.node-version
+          cache: npm
+          cache-dependency-path: site/package-lock.json
+
+      - name: Install
+        run: npm ci
+
+      # `npm run build` = `ng build` + the sitemap. No build-time secrets or
+      # variables: the shop endpoint and the download/changelog data are read
+      # from the committed `src/app/content/site-data.json`, which
+      # `npm run data:refresh` regenerates deliberately. That is why the
+      # `PUBLIC_LICENSE_API_BASE` / `PUBLIC_APP_API_KEY` Actions variables the
+      # Astro build read are no longer wired in here - nothing consumes them.
+      - name: Build (prerendered, five languages)
+        run: npm run build
+
+      # The browser output directory is named `enigma2_player` because that is
+      # the base href, and the artifact root is what GitHub serves under
+      # `/enigma2_player/` - so the directory CONTENTS are uploaded, not the
+      # directory, or every URL would gain the segment twice.
+      - name: Upload the built site
+        uses: actions/upload-pages-artifact@v4
+        with:
+          path: site/dist/site/enigma2_player
 
   deploy:
     needs: build

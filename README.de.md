@@ -29,7 +29,8 @@ Android und iOS folgen über die App-Stores.
 
 ## Über dieses Repository
 
-Dieses Repo beherbergt die **Produkt-Website** (Astro → GitHub Pages) und die
+Dieses Repo beherbergt die **Produkt-Website** (`site/`, Angular 22
+vorgerendert → GitHub Pages) und die
 **öffentlichen Releases**. Der Quellcode der Anwendung liegt in einem
 privaten Repository.
 

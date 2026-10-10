@@ -6,11 +6,11 @@ on:
   pull_request:
 
 jobs:
-  # The Angular site under site/ (enigma2_player_source-bdb). Its own job, not
-  # a step in `verify`: that one auto-detects a stack from the repository root,
-  # where the Astro site still lives until its content has moved over
-  # (enigma2_player_source-n5j). Two stacks in one repository for the duration
-  # of the migration, and each one checked on its own terms.
+  # The site (enigma2_player_source-bdb). Still its own job rather than a step
+  # in `verify`: it needs its own Node version and its own install, and a
+  # failure should say "site" in the job list. Since the cutover it is the only
+  # site in the repository - the Astro tree the root used to hold is gone
+  # (enigma2_player-hsf.1), and `verify` now only checks repository-level files.
   site:
     runs-on: ubuntu-latest
     defaults:
@@ -31,13 +31,11 @@ jobs:
       - name: Install
         run: npm ci
 
-      # This job had no style step at all, which is why 36 of its files had
-      # drifted from its own `.prettierrc` (enigma2_player-63s). Prettier is a
-      # pinned devDependency here and the version is exact, not a caret range:
-      # a formatter patch release can change its output, and then the gate
-      # fails on a file nobody touched.
-      - name: Code style (Prettier)
-        run: npm run check:format
+      # No style step here any more: one pinned Prettier at the repository root
+      # checks this tree in the same pass as everything else (the
+      # `Code style (Prettier)` step in `verify`). Two installs of the same
+      # exact version, each with its own config and ignore file, is how the
+      # formatting drifted in the first place (enigma2_player-63s/hsf.1).
 
       # A hard gate, no allow list: this tree is new, it reports nothing, and
       # the moment it reports a high or critical the build stops. The Astro
@@ -70,6 +68,14 @@ jobs:
 
       # Against the built files, because this site has no backend: what a
       # visitor and a crawler get is the output of the build.
+      #
+      # This is also where the declared page language is checked now. The root
+      # used to run `npm run check:lang` against the Astro build for it
+      # (enigma2_player-w83) - a page that lies about its language makes a
+      # screen reader read it in the wrong voice, WCAG 2.2 SC 3.1.1 - and the
+      # cutover did not drop that guard, it inherited it: `pages.spec.ts`,
+      # `prerender.spec.ts` and `legal.spec.ts` assert `<html lang>` on every
+      # prerendered route, for the same reason against the built output.
       - name: End-to-end tests (Playwright)
         run: npm run test:e2e
 
@@ -89,7 +95,7 @@ jobs:
       - name: Node
         if: hashFiles('package.json') != ''
         uses: actions/setup-node@v6
-        with: {node-version: '22'}
+        with: { node-version: '22' }
       - name: Node verify
         if: hashFiles('package.json') != ''
         run: |
@@ -107,33 +113,20 @@ jobs:
         if: hashFiles('package.json') != ''
         run: npx prettier --check .
 
-      # The Astro site's own check, and it needs the build: the bug it guards
-      # only appears once the configured base path is in the URL, so it is
-      # invisible to a unit test and to a local dev run (enigma2_player-w83).
-      # A page that lies about its language makes a screen reader read it in
-      # the wrong voice - WCAG 2.2 SC 3.1.1.
-      - name: Astro build + declared page language
-        if: hashFiles('astro.config.mjs') != ''
-        run: |
-          npm run build
-          npm run check:lang
-
-      # The Astro tree at the repository root, with two named exceptions.
-      # `astro` (critical) and `sharp` (high) are only fixable by jumping two
-      # major versions, on a dependency that the migration deletes - and
-      # neither is exploitable here: the vulnerable Astro features
-      # (`define:vars`, `server:defer`, `getSecret`) appear nowhere in `src/`,
-      # the site is static with no server at all, and `sharp` touches only our
-      # own images at build time. Justification in enigma2_player-yrq; the
-      # gate fails on anything else, and on an exception that stops applying.
-      - name: Dependency audit (Astro tree, with named exceptions)
+      # No allow list any more. It carried `astro` (critical) and `sharp`
+      # (high), both unfixable without a two-major jump and both argued as
+      # not exploitable in a static site (enigma2_player-yrq) - and both gone
+      # with the Astro tree itself (enigma2_player-hsf.1). What is left at the
+      # root is the pinned Prettier, so this gate is now plain: it fails on any
+      # high or critical, with nothing excused.
+      - name: Dependency audit (repository root, no exceptions)
         if: hashFiles('package.json') != ''
-        run: node .github/scripts/audit-gate.mjs . --allow astro,sharp
+        run: node .github/scripts/audit-gate.mjs .
 
       - name: Python
         if: hashFiles('pyproject.toml','requirements.txt') != ''
         uses: actions/setup-python@v6
-        with: {python-version: '3.12'}
+        with: { python-version: '3.12' }
       - name: Python verify
         if: hashFiles('pyproject.toml','requirements.txt') != ''
         run: |
@@ -145,7 +138,7 @@ jobs:
       - name: Go
         if: hashFiles('go.mod') != ''
         uses: actions/setup-go@v6
-        with: {go-version: 'stable'}
+        with: { go-version: 'stable' }
       - name: Go verify
         if: hashFiles('go.mod') != ''
         run: |

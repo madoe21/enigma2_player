@@ -28,7 +28,8 @@ Android and iOS are coming to the app stores.
 
 ## About this repository
 
-This repo hosts the **product website** (Astro → GitHub Pages) and the
+This repo hosts the **product website** (`site/`, Angular 22 prerendered →
+GitHub Pages) and the
 **public releases**. The application source code lives in a private
 repository.
 

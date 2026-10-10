@@ -1,5 +1,13 @@
 # Conventions — as observed in the code (onboarder, 2026-07-06)
 
+> **STALE in part — observed in the Astro tree, which no longer exists.** The
+> `.astro` patterns, the `astro check` verify step and the 80-column Prettier
+> settings below were read off the tree the cutover removed on 2026-10-10
+> (`enigma2_player-hsf.1`). What holds now: Angular 22 in `site/`, one Prettier
+> at the repository root (printWidth 100, single quotes, Angular HTML parser),
+> verified with `npm run build` + `npm test` + `npm run test:e2e` in `site/`.
+> Re-derivation filed as `enigma2_player-0ii`.
+
 Match these when writing code here; they follow Google TS style.
 
 ## Language & formatting

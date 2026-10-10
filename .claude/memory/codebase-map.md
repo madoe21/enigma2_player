@@ -1,5 +1,13 @@
 # Codebase map — Enigma2 Player product site
 
+> **STALE — describes the Astro tree, which no longer exists.** Everything below
+> was written from `src/` in the repository root, and the cutover removed it on
+> 2026-10-10 (`enigma2_player-hsf.1`). The site is an Angular 22 prerender in
+> `site/` now. Do not plan from this file; it is kept only as history of the
+> predecessor. Current picture: `docs/architecture/arc42.md`,
+> `docs/adr/0002-product-site-angular-prerender.md`, `site/README.md`. A
+> re-derivation by the onboarder is filed as `enigma2_player-0ii`.
+
 Written by the onboarder (2026-07-06) from the code. Structural map so future
 sessions don't re-scan. Detail view: `docs/architecture/arc42.md`.
 

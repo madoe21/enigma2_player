@@ -22,16 +22,14 @@
  *   node .github/scripts/audit-gate.mjs <dir>
  *   node .github/scripts/audit-gate.mjs . --allow astro,sharp
  */
-import {execSync} from 'node:child_process';
+import { execSync } from 'node:child_process';
 
 const BLOCKING = new Set(['high', 'critical']);
 
 const [dir = '.', ...rest] = process.argv.slice(2);
 const allowIndex = rest.indexOf('--allow');
 const allowed = new Set(
-  allowIndex === -1
-    ? []
-    : (rest[allowIndex + 1] ?? '').split(',').filter(Boolean),
+  allowIndex === -1 ? [] : (rest[allowIndex + 1] ?? '').split(',').filter(Boolean),
 );
 
 /**
@@ -76,12 +74,10 @@ const blocking = vulnerabilities.filter(([name]) => !allowed.has(name));
 
 for (const [name, value] of vulnerabilities) {
   const titles = (value.via ?? [])
-    .map(via => (typeof via === 'string' ? via : via.title))
+    .map((via) => (typeof via === 'string' ? via : via.title))
     .filter(Boolean);
   const mark = allowed.has(name) ? 'allowed' : 'BLOCKING';
-  console.log(
-    `${value.severity.toUpperCase()} ${name} ${value.range ?? ''} [${mark}]`,
-  );
+  console.log(`${value.severity.toUpperCase()} ${name} ${value.range ?? ''} [${mark}]`);
   for (const title of titles) {
     console.log(`    ${title}`);
   }
@@ -104,9 +100,7 @@ if (blocking.length > 0) {
 
 // An allow list that outlives its reason is worse than no allow list: it keeps
 // passing after the advisory is gone and nobody notices it is still there.
-const stale = [...allowed].filter(
-  name => !vulnerabilities.some(([vuln]) => vuln === name),
-);
+const stale = [...allowed].filter((name) => !vulnerabilities.some(([vuln]) => vuln === name));
 if (stale.length > 0) {
   console.error(
     `\naudit-gate: these packages are allowed but no longer report a high or ` +

@@ -5,10 +5,9 @@
 .beads-credential-key
 .beads/proxieddb/
 
-# Node / Astro
+# Node
 node_modules/
 dist/
-.astro/
 .env
 .env.*
 !.env.example

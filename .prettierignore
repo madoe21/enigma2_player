@@ -4,12 +4,18 @@
 # nobody - the same failure mode as the missing `.prettierrc` it accompanies
 # (enigma2_player-bxw). Everything below is either generated, owned by a tool,
 # or checked by its own job.
+#
+# The ONLY copy since the Astro cutover (enigma2_player-hsf.1). There were two,
+# because Prettier reads exactly one ignore file - the one in the directory it
+# is invoked from - and `site/` was checked from inside itself. It no longer is:
+# one pinned Prettier at the root checks the whole repository in one pass, so
+# one ignore file and one `.prettierrc` is all there is to keep in step.
 
 # Build output.
-dist/
 site/dist/
 site/.angular/
 site/test-results/
+site/playwright-report/
 
 # Generated: written by a script, so formatting it by hand is undone next run.
 # `.mcp.json` says so in its own `$comment`: aiflow rewrites it from
