@@ -119,13 +119,22 @@ fi
 # 3) Bead ids in the ADDED lines: same warning as in commit-msg, for files rather than the
 # message. Added lines only — an id already sitting in a file you touched is not this commit's
 # problem, and warning about it every time would train you to ignore the warning.
-lib="$(dirname "$0")/lib-bead-ids.sh"
-# shellcheck source=/dev/null
-if [ -f "$lib" ]; then
+# Looked for next to the hook AND in .githooks/: `core.hooksPath` points at .beads/hooks here,
+# where beads installed its hooks but not this library, so the step skipped itself in silence on
+# every commit since (enigma2_player-aji). Missing in both, it says so instead of vanishing.
+lib=""
+for cand in "$(dirname "$0")/lib-bead-ids.sh" \
+  "$(git rev-parse --show-toplevel 2>/dev/null)/.githooks/lib-bead-ids.sh"; do
+  [ -f "$cand" ] && { lib="$cand"; break; }
+done
+if [ -n "$lib" ]; then
+  # shellcheck source=/dev/null
   . "$lib"
   # quotePath=false like every other path-reading call here: a non-ASCII path would otherwise
   # arrive as "Ã¼ber" and drag its escaping into the scanned text (aiflow-4cl).
   git -c core.quotePath=false diff --cached -U0 | grep '^+' | warn_unknown_bead_ids "staged changes"
+else
+  echo "  ! no lib-bead-ids.sh next to this hook or in .githooks/ - bead ids NOT checked" >&2
 fi
 
 # 4) Lint + tests by detected stack (best-effort; fails the commit on error).

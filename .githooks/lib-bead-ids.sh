@@ -8,12 +8,19 @@
 # pulled yet, and a commit is the wrong place to lose that argument. Silently skipped when `bd`
 # or `jq` is absent, or outside a beads project.
 #
-# Usage: . "$(dirname "$0")/lib-bead-ids.sh"; printf '%s' "$text" | warn_unknown_bead_ids "<where>"
+# Usage: . "<this file>"; printf '%s' "$text" | warn_unknown_bead_ids "<where>"
+# The caller resolves the path — next to the hook, then .githooks/: `core.hooksPath` can point at
+# a directory this file was never installed into (enigma2_player-aji).
 
 # The prefix is read from the issue DB, never hardcoded: a project that renamed its prefix
-# (`bd rename-prefix`) must keep working without touching this file.
+# (`bd rename-prefix`) must keep working without touching this file. Read as the MODE of a sample
+# of ids rather than from a single one: a legacy id like `<prefix>-1782845428743-11-493621e3`
+# strips down to `<prefix>-1782845428743-11`, which matches no bead id below — and the check would
+# then do nothing, in silence, exactly the failure this file was just rescued from. `bd list`
+# documents no order, so "the first id" is not something to build on.
 bead_prefix() {
-  bd list --limit 1 --json 2>/dev/null | jq -r '(.[0].id // "") | sub("-[^-]+$"; "")' 2>/dev/null
+  bd list --all --limit 50 --json 2>/dev/null \
+    | jq -r '[.[].id | sub("-[^-]+$"; "")] | group_by(.) | max_by(length) | .[0] // ""' 2>/dev/null
 }
 
 warn_unknown_bead_ids() { # <context label>; text on stdin

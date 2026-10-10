@@ -26,7 +26,22 @@ fi
 
 # Warn (never block) about bead ids that do not exist — an invented id reads exactly like a real
 # one, and CI cannot check it: no `bd` in the runner, and the issue DB is not a tracked file.
-lib="$(dirname "$0")/lib-bead-ids.sh"
-# shellcheck source=/dev/null
-[ -f "$lib" ] && { . "$lib"; printf '%s' "$(cat "$1")" | warn_unknown_bead_ids "commit message"; }
+#
+# Two candidates, because `core.hooksPath` may point at a directory this library was never
+# installed into: beads points it at .beads/hooks and copied only the hooks there, so
+# `$(dirname "$0")` held no library and the step skipped itself without a word — for every
+# commit since (enigma2_player-aji). Found in neither place, the hook SAYS so: a check that
+# disappears in silence is worse than no check, because nobody stops trusting it.
+lib=""
+for cand in "$(dirname "$0")/lib-bead-ids.sh" \
+  "$(git rev-parse --show-toplevel 2>/dev/null)/.githooks/lib-bead-ids.sh"; do
+  [ -f "$cand" ] && { lib="$cand"; break; }
+done
+if [ -n "$lib" ]; then
+  # shellcheck source=/dev/null
+  . "$lib"
+  printf '%s' "$(cat "$1")" | warn_unknown_bead_ids "commit message"
+else
+  echo "  ! no lib-bead-ids.sh next to this hook or in .githooks/ - bead ids NOT checked" >&2
+fi
 exit 0
