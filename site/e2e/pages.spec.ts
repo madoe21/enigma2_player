@@ -142,3 +142,30 @@ test('no page loads anything from another host', async ({ page }) => {
   // This is that sentence, as a test (PO, 2026-10-09).
   expect(foreign, `requested: ${foreign.join(', ')}`).toEqual([]);
 });
+
+test('the demo notice is on every page, and holds nothing up', async ({ page, context }) => {
+  await context.addCookies([
+    { name: 'e2p_consent', value: 'accepted', url: 'http://127.0.0.1:4321/enigma2_player/' },
+  ]);
+
+  for (const path of ['', 'features', 'en/downloads', 'it/faq', 'impressum']) {
+    await page.goto(path);
+    const notice = page.locator('.demo-notice');
+
+    await expect(notice, `/${path} must say it is a demo`).toBeVisible();
+    // Before the content, so it is read early rather than discovered late.
+    const order = await page.evaluate(() => {
+      const banner = document.querySelector('.demo-notice');
+      const content = document.querySelector('#content');
+      return banner && content
+        ? banner.compareDocumentPosition(content) & Node.DOCUMENT_POSITION_FOLLOWING
+        : 0;
+    });
+    expect(order).toBeTruthy();
+  }
+
+  // The first Tab still reaches the skip link: the banner is not in the way.
+  await page.goto('');
+  await page.keyboard.press('Tab');
+  await expect(page.locator('.skip-link')).toBeFocused();
+});

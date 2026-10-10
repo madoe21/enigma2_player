@@ -3,6 +3,7 @@ import { RouterOutlet } from '@angular/router';
 
 import { ConsentModal } from './consent/consent-modal';
 import { ConsentStateNotice } from './consent/consent-state-notice';
+import { DemoNotice } from './shell/demo-notice';
 import { SiteFooter } from './shell/site-footer';
 import { SiteNav } from './shell/site-nav';
 import { RouteAnnouncer } from './i18n/route-announcer';
@@ -15,7 +16,7 @@ import { Translate } from './content/translate';
  * 2026-10-09).
  */
 @Component({
-  imports: [RouterOutlet, ConsentModal, ConsentStateNotice, SiteNav, SiteFooter],
+  imports: [RouterOutlet, ConsentModal, ConsentStateNotice, DemoNotice, SiteNav, SiteFooter],
   selector: 'app-root',
   styleUrl: './app.css',
   templateUrl: './app.html',

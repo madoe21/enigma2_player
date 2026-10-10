@@ -1,7 +1,7 @@
 import { Routes } from '@angular/router';
 
 import { Lang, defaultLang, locales, localePath } from './i18n/locales';
-import { legalLocales } from './legal/legal-copy';
+import { legalLocales } from './legal/legal-locales';
 import { UiKey } from './content/ui';
 
 /**
@@ -169,7 +169,9 @@ export function pathOf(page: PageDefinition, lang: Lang): string {
 export function pageOfPath(path: string): PageDefinition | undefined {
   const normalised = `/${path.replace(/^\/+|\/+$/g, '')}`.replace(/^\/$/, '/');
   return pageRoutes.find((page) =>
-    languagesOf(page).some((lang) => pathOf(page, lang).replace(/\/$/, '') === normalised.replace(/\/$/, '')),
+    languagesOf(page).some(
+      (lang) => pathOf(page, lang).replace(/\/$/, '') === normalised.replace(/\/$/, ''),
+    ),
   );
 }
 

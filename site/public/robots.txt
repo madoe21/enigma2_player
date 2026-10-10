@@ -1,4 +1,7 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://madoe21.github.io/enigma2_player/sitemap-index.xml
+# Written again into the build output by tool/write-sitemap.mjs, which knows
+# the file name it actually produced. This copy exists so a build that skips
+# that step still ships a robots.txt rather than none.
+Sitemap: https://madoe21.github.io/enigma2_player/sitemap.xml

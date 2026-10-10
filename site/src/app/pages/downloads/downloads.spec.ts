@@ -3,6 +3,7 @@ import { ActivatedRoute, provideRouter } from '@angular/router';
 
 import { Downloads } from './downloads';
 import { SITE_DATA, latestRelease } from '../../content/site-data';
+import { SiteContent } from '../../content/site-content';
 
 /**
  * The download list, which is now built from data the BUILD fetched.
@@ -16,10 +17,7 @@ describe('Downloads', () => {
     TestBed.resetTestingModule();
     await TestBed.configureTestingModule({
       imports: [Downloads],
-      providers: [
-        provideRouter([]),
-        { provide: ActivatedRoute, useValue: routeStub({ lang }) },
-      ],
+      providers: [provideRouter([]), { provide: ActivatedRoute, useValue: routeStub({ lang }) }],
     }).compileComponents();
     const fixture = TestBed.createComponent(Downloads);
     await fixture.whenStable();
@@ -79,6 +77,111 @@ describe('Downloads', () => {
 
     expect(text).toContain(`https://github.com/${SITE_DATA.repo}/releases`);
   });
+
+  describe('against an invented release', () => {
+    /**
+     * A release as the build would write it: one file per desktop platform.
+     *
+     * Invented rather than the committed one, because the committed one is
+     * whatever GitHub had on the day - and the cases worth testing are the
+     * ones it does not happen to show: an Android asset slipping in, a lookup
+     * that failed, a version the page must not hardcode (enigma2_player-oik).
+     *
+     * `9.9.9` is deliberately NOT a plausible version. The real releases run
+     * v1.0.0 to v1.1.1 and the current one is v1.1.1, which is what
+     * `site-data.json` carries; a fixture that looked like a real version
+     * would be mistaken for one the first time this test fails.
+     */
+    const invented = {
+      version: 'v9.9.9',
+      publishedAt: '2026-12-24T10:00:00Z',
+      url: 'https://github.com/madoe21/enigma2_player/releases/tag/v9.9.9',
+      downloads: [
+        {
+          platform: 'windows',
+          label: 'Windows',
+          file: 'enigma2_player-windows-x64-setup-9.9.9.exe',
+          url: 'https://github.com/madoe21/enigma2_player/releases/download/v9.9.9/win.exe',
+          size: 42,
+        },
+        {
+          platform: 'linux',
+          label: 'Linux',
+          file: 'enigma2_player-linux-x64-9.9.9.deb',
+          url: 'https://github.com/madoe21/enigma2_player/releases/download/v9.9.9/linux.deb',
+          size: 43,
+        },
+      ],
+    };
+
+    it('offers exactly what the release contains, no more', async () => {
+      const fixture = await render();
+      TestBed.inject(SiteContent).release.set(invented);
+      fixture.detectChanges();
+      await fixture.whenStable();
+
+      const element = fixture.nativeElement as HTMLElement;
+      expect(element.querySelectorAll('.download-row').length).toBe(2);
+      expect(element.textContent).toContain('enigma2_player-windows-x64-setup-9.9.9.exe');
+      expect(element.textContent).toContain('v9.9.9');
+    });
+
+    it('never offers an Android or iOS build', async () => {
+      // They exist only in the private repository and the store route is not
+      // decided (PO, 2026-07-07). The generator filters by platform; this is
+      // the assertion that the page adds no row of its own on top.
+      const fixture = await render();
+      TestBed.inject(SiteContent).release.set({
+        ...invented,
+        downloads: [
+          ...invented.downloads,
+          {
+            platform: 'android',
+            label: 'Android',
+            file: 'app-release.apk',
+            url: 'https://example.invalid/app-release.apk',
+            size: 1,
+          },
+        ],
+      });
+      fixture.detectChanges();
+      await fixture.whenStable();
+
+      const text = (fixture.nativeElement as HTMLElement).textContent ?? '';
+      expect(text).not.toContain('.apk');
+      expect(text).not.toContain('.ipa');
+    });
+
+    it('stays usable when the release lookup failed', async () => {
+      // The generator writes null when GitHub could not be reached. The page
+      // then has to point at the releases page rather than show an empty list:
+      // somebody who came to download something must not land on nothing.
+      const fixture = await render();
+      TestBed.inject(SiteContent).release.set(null);
+      fixture.detectChanges();
+      await fixture.whenStable();
+
+      const element = fixture.nativeElement as HTMLElement;
+      expect(element.querySelectorAll('.download-row').length).toBe(0);
+      expect(element.textContent).toContain('Noch keine Releases');
+      const hrefs = Array.from(element.querySelectorAll('a')).map((a) => a.getAttribute('href'));
+      expect(hrefs).toContain('https://github.com/madoe21/enigma2_player/releases');
+    });
+
+    it('carries no version number of its own', async () => {
+      // The site is not versioned and stays at 1.0.0 (PO, 2026-10-09). The
+      // only version on the page is the release's, and it comes from the
+      // generated data rather than from any source file.
+      const fixture = await render();
+      TestBed.inject(SiteContent).release.set(invented);
+      fixture.detectChanges();
+      await fixture.whenStable();
+
+      const text = (fixture.nativeElement as HTMLElement).textContent ?? '';
+      const versions = [...text.matchAll(/\d+\.\d+\.\d+/g)].map((match) => match[0]);
+      expect(new Set(versions)).toEqual(new Set(['9.9.9']));
+    });
+  });
 });
 
 /**
@@ -89,7 +192,8 @@ describe('Downloads', () => {
  * page that cannot say which page it is.
  */
 function routeStub(data: Record<string, unknown>) {
-  const segments = data['lang'] === 'de' || data['lang'] === undefined ? [] : [String(data['lang'])];
+  const segments =
+    data['lang'] === 'de' || data['lang'] === undefined ? [] : [String(data['lang'])];
   return {
     snapshot: {
       data,

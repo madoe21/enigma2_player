@@ -1,15 +1,8 @@
 import { ENTITY } from './entity';
+import { LegalLang, isLegalLang, legalLocales } from './legal-locales';
 
-/** The languages the legal texts are published in. */
-export const legalLocales = ['de', 'en'] as const;
-
-/** A language a legal text exists in. */
-export type LegalLang = (typeof legalLocales)[number];
-
-/** Whether a legal text exists in this language. */
-export function isLegalLang(value: string): value is LegalLang {
-  return (legalLocales as readonly string[]).includes(value);
-}
+export { legalLocales, isLegalLang };
+export type { LegalLang };
 
 /** One section of a legal page: a heading and its lines. */
 export interface LegalSection {
@@ -89,7 +82,10 @@ export const LEGAL_COPY: Record<LegalLang, LegalCopy> = {
         },
         {
           heading: 'Registereintrag',
-          lines: [`Registergericht: ${ENTITY.registerCourt}`, `Registernummer: ${ENTITY.registerNumber}`],
+          lines: [
+            `Registergericht: ${ENTITY.registerCourt}`,
+            `Registernummer: ${ENTITY.registerNumber}`,
+          ],
         },
         {
           heading: 'Umsatzsteuer-Identifikationsnummer',

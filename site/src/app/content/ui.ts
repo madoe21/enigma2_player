@@ -48,6 +48,12 @@ export type Section = (typeof sections)[number];
 
 export const ui = {
   de: {
+    'legal.imprint': 'Impressum',
+    'legal.privacy': 'Datenschutz',
+    'legal.cookies': 'Cookie-Richtlinie',
+    'demo.label': 'Hinweis zur Demo-Version',
+    'demo.notice':
+      'Demo-Version: diese Seite zeigt den Stand der Entwicklung. Käufe sind noch nicht möglich, und die Angaben im Impressum sind noch nicht ausgefüllt.',
     'a11y.languageChanged': 'Sprache gewechselt: Deutsch',
     'a11y.pageChanged': 'Seite geladen:',
     'nav.skip': 'Direkt zum Inhalt',
@@ -60,8 +66,7 @@ export const ui = {
     'nav.main': 'Hauptnavigation',
     'nav.languages': 'Sprache wählen',
     'site.title': 'Enigma2 Player',
-    'site.tagline':
-      'Live-TV, Radio und Aufnahmen von deinem Enigma2-Receiver — auf jedem Gerät.',
+    'site.tagline': 'Live-TV, Radio und Aufnahmen von deinem Enigma2-Receiver — auf jedem Gerät.',
     'nav.home': 'Start',
     'nav.features': 'Funktionen',
     'nav.screenshots': 'Screenshots',
@@ -90,7 +95,8 @@ export const ui = {
     'contact.issues': 'Problem melden (GitHub Issues)',
     'contact.email': 'E-Mail',
     'contact.buy': 'Für Kauf-/Lizenzfragen siehe „Lizenz kaufen“ und dein Konto.',
-    'screenshots.note': 'Ein Blick in die App — auf allen Plattformen dieselbe Oberfläche. Zum Vergrößern anklicken.',
+    'screenshots.note':
+      'Ein Blick in die App — auf allen Plattformen dieselbe Oberfläche. Zum Vergrößern anklicken.',
     'pricing.intro': 'Wähle das Modell, das zu dir passt. Alle Preise inkl. USt.',
     'pricing.empty': 'Preise sind bald verfügbar.',
     'pricing.devices': 'Geräte',
@@ -110,6 +116,12 @@ export const ui = {
     'footer.note': 'Enigma2 Player — von madoe21.',
   },
   en: {
+    'legal.imprint': 'Imprint',
+    'legal.privacy': 'Privacy',
+    'legal.cookies': 'Cookie policy',
+    'demo.label': 'Note on the demonstration version',
+    'demo.notice':
+      'Demonstration: this site shows work in progress. Purchases are not possible yet, and the imprint details are not filled in.',
     'a11y.languageChanged': 'Language changed: English',
     'a11y.pageChanged': 'Page loaded:',
     'nav.skip': 'Skip to content',
@@ -122,8 +134,7 @@ export const ui = {
     'nav.main': 'Main navigation',
     'nav.languages': 'Choose a language',
     'site.title': 'Enigma2 Player',
-    'site.tagline':
-      'Live TV, radio and recordings from your Enigma2 receiver — on any device.',
+    'site.tagline': 'Live TV, radio and recordings from your Enigma2 receiver — on any device.',
     'nav.home': 'Home',
     'nav.features': 'Features',
     'nav.screenshots': 'Screenshots',
@@ -172,6 +183,12 @@ export const ui = {
     'footer.note': 'Enigma2 Player — by madoe21.',
   },
   es: {
+    'legal.imprint': 'Aviso legal',
+    'legal.privacy': 'Privacidad',
+    'legal.cookies': 'Política de cookies',
+    'demo.label': 'Aviso sobre la versión de demostración',
+    'demo.notice':
+      'Versión de demostración: este sitio muestra el estado del desarrollo. Todavía no se pueden realizar compras y los datos del aviso legal están sin rellenar.',
     'a11y.languageChanged': 'Idioma cambiado: Español',
     'a11y.pageChanged': 'Página cargada:',
     'nav.skip': 'Ir al contenido',
@@ -214,7 +231,8 @@ export const ui = {
     'contact.issues': 'Informar de un problema (GitHub Issues)',
     'contact.email': 'Correo',
     'contact.buy': 'Para compras/licencias consulta “Comprar licencia” y tu cuenta.',
-    'screenshots.note': 'Un vistazo a la app — la misma interfaz en todas las plataformas. Haz clic para ampliar.',
+    'screenshots.note':
+      'Un vistazo a la app — la misma interfaz en todas las plataformas. Haz clic para ampliar.',
     'pricing.intro': 'Elige el modelo que mejor se adapte a ti. IVA incluido.',
     'pricing.empty': 'Los precios estarán disponibles pronto.',
     'pricing.devices': 'dispositivos',
@@ -234,6 +252,12 @@ export const ui = {
     'footer.note': 'Enigma2 Player — por madoe21.',
   },
   fr: {
+    'legal.imprint': 'Mentions légales',
+    'legal.privacy': 'Confidentialité',
+    'legal.cookies': 'Politique de cookies',
+    'demo.label': 'Avis concernant la version de démonstration',
+    'demo.notice':
+      'Version de démonstration : ce site montre l’état du développement. Les achats ne sont pas encore possibles et les mentions légales ne sont pas renseignées.',
     'a11y.languageChanged': 'Langue changée : Français',
     'a11y.pageChanged': 'Page chargée :',
     'nav.skip': 'Aller au contenu',
@@ -276,7 +300,8 @@ export const ui = {
     'contact.issues': 'Signaler un problème (GitHub Issues)',
     'contact.email': 'E-mail',
     'contact.buy': 'Pour les achats/licences, voir « Acheter une licence » et votre compte.',
-    'screenshots.note': 'Un aperçu de l’app — la même interface sur toutes les plateformes. Cliquez pour agrandir.',
+    'screenshots.note':
+      'Un aperçu de l’app — la même interface sur toutes les plateformes. Cliquez pour agrandir.',
     'pricing.intro': 'Choisissez le modèle qui vous convient. TVA incluse.',
     'pricing.empty': 'Les tarifs seront bientôt disponibles.',
     'pricing.devices': 'appareils',
@@ -296,6 +321,12 @@ export const ui = {
     'footer.note': 'Enigma2 Player — par madoe21.',
   },
   it: {
+    'legal.imprint': 'Note legali',
+    'legal.privacy': 'Privacy',
+    'legal.cookies': 'Informativa sui cookie',
+    'demo.label': 'Avviso sulla versione dimostrativa',
+    'demo.notice':
+      'Versione dimostrativa: questo sito mostra lo stato dello sviluppo. Gli acquisti non sono ancora possibili e i dati delle note legali non sono compilati.',
     'a11y.languageChanged': 'Lingua cambiata: Italiano',
     'a11y.pageChanged': 'Pagina caricata:',
     'nav.skip': 'Vai al contenuto',
@@ -338,7 +369,8 @@ export const ui = {
     'contact.issues': 'Segnala un problema (GitHub Issues)',
     'contact.email': 'E-mail',
     'contact.buy': 'Per acquisti/licenze vedi “Acquista licenza” e il tuo account.',
-    'screenshots.note': 'Uno sguardo all’app — la stessa interfaccia su ogni piattaforma. Clicca per ingrandire.',
+    'screenshots.note':
+      'Uno sguardo all’app — la stessa interfaccia su ogni piattaforma. Clicca per ingrandire.',
     'pricing.intro': 'Scegli il modello più adatto a te. IVA inclusa.',
     'pricing.empty': 'I prezzi saranno presto disponibili.',
     'pricing.devices': 'dispositivi',

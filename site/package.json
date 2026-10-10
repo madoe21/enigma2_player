@@ -4,7 +4,7 @@
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
-    "build": "ng build",
+    "build": "ng build && node tool/write-sitemap.mjs",
     "watch": "ng build --watch --configuration development",
     "test": "ng test --watch=false",
     "test:e2e": "playwright test",
@@ -15,7 +15,9 @@
     "check:literals": "node tool/check-no-literals.mjs",
     "check": "npm run check:literals && npm run check:translations && npm run check:placeholders && npm test",
     "check:translations": "node tool/check-translations.mjs",
-    "test:a11y": "playwright test e2e/a11y.spec.ts"
+    "test:a11y": "playwright test e2e/a11y.spec.ts",
+    "sitemap": "node tool/write-sitemap.mjs",
+    "vitals": "node tool/measure-vitals.mjs"
   },
   "private": true,
   "packageManager": "npm@11.11.0",

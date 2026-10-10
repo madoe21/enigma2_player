@@ -1,0 +1,17 @@
+/*
+ * Visible without shouting, and legible in both themes.
+ *
+ * The colours are the measured tokens (src/styles.css), not a yellow warning
+ * strip: this is a statement of fact about the site, not an error.
+ */
+.demo-notice {
+  padding: 0.6rem 1.25rem;
+  background: var(--paper-raised);
+  border-bottom: 1px solid var(--line);
+}
+
+.demo-notice p {
+  max-width: 60rem;
+  margin: 0 auto;
+  font-size: 0.95rem;
+}

@@ -1,14 +1,39 @@
 # Offene Stellen der Produktseite
 
-Erzeugt von `site/tool/check-placeholders.mjs`. **Nicht von Hand pflegen** -
-ausfüllen heißt: den Wert in `site/src/app/legal/entity.ts` eintragen und das
-Skript erneut laufen lassen.
+Erzeugt am 2026-10-10 von `site/tool/check-placeholders.mjs`.
+**Nicht von Hand pflegen**: Wert eintragen, dann
+`npm run check:placeholders -- --write` erneut laufen lassen.
 
 Diese Liste steht bewusst hier und nicht in Beads: es sind keine Aufgaben mit
 Reihenfolge und Abhängigkeiten, sondern Werte, die erst existieren, wenn das
-Unternehmen existiert (`license_server-xwl0`).
+Unternehmen existiert (`license_server-xwl0`). Technisch funktioniert die
+Seite; was hier steht, bringt ein Unternehmen mit.
 
-Stand: 16 offene Platzhalter an 16 Stellen.
+## Stand
+
+| | |
+|---|---|
+| Demo-Hinweis | **sichtbar** (`DEMO_MODE = true`) |
+| Identitätsangaben | 15 offen |
+| Prüfung scheitert bei Platzhaltern | nein, erst ab `FILLED` |
+
+## Beim Livegang zu tun
+
+1. **Die 15 Platzhalter unten ausfüllen**, alle in
+   `site/src/app/legal/entity.ts`. Danach dort `ENTITY_STATUS` auf `FILLED`
+   setzen: ab dann **scheitert** die Prüfung bei jedem verbliebenen
+   Platzhalter, damit kein Rechtstext mit ⟨…⟩ online geht.
+2. **Den Demo-Hinweis abschalten**: `DEMO_MODE = false` in
+   `site/src/app/content/site-flags.ts`. Er steht auf jeder Seite und sagt,
+   dass noch nichts gekauft werden kann.
+3. **Dieselben Angaben im License Server eintragen**, dort in
+   `compliance/legal/entity.yaml`. Zwei Repositorys können keine Datei
+   teilen, also wird zweimal aus derselben Tatsache ausgefüllt.
+4. **Preismodelle anlegen**, sonst sagt die Preisseite weiter „Preise sind
+   bald verfügbar": der Endpunkt des License Servers antwortet, seine Liste
+   ist leer.
+
+## Die Platzhalter
 
 | Platzhalter | Stellen |
 |---|---|
@@ -26,9 +51,4 @@ Stand: 16 offene Platzhalter an 16 Stellen.
 | `⟨PRIVACY_EMAIL⟩` | src/app/legal/entity.ts:49 |
 | `⟨REGISTER_COURT⟩` | src/app/legal/entity.ts:43 |
 | `⟨REGISTER_NUMBER⟩` | src/app/legal/entity.ts:44 |
-| `⟨UPPER_SNAKE⟩` | src/app/legal/entity.ts:5 |
 | `⟨VAT_ID⟩` | src/app/legal/entity.ts:45 |
-
-Dieselben Angaben werden im License Server ein zweites Mal gebraucht
-(`compliance/legal/entity.yaml`). Zwei Repositorys können keine Datei teilen,
-also wird zweimal aus derselben Tatsache ausgefüllt.
