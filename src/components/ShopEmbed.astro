@@ -5,12 +5,17 @@
  * login and account management are implemented THERE — this site only
  * frames it. The server must allow this origin via EMBED_ALLOWED_ORIGINS.
  */
+import {getLangFromUrl} from '../i18n/utils';
+
 const base = import.meta.env.PUBLIC_LICENSE_API_BASE;
 const apiKey = import.meta.env.PUBLIC_APP_API_KEY;
 // Pass the page's locale into the shop so it renders in the same language.
-// `de` is the unprefixed default; en/es/fr/it live under their prefix.
-const seg = Astro.url.pathname.split('/').filter(Boolean);
-const lang = ['en', 'es', 'fr', 'it'].includes(seg[1]) ? seg[1] : 'de';
+// Through the shared helper, not a fourth copy of the language list: this
+// read its own `['en', 'es', 'fr', 'it']` and took the locale from
+// `segments[1]`, which assumes a base path is always present. Deployed it
+// was, so this one worked in production and silently sold in German locally -
+// the exact mirror of the bug in `getLangFromUrl` (enigma2_player-w83).
+const lang = getLangFromUrl(Astro.url);
 const src =
   base && apiKey ? `${base}/shop/${apiKey}?lang=${lang}` : null;
 ---

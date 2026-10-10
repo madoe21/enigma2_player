@@ -23,7 +23,17 @@ const alternates = langs.map(l => ({
   href: new URL(href(key, l), Astro.site).toString(),
 }));
 const ogImage = new URL(asset('og.svg'), Astro.site).toString();
-const ogLocale: Record<Lang, string> = {de: 'de_DE', en: 'en_US', es: 'es_ES'};
+// `Record<Lang, …>` is what caught this: fr and it were missing, so those
+// pages emitted an empty `og:locale` and told a link preview nothing about
+// their language. The same omission as in `getLangFromUrl`, one layer up
+// (enigma2_player-w83) - the type objected, and `astro check` was not run.
+const ogLocale: Record<Lang, string> = {
+  de: 'de_DE',
+  en: 'en_US',
+  es: 'es_ES',
+  fr: 'fr_FR',
+  it: 'it_IT',
+};
 ---
 
 <!doctype html>

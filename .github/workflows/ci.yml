@@ -89,6 +89,17 @@ jobs:
           npx --yes prettier --check . || echo "::warning::prettier issues"
           npm test --if-present
 
+      # The Astro site's own check, and it needs the build: the bug it guards
+      # only appears once the configured base path is in the URL, so it is
+      # invisible to a unit test and to a local dev run (enigma2_player-w83).
+      # A page that lies about its language makes a screen reader read it in
+      # the wrong voice - WCAG 2.2 SC 3.1.1.
+      - name: Astro build + declared page language
+        if: hashFiles('astro.config.mjs') != ''
+        run: |
+          npm run build
+          npm run check:lang
+
       # The Astro tree at the repository root, with two named exceptions.
       # `astro` (critical) and `sharp` (high) are only fixable by jumping two
       # major versions, on a dependency that the migration deletes - and

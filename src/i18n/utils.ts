@@ -1,11 +1,35 @@
 /** i18n helpers: detect the locale from a URL and translate/route by it. */
-import {ui, defaultLang, type Lang, type UiKey} from './ui';
+import {ui, defaultLang, languages, type Lang, type UiKey} from './ui';
 
-/** Reads the active locale from the URL path (`/en/...`, `/es/...` → else de). */
+/**
+ * Whether a path segment names one of the site's locales.
+ *
+ * Reads `languages`, which is the one place the list exists. Two call sites
+ * below used to compare against the literals `'en'` and `'es'`, so `/fr` and
+ * `/it` were served as German — the same list written three times
+ * (here, `ui.ts`, `astro.config.mjs`) and one of them left behind
+ * (enigma2_player-w83).
+ */
+function isLang(segment: string | undefined): segment is Lang {
+  // `hasOwn`, not `in`: `in` walks the prototype, so a path segment called
+  // `toString` or `constructor` would pass as a locale.
+  return segment !== undefined && Object.hasOwn(languages, segment);
+}
+
+/**
+ * Reads the active locale from the URL path (`/en/...`, `/fr/...` → else de).
+ *
+ * The base path is stripped to nothing, not to `/`: with `base:
+ * '/enigma2_player'` the old `replace(baseUrl(), '/')` turned
+ * `/enigma2_player/en/` into `//en/`, whose first segment after the split is
+ * empty. So in a DEPLOYED build the locale check never saw a locale and every
+ * prefixed page fell back to German — including `/en` and `/es`, which the
+ * two-literal list would have allowed. Locally, where there is no base path,
+ * it worked; that is why it went unseen.
+ */
 export function getLangFromUrl(url: URL): Lang {
-  const [, maybeLang] = url.pathname.replace(baseUrl(), '/').split('/');
-  if (maybeLang === 'en' || maybeLang === 'es') return maybeLang;
-  return defaultLang;
+  const [, maybeLang] = url.pathname.replace(baseUrl(), '').split('/');
+  return isLang(maybeLang) ? maybeLang : defaultLang;
 }
 
 /** Returns a translator that falls back to the default locale for missing keys. */
@@ -36,13 +60,17 @@ export function href(path: string, lang: Lang): string {
 /**
  * The locale-independent route key for a URL (e.g. `/enigma2_player/en/features`
  * → `features`, home → ''). Used to build hreflang alternates.
+ *
+ * The default locale is excluded deliberately: `de` is unprefixed, so a `de`
+ * segment is a route name and not a locale. Dropping it would make a page
+ * called `de` claim the alternates of the start page.
  */
 export function routeKey(url: URL): string {
   const segments = url.pathname
     .replace(baseUrl(), '')
     .split('/')
     .filter(Boolean);
-  if (segments[0] === 'en' || segments[0] === 'es') segments.shift();
+  if (isLang(segments[0]) && segments[0] !== defaultLang) segments.shift();
   return segments.join('/');
 }
 
