@@ -50,6 +50,15 @@ jobs:
       - name: Unit tests (Vitest)
         run: npm test
 
+      # The gates' own tests, BEFORE the gates (enigma2_player-rie). `npm run
+      # check` runs them locally in this order for the same reason: a gate that
+      # has stopped detecting anything passes its own run, so without this step
+      # the three below can only report that the content is clean - never that
+      # they still work. Each case runs the real script against a throwaway tree
+      # and asserts the exit code.
+      - name: The gates in tool/ still detect (node --test)
+        run: npm run test:tool
+
       # The checks that are cheap and mechanical, before the browser is
       # downloaded. Each one has been a real finding rather than a formality:
       # a translatable sentence left in a template, a key missing from a

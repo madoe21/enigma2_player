@@ -125,9 +125,21 @@ follow Google TS style where the two have an opinion each. Structural map:
   `.githooks/` vs `.beads/hooks/` comparison, the same one `pre-commit` step 4
   makes, as a CI step. There is deliberately no root `npm test` script: step 5
   would then run this suite on every commit (`enigma2_player-3c5`).
-- **Before done, in `site/`**: `npm run check` (literals → translations →
-  placeholders → unit), `npm run build`, `npm run test:e2e`, `npm run test:a11y`;
-  `npm run format`/`check:format` at the root.
+- **The gates in `site/tool/` have tests of their own** (`tool/*.test.mjs`,
+  `npm run test:tool`, Node's built-in runner). Each case builds a throwaway
+  `<tmp>/site` tree, runs the real script against it and asserts the EXIT CODE as
+  well as the text — a gate that reports every defect and exits 0 reads exactly
+  like one that passed (`enigma2_player-rie`). It runs **first** in `npm run
+  check`, so a broken gate is reported as a broken gate rather than as clean
+  content. No second Vitest project: these are `.mjs` scripts outside `src/`, and
+  Vitest here is bound to `src/**/*.spec.ts` via `tsconfig.spec.json`.
+  Two traps, both paid for once: `node --test <dir>` runs the *directory* as a
+  test and fails on Node 24 — pass the quoted glob `"tool/*.test.mjs"` and let
+  node expand it, which also keeps bash and cmd identical. And a helper beside
+  the tests must not be named `*.test.mjs`/`test-*` or the runner executes it.
+- **Before done, in `site/`**: `npm run check` (tool gates → literals →
+  translations → placeholders → unit), `npm run build`, `npm run test:e2e`,
+  `npm run test:a11y`; `npm run format`/`check:format` at the root.
 - The production **bundle budget is a hard error** (initial 375 kB): a change
   that pulls content into the shell fails the build rather than slowly getting
   heavier. That is how importing `legal-copy.ts` for three footer labels was
