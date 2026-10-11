@@ -117,6 +117,14 @@ follow Google TS style where the two have an opinion each. Structural map:
   the app's `.lng` files, not this site (`enigma2_player-60g`). Ids are written
   here unprefixed or as `<id>` on purpose, so the hook does not read an example
   as a reference.
+- **The hooks have tests of their own** (`test/hooks/*.bats`, bats 1.13.0,
+  `npm run test:hooks`), one case per branch, each in a throwaway repository
+  under `$TMPDIR`. `npm run test:hooks:mutate` breaks one branch per run and
+  demands the matching case go red — a green hook suite proves little otherwise,
+  since nearly every hook branch ends in `exit 0`. `npm run check:hooks` is the
+  `.githooks/` vs `.beads/hooks/` comparison, the same one `pre-commit` step 4
+  makes, as a CI step. There is deliberately no root `npm test` script: step 5
+  would then run this suite on every commit (`enigma2_player-3c5`).
 - **Before done, in `site/`**: `npm run check` (literals → translations →
   placeholders → unit), `npm run build`, `npm run test:e2e`, `npm run test:a11y`;
   `npm run format`/`check:format` at the root.

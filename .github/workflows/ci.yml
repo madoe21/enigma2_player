@@ -91,6 +91,15 @@ jobs:
     steps:
       - uses: actions/checkout@v7
 
+      # The same comparison `pre-commit` step 4 makes locally, as a step of its own
+      # (enigma2_player-3c5). A hook is the wrong place for the only copy of a check: it is
+      # skippable, it does not exist on a fresh clone until somebody points core.hooksPath at
+      # it, and it cannot see what arrives through a pull request. Needs nothing installed, so
+      # it runs first. It also checks the executable bit, which is how nine hooks sat in the
+      # index as mode 644 - ignored by git on every machine that is not Windows.
+      - name: Hook trees in sync (.githooks vs .beads/hooks)
+        run: bash .github/scripts/check-hook-sync.sh
+
       # Auto-detect stack and run style + tests. Extend per project.
       - name: Node
         if: hashFiles('package.json') != ''
@@ -101,6 +110,25 @@ jobs:
         run: |
           npm ci || npm install
           npm test --if-present
+
+      # The hooks themselves, under bats (enigma2_player-3c5). Deliberately not wired to
+      # `npm test`, which `pre-commit` step 5 would then run on every single commit - one
+      # throwaway repository per case, around fifty, each running these hooks again.
+      #
+      # This job is where the suite earns its keep: on Linux it also exercises the branches a
+      # Windows developer can only skip (a PATH without node needs real symlinks), and it is the
+      # only place that proves the hooks work at all on a checkout nobody has configured.
+      - name: Hook tests (bats)
+        if: hashFiles('package.json') != ''
+        run: npm run test:hooks
+
+      # And the tests' own gate: each mutant breaks one hook branch in a temp copy and the one
+      # test that should notice has to go red. Hook tests are unusually easy to fake green -
+      # nearly every branch of a hook ends in `exit 0`, so a check that does nothing looks
+      # exactly like a check that passed. Twelve seconds for the whole set.
+      - name: Hook tests notice defects (mutation check)
+        if: hashFiles('package.json') != ''
+        run: npm run test:hooks:mutate
 
       # Its own step, and hard. It used to be
       # `npx --yes prettier --check . || echo "::warning::prettier issues"`

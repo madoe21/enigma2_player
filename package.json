@@ -6,9 +6,13 @@
   "description": "Repository-level toolchain. The site itself lives in site/ (Angular 22, prerendered).",
   "scripts": {
     "check:format": "prettier --check .",
-    "format": "prettier --write ."
+    "check:hooks": "bash .github/scripts/check-hook-sync.sh",
+    "format": "prettier --write .",
+    "test:hooks": "bats test/hooks",
+    "test:hooks:mutate": "node test/hooks/mutation-check.mjs"
   },
   "devDependencies": {
+    "bats": "1.13.0",
     "prettier": "3.9.10"
   }
 }

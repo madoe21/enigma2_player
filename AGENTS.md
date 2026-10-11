@@ -638,6 +638,12 @@ on the task yourself until AC are met, checking back against Â§4 at each step.
 - **Conventional Commits** + bead id: `feat(auth): add token refresh (bd-12)`. Enforced by the
   `commit-msg` git hook.
 - The `pre-commit` hook enforces Google-style format + lint + unit tests. Do not bypass it.
+- **The hooks themselves are tested.** `npm run test:hooks` (bats) covers every branch of
+  `commit-msg`, `pre-commit` and `pre-push`; `npm run test:hooks:mutate` proves each case still
+  fails when that branch is deliberately broken, and `npm run check:hooks` compares `.githooks/`
+  with the directory `core.hooksPath` points at. All three run in CI. When you change a hook, run
+  them — and when you add a branch, add its case: a hook branch that silently does nothing looks
+  exactly like one that passed. See `test/hooks/README.md`.
 - Never commit `.env` or secrets. Never `--no-verify`. Never force-push shared branches.
 - Branch per task: `task/bd-<id>-short-slug` (unless the branching model defines a type â€” then use it).
 - **Branching model:** follow `docs/branching.md` / `.aiflow/branching.json` â€” allowed branch
