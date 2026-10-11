@@ -71,12 +71,14 @@ follow Google TS style where the two have an opinion each. Structural map:
 - Missing keys fall back to `de` on purpose. `es`/`fr`/`it` are unreviewed
   machine translations (`enigma2_player-60g`; the similar-looking
   `enigma2_player_source-4dx` is about the app's `.lng` files, not these), so
-  `check:translations` **fails** only on a key missing from **de/en** or present
-  in a language but not in `de`. Unread keys are *reported* and do not fail —
-  despite the script's header claiming otherwise, and it currently reports three
-  false positives (`legal.imprint/privacy/cookies`, read via the computed key
-  `legal.${id}` in `legal-links.ts`, which a text scan cannot see).
-  `enigma2_player-7qz`.
+  `check:translations` **fails** on three things and only those: a key missing
+  from **de/en**, a key a language has and `de` does not, and a key no source
+  file reads. The third one used to be reported without failing, against the
+  script's own header, and it reported three false positives — fixed in
+  `enigma2_player-7qz`: a literal prefix in front of a `${` counts as read, so
+  the computed `legal.${id}` in `legal-links.ts` covers `legal.*`. A computed
+  key of the shape `${group}.title` is still unresolvable and would show up as
+  unread — teach the scanner about it, never delete the key it reads.
 - A surface may be published in fewer languages than the site (the legal texts
   are de/en): declare it in `languages` and the route tree simply has no route
   for the others — never serve an unchecked translation of a legal text.

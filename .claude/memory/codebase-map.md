@@ -43,10 +43,12 @@ in `site/`.
 | `npm run data:refresh` | regenerates `src/app/content/site-data.json` (network) |
 | `npm run sitemap` / `vitals` / `serve:dist` | sitemap only / Core Web Vitals lab run / the e2e static server |
 
-**`tsconfig*.json` does not set `"strict"`** (nor `strictTemplates`), although
-the scaffold's companion flags are there. Measured on 2026-10-11: the tree
-compiles with **zero** errors under both — switching them on is free and is
-filed as `enigma2_player-b3m`.
+**`tsconfig.json` sets `"strict"` and `strictTemplates`** (since
+`enigma2_player-b3m`, 2026-10-11), and `tsconfig.app.json`/`tsconfig.spec.json`
+only extend it, so app and tests run under the same rules. They were switched on
+after the fact and cost nothing: the tree already compiled with **zero** errors
+under both. Switching either off is a decision to let a `null` or a mistyped
+template binding compile.
 
 ## Modules & responsibilities
 
@@ -63,7 +65,7 @@ filed as `enigma2_player-b3m`.
 | `src/app/i18n/page-meta.ts` | Title, description, robots, canonical, `hreflang` + `x-default`, Open Graph/Twitter. `SITE_ORIGIN`/`BASE_PATH` live here. |
 | `src/app/i18n/route-announcer.ts` | Announces page and language changes — an SPA swaps the document without a page load, so nothing is said otherwise. |
 | `src/app/i18n/format-date.ts` | `Intl.DateTimeFormat`, not `DatePipe`: the pipe needs `registerLocaleData` and renders **nothing** without it, which blanked every prerendered changelog heading. |
-| `src/app/content/ui.ts` | **63** short string keys × 5 languages (315 entries, measured), `UiKey`, `sections`. The file's own header still says 445 and `check-translations.mjs` says 475 — both left over from before the removals that header describes. |
+| `src/app/content/ui.ts` | **63** short string keys × 5 languages (315 entries), `UiKey`, `sections`. Both headers carried pre-removal figures (445 here, 475 in `check-translations.mjs`) until `enigma2_player-7qz`; the number to trust is the one `npm run check:translations` prints on every run. |
 | `src/app/content/content.ts` | Long-form content × 5 languages: `getFeatures`, `getFaq`, `getLicenseInfo`, `getDocs`, `getScreenshots`, each falling back to `de`. |
 | `src/app/content/translate.ts` | `Translate` service: `t(key)` signal, `of(key, lang)`, `group({…})` for a template. Falls back to `de`. |
 | `src/app/content/site-data.json` + `site-data.ts` | What the build baked in: latest release + downloads, release notes, price models, shop base/key. A plain **import**, not a request. |
@@ -138,13 +140,12 @@ imports back.
 
 ## Risks / debt (observed)
 
-- `"strict"`/`"strictTemplates"` off while the code already satisfies both
-  (`enigma2_player-b3m`).
 - `es`, `fr`, `it` are machine translations nobody has reviewed, which is why
-  `check-translations.mjs` only fails on a key missing from **de/en**. Four
-  comments point at `enigma2_player_source-4dx` for it, and that bead covers the
-  **app's** `.lng` files, not this site's dictionaries — the site's own
-  translation debt is `enigma2_player-60g`.
+  `check-translations.mjs` only fails on a key missing from **de/en**. The
+  comments used to point at `enigma2_player_source-4dx`, which covers the
+  **app's** `.lng` files and not this site's dictionaries; they now name
+  `enigma2_player-60g`, the site's own translation debt, and that bead stays
+  open because it is what those comments promise somebody is tracking.
 - The shop's public API key sits in the tracked `site-data.json`
   (`enigma2_player-9c9`).
 - `angular.json` still declares `prefix: "app"` while every component uses
