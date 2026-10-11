@@ -131,7 +131,10 @@ if [ -n "$lib" ]; then
   # shellcheck source=/dev/null
   . "$lib"
   # quotePath=false like every other path-reading call here: a non-ASCII path would otherwise
-  # arrive as "Ã¼ber" and drag its escaping into the scanned text (aiflow-4cl).
+  # arrive octal-escaped as "\303\274ber" and drag that escaping into the scanned text
+  # (aiflow-4cl). Written as the bytes git actually prints, not as the mojibake glyphs it used
+  # to show here: those made this comment the only false positive of check-encoding.mjs
+  # (enigma2_player-5rk).
   git -c core.quotePath=false diff --cached -U0 | grep '^+' | warn_unknown_bead_ids "staged changes"
 else
   echo "  ! no lib-bead-ids.sh next to this hook or in .githooks/ - bead ids NOT checked" >&2

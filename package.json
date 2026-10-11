@@ -5,10 +5,12 @@
   "private": true,
   "description": "Repository-level toolchain. The site itself lives in site/ (Angular 22, prerendered).",
   "scripts": {
+    "check:encoding": "node .github/scripts/check-encoding.mjs .",
     "check:format": "prettier --check .",
     "check:hooks": "bash .github/scripts/check-hook-sync.sh",
     "format": "prettier --write .",
     "test:hooks": "bats test/hooks",
+    "test:scripts": "node --test \"test/scripts/*.test.mjs\"",
     "test:hooks:mutate": "node test/hooks/mutation-check.mjs"
   },
   "devDependencies": {

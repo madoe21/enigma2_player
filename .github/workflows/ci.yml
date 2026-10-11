@@ -114,6 +114,26 @@ jobs:
         if: hashFiles('package.json') != ''
         uses: actions/setup-node@v6
         with: { node-version: '22' }
+
+      # Encoding, before anything reformats or rewrites a file
+      # (enigma2_player-5rk). Commit 670168b wrote AGENTS.md - the operating
+      # rules every agent session loads - back as windows-1252, mangling 395
+      # sequences, and nothing noticed for four days: mojibake is still valid
+      # UTF-8, so Prettier reformats it happily and a diff viewer shows two
+      # changed glyphs per line. The damage arrives through tooling upgrades,
+      # which arrive as pull requests, which is exactly what this job sees and a
+      # hook does not.
+      - name: Text files are UTF-8, no BOM, not double-encoded
+        if: hashFiles('package.json') != ''
+        run: npm run check:encoding
+
+      # And that gate's own tests, for the reason the site job runs test:tool
+      # before its three gates (enigma2_player-rie). Here it earned its keep
+      # immediately: the suite caught the detector swallowing the ASCII after a
+      # mangled sequence, and killed eleven of twelve hand-made mutants.
+      - name: The gate in .github/scripts still detects (node --test)
+        if: hashFiles('package.json') != ''
+        run: npm run test:scripts
       - name: Node verify
         if: hashFiles('package.json') != ''
         run: |

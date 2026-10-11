@@ -137,6 +137,18 @@ follow Google TS style where the two have an opinion each. Structural map:
   test and fails on Node 24 — pass the quoted glob `"tool/*.test.mjs"` and let
   node expand it, which also keeps bash and cmd identical. And a helper beside
   the tests must not be named `*.test.mjs`/`test-*` or the runner executes it.
+- **Encoding is checked, because it was once wrong everywhere**:
+  `npm run check:encoding` (`.github/scripts/check-encoding.mjs`, tests in
+  `test/scripts/`, `npm run test:scripts`) fails on a BOM, on a file that is not
+  UTF-8, and on double-encoded text. The aiflow 0.8.0 upgrade (`670168b`) wrote
+  AGENTS.md back as windows-1252 and mangled 395 sequences — every em dash,
+  every `§`, the whole diagram — and nothing caught it, because mojibake is
+  valid UTF-8: Prettier reformats it, the hooks don't look, and the only visible
+  symptom is that the agent reading the rules gets worse rules. If a comment
+  needs to show mojibake, spell out the bytes (`"\303\274ber"`) like
+  `.githooks/pre-commit` does; the one exempt path is the `bd` telemetry log,
+  which is machine-written and whose past lines are history
+  (`enigma2_player-5rk`).
 - **Before done, in `site/`**: `npm run check` (tool gates → literals →
   translations → placeholders → unit), `npm run build`, `npm run test:e2e`,
   `npm run test:a11y`; `npm run format`/`check:format` at the root.
