@@ -13,12 +13,19 @@
 # a directory this file was never installed into (enigma2_player-aji).
 
 # The prefix is read from the issue DB, never hardcoded: a project that renamed its prefix
-# (`bd rename-prefix`) must keep working without touching this file. Read as the MODE of a sample
-# of ids rather than from a single one: a legacy id like `<prefix>-1782845428743-11-493621e3`
-# strips down to `<prefix>-1782845428743-11`, which matches no bead id below — and the check would
-# then do nothing, in silence, exactly the failure this file was just rescued from. `bd list`
-# documents no order, so "the first id" is not something to build on.
+# (`bd rename-prefix`) must keep working without touching this file. The DB records it, so it is
+# asked rather than inferred (enigma2_player-pog) — `--json` because a value must not be confused
+# with an error line or a reworded message.
 bead_prefix() {
+  local p
+  p="$(bd config get issue_prefix --json 2>/dev/null | jq -r '.value // empty' 2>/dev/null)"
+  [ -n "$p" ] && { printf '%s\n' "$p"; return 0; }
+
+  # Fallback for a DB with no prefix recorded: the MODE of a sample of ids, never a single id. A
+  # legacy id such as `<prefix>-1782845428743-11-493621e3` strips down to
+  # `<prefix>-1782845428743-11`, which matches no id in the pattern below — the check would then do
+  # nothing, in silence, which is the failure this file was just rescued from (enigma2_player-aji).
+  # `bd list` documents no order, so "the first id" is not something to build on.
   bd list --all --limit 50 --json 2>/dev/null \
     | jq -r '[.[].id | sub("-[^-]+$"; "")] | group_by(.) | max_by(length) | .[0] // ""' 2>/dev/null
 }

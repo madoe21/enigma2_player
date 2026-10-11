@@ -137,47 +137,95 @@ else
   echo "  ! no lib-bead-ids.sh next to this hook or in .githooks/ - bead ids NOT checked" >&2
 fi
 
-# 4) Lint + tests by detected stack (best-effort; fails the commit on error).
+# 4) The two hook trees must not drift apart. The same three hooks are versioned twice -
+# .githooks/ is the aiflow template, and whatever core.hooksPath points at is what git actually
+# runs - and nothing compared them (enigma2_player-puh). Editing one copy only is invisible: a fix
+# in the template changes nothing about the running hook, and a fix in the running copy is
+# overwritten by the next `bd hooks install`. Not theory - lib-bead-ids.sh existed in the template
+# alone, and the bead-id check above silently did nothing for every commit since
+# (enigma2_player-aji).
+#
+# Two tiers on purpose. If THIS commit touches a hook, drift is a hard stop: that is the moment its
+# author can fix it, and the moment the fix would otherwise be half-applied. If it does not, drift
+# only warns - a commit elsewhere in the tree must not be held hostage by a divergence somebody
+# else introduced, and the warning returns on every commit until it is dealt with. A beads block
+# appended back into the running copy (enigma2_player-a3q) surfaces as that warning.
+#
+# lib-bead-ids.sh is deliberately NOT compared: it belongs to the template alone, and both hooks
+# resolve it from there instead of keeping a second copy (aji).
+hooks_tmpl="$(git rev-parse --show-toplevel 2>/dev/null)/.githooks"
+hooks_run="$(dirname "$0")"
+tmpl_abs=""
+run_abs=""
+[ -d "$hooks_tmpl" ] && tmpl_abs="$(cd "$hooks_tmpl" && pwd)"
+[ -d "$hooks_run" ] && run_abs="$(cd "$hooks_run" && pwd)"
+if ! have cmp; then
+  echo "  ! no cmp - the two hook copies were NOT compared" >&2
+elif [ -n "$tmpl_abs" ] && [ -n "$run_abs" ] && [ "$tmpl_abs" != "$run_abs" ]; then
+  drift=""
+  for h in commit-msg pre-commit pre-push; do
+    [ -f "$hooks_tmpl/$h" ] || continue
+    # `cmp -s` fails for a missing running copy too - its own defect, and one git reports by
+    # simply not running the hook at all.
+    cmp -s "$hooks_tmpl/$h" "$hooks_run/$h" || drift="$drift $h"
+  done
+  if [ -n "$drift" ]; then
+    echo "  ! hook copies disagree:$drift" >&2
+    echo "      template: $tmpl_abs" >&2
+    echo "      running:  $run_abs" >&2
+    echo "      copy the intended version over the other - otherwise a fix or a commit is lost" >&2
+    # Whether THIS commit touches a hook is asked of git as a pathspec, not matched against the
+    # staged list by hand. Two reasons. The paths are a setting (core.hooksPath), so hardcoding
+    # `.githooks/` and `.beads/hooks/` here would stop matching the moment somebody moves them -
+    # silently, which is the failure this gate exists to catch. And the obvious way to make them
+    # relative does not work on Windows: `pwd` says /c/dev/..., `git rev-parse --show-toplevel`
+    # says C:/dev/..., so stripping the one from the other leaves the path untouched and nothing
+    # ever matches. One call per directory, because a pathspec outside the work tree makes git
+    # fail for the whole call and the other directory must still be checked.
+    staged_hooks=""
+    for d in "$hooks_tmpl" "$hooks_run"; do
+      in_d="$(git diff --cached --name-only --diff-filter=ACM -- "$d" 2>/dev/null)"
+      staged_hooks="$staged_hooks$in_d"
+    done
+    if [ -n "$staged_hooks" ]; then
+      fail "this commit changes a hook and the two copies disagree (see above)"
+    fi
+  fi
+fi
+
+# 5) Lint + tests by detected stack (best-effort; fails the commit on error).
 if [ -f package.json ]; then
   have npx && npx --no-install eslint . >/dev/null 2>&1 || true
-  if grep -q '"test"' package.json; then npm test --silent || fail "npm test failed"; fi
+  # The manifest is asked about its STRUCTURE, not its text. `grep -q '"test"' package.json` also
+  # matches a dependency NAMED test - the npm package exists - and `npm test` without a script
+  # exits with "Missing script: test", which this hook would turn into a blocked commit nobody can
+  # explain (enigma2_player-nje). Wherever npm exists so does node, and if it does not, the step
+  # says so rather than quietly deciding either way.
+  if have node; then
+    node -e 'process.exit(require("./package.json").scripts?.test ? 0 : 1)' 2>/dev/null \
+      && { npm test --silent || fail "npm test failed"; }
+  else
+    echo "  ! no node - cannot read package.json scripts; unit tests NOT run" >&2
+  fi
 fi
 [ -f pyproject.toml ] || [ -f requirements.txt ] && { have ruff && { ruff check . || fail "ruff failed"; }; have pytest && { pytest -q || fail "pytest failed"; }; }
 [ -f go.mod ] && { [ -z "$(gofmt -l .)" ] || fail "gofmt"; have go && { go vet ./... || true; go test ./... || fail "go test failed"; }; }
 [ -f pubspec.yaml ] && { have dart && dart analyze >/dev/null 2>&1; have flutter && { flutter test || fail "flutter test failed"; }; }
 
 echo "• pre-commit OK"
+# Nothing runs below this line, and nothing may be appended below it. `bd hooks install` installs
+# beads' integration by APPENDING, so the active copy of this hook in .beads/hooks/ carried 30
+# lines of unreachable code behind this `exit 0` (enigma2_player-a3q), while `bd hooks list`
+# reported the hook as "installed (shim 1.0.5)".
+#
+# The block was removed rather than made reachable. Reaching it gains nothing today: `bd hooks run
+# pre-commit` and `bd hooks run pre-push` are no-ops in bd 1.0.5 - probed with writes allowed and
+# no remote push, both print nothing, exit 0, and leave every file in .beads/ untouched. What it
+# would gain tomorrow is beads writing to the issue DB on every commit and every push, which this
+# project deliberately does not do (CLAUDE.md: no commit, no push, no Dolt sync without being
+# asked). Beads' own three hooks keep their block and keep working, because there it sits in line
+# 2: post-merge, post-checkout, prepare-commit-msg.
+#
+# If a later `bd hooks install` appends it here again, remove it again - `bd hooks uninstall` is
+# the blunt instrument that would take those three working hooks with it.
 exit 0
-
-# --- BEGIN BEADS INTEGRATION v1.0.5 ---
-# This section is managed by beads. Do not remove these markers.
-if command -v bd >/dev/null 2>&1; then
-  export BD_GIT_HOOK=1
-  _bd_timeout=${BEADS_HOOK_TIMEOUT:-300}
-  _bd_used_perl=0
-  if command -v timeout >/dev/null 2>&1; then
-    timeout "$_bd_timeout" bd hooks run pre-commit "$@"
-    _bd_exit=$?
-  elif command -v gtimeout >/dev/null 2>&1; then
-    gtimeout "$_bd_timeout" bd hooks run pre-commit "$@"
-    _bd_exit=$?
-  elif command -v perl >/dev/null 2>&1; then
-    _bd_used_perl=1
-    perl -e 'alarm shift; exec @ARGV' "$_bd_timeout" bd hooks run pre-commit "$@"
-    _bd_exit=$?
-  else
-    echo >&2 "beads: hook 'pre-commit' running without timeout; install coreutils or perl to enable BEADS_HOOK_TIMEOUT"
-    bd hooks run pre-commit "$@"
-    _bd_exit=$?
-  fi
-  if [ $_bd_exit -eq 124 ] || { [ $_bd_used_perl -eq 1 ] && [ $_bd_exit -eq 142 ]; }; then
-    echo >&2 "beads: hook 'pre-commit' timed out after ${_bd_timeout}s — continuing without beads"
-    _bd_exit=0
-  fi
-  if [ $_bd_exit -eq 3 ]; then
-    echo >&2 "beads: database not initialized — skipping hook 'pre-commit'"
-    _bd_exit=0
-  fi
-  if [ $_bd_exit -ne 0 ]; then exit $_bd_exit; fi
-fi
-# --- END BEADS INTEGRATION v1.0.5 ---

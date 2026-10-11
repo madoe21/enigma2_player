@@ -82,4 +82,10 @@ while read -r lref lsha rref rsha; do
     esac
   fi
 done
+# Nothing runs below this line, and nothing may be appended below it: this hook's active copy in
+# .beads/hooks/ carried beads' integration block behind this `exit 0` as unreachable code
+# (enigma2_player-a3q). Removed, not made reachable - `bd hooks run pre-push` is a no-op in bd
+# 1.0.5, and a beads push hook that did something would write to the issue DB on every `git push`,
+# which this project does not do without being asked (CLAUDE.md). The reasoning in full sits at
+# the end of .githooks/pre-commit; beads' own three hooks are untouched and still run.
 exit 0
