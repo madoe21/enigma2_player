@@ -1,0 +1,47 @@
+# Line endings, declared here once instead of depending on every developer's
+# local core.autocrlf (enigma2_player-efi).
+#
+# Found while fixing enigma2_player-63s: 12 of the 41 files Prettier reported on
+# Windows were formatted perfectly and failed on CRLF alone - and permanently,
+# because the next checkout restored CRLF. CI checks out LF and never saw any of
+# it, so the noise landed on one platform only, where it buried the 29 real
+# findings. `endOfLine: "auto"` in .prettierrc made Prettier stop caring; it did
+# not give this repository an opinion, so every other tool with one (shfmt,
+# clang-format, editors) still met a repository that says nothing.
+#
+# What this file actually changes: the index was already uniformly LF when it was
+# written (287 text files, 16 binary), so `git add --renormalize .` found nothing
+# to do. The damage was in the WORKING COPY - with core.autocrlf=true, 138 files
+# were checked out as CRLF and four had drifted to mixed endings, among them
+# every git hook and every shell script in .aiflow/, .claude/hooks/, .githooks/
+# and .beads/hooks/. A hook with CRLF lines is one Git-for-Windows version away
+# from `bad interpreter: /usr/bin/env bash^M`, and bash is the only interpreter
+# those files have.
+
+# The rule: git decides what is text, and text is LF in the object store AND in
+# the working copy on every platform - that is what bash, Node and Prettier read
+# here, and it is what the extensionless hooks need.
+* text=auto eol=lf
+
+# PowerShell is the exception that stays CRLF. These are the Windows half of the
+# toolchain (.aiflow/*.ps1, .claude/hooks/*.ps1, docker/run.ps1), run by
+# powershell.exe, and CRLF is what Windows PowerShell writes back into them -
+# without this line every edit from the PowerShell side would show up as a
+# whole-file diff. `text` without `eol=lf` means normalised to LF in the object
+# store, CRLF on checkout.
+*.ps1 text eol=crlf
+
+# No .bat or .cmd in the tree today, and the rules are here anyway: a file kind
+# that MUST have CRLF cannot be detected after the fact - cmd.exe mis-reads a
+# batch file with LF endings, and a label or `goto` that silently falls through
+# is not something anybody finds by reading a diff. The binary rules below need
+# no such foresight, which is why they only list what exists.
+*.bat text eol=crlf
+*.cmd text eol=crlf
+
+# Binary: never converted, never diffed as text. Git's heuristic already detects
+# all 16 of these, but a heuristic is not a declaration, and a new image format
+# it guesses wrong about would be corrupted on checkout, not merely noisy.
+*.png binary
+*.jpg binary
+*.ico binary
