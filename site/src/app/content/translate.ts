@@ -10,9 +10,11 @@ import { UiKey, ui } from './ui';
  * The fallback is the Astro site's behaviour and it is kept deliberately: the
  * five dictionaries are not equally complete, and a missing key has to render
  * *something* a reader can act on rather than an empty element or a raw key.
- * `es`, `fr` and `it` are machine translations awaiting a native speaker
- * (`enigma2_player-4dx`), so the gaps are known and tracked rather than
- * guessed at here.
+ * `es`, `fr` and `it` are machine translations nobody has reviewed
+ * (`enigma2_player-60g`), so the gaps are known and tracked rather than
+ * guessed at here. This used to cite a bead that lives in the app repo and is
+ * about the app's `.lng` files - a reference to the wrong bead reads as
+ * "someone has this" and nobody does.
  */
 @Injectable({ providedIn: 'root' })
 export class Translate {

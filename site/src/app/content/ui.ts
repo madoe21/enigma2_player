@@ -2,9 +2,15 @@
  * The product page's short UI strings, moved from the Astro site unchanged
  * (`src/i18n/ui.ts` there).
  *
- * Moved rather than rewritten: this is 445 keys in five languages, it is the
- * site's actual payload, and a rewrite would be a translation project dressed
- * as a migration (enigma2_player-n5j).
+ * Moved rather than rewritten: this is the site's actual payload in five
+ * languages, and a rewrite would be a translation project dressed as a
+ * migration (enigma2_player-n5j).
+ *
+ * The count is 63 keys per language, 315 entries (measured 2026-10-11,
+ * enigma2_player-7qz). It used to say 445 here, which was the figure before
+ * the removals listed below - a number in a comment is wrong the moment the
+ * file changes, so `npm run check:translations` prints the current one on
+ * every run and that is the figure to trust.
  *
  * REMOVED on 2026-10-09, with reasons rather than silently (the old
  * repository carried 127 unread keys - enigma2_player_source-gwf):
