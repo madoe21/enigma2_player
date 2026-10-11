@@ -39,6 +39,14 @@ because that is where GitHub Pages serves this project. The build writes into
 reproduces the deployed URLs exactly — a test that served the output at `/`
 would pass while the deployment broke.
 
+**`strict` and `strictTemplates` are on.** Both in `tsconfig.json`, and they are
+not negotiable per file: `tsconfig.app.json` and `tsconfig.spec.json` only
+extend it, so the same rules cover the app and the tests. They were switched on
+after the fact (`enigma2_player-b3m`) and cost nothing — the code already
+satisfied them, `npm run build`, `npm test` and `npm run test:e2e` stayed green
+on the same commit. Switching either one off is a decision to let a `null` or a
+mistyped template binding compile, not a tooling detail.
+
 ## Commands
 
 ```bash

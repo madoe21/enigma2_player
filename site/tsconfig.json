@@ -3,6 +3,13 @@
 {
   "compileOnSave": false,
   "compilerOptions": {
+    /* On, and it stays on. The code already satisfied both strict flags before they
+       were set (enigma2_player-b3m): `tsc --strict --noEmit` and a strictTemplates
+       build each reported zero errors, so this costs nothing and keeps the next
+       `null` or the next mistyped template binding from compiling. Turning either
+       one off again is not a formatting choice - it hides errors that are already
+       absent today. */
+    "strict": true,
     "noImplicitOverride": true,
     "noPropertyAccessFromIndexSignature": true,
     "noImplicitReturns": true,
@@ -15,6 +22,9 @@
     "module": "preserve"
   },
   "angularCompilerOptions": {
+    /* The template half of `strict` above - without it the compiler type-checks the
+       classes and waves the templates through, which is where an Angular typo lives. */
+    "strictTemplates": true,
     "enableI18nLegacyMessageIdFormat": false,
     "strictInjectionParameters": true,
     "strictInputAccessModifiers": true
