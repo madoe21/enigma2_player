@@ -15,3 +15,9 @@ npm-debug.log*
 
 # aiflow project-update keeps your customised file as <file>.bak before replacing it
 *.bak
+
+# Run logs from the aiflow commands. The rule arrived after .aiflow/onboard.log
+# had already been committed, and an ignore rule does nothing for a file that is
+# already tracked - which is how 35 *.bak files survived the line above
+# (enigma2_player-noq).
+*.log
