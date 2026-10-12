@@ -725,7 +725,27 @@ on the task yourself until AC are met, checking back against §4 at each step.
     deliberately unversioned at 1.0.0 (§1), so `aiflow release` / `aiflow hotfix` and the
     `-SNAPSHOT` / `-HOTFIX` suffixes they manage have nothing to act on and are not used. The
     `v*` tags and GitHub Releases in this repository belong to the **application**, not to the
-    site (`enigma2_player-imj`).
+    site — the next two bullets say who writes them (`enigma2_player-imj`).
+- **This repository publishes no releases of its own — the application's pipeline writes them
+  here.** `madoe21/enigma2_player_source/.github/workflows/release.yml` builds the desktop
+  artefacts on a `v*` tag in *that* repo and pushes them into *this* one with
+  `softprops/action-gh-release@v3` + `repository: madoe21/enigma2_player`, authenticated by the
+  PAT `RELEASE_REPO_TOKEN` (the default `GITHUB_TOKEN` cannot reach another repository). It then
+  forces title and body with `gh release edit "$TAG" --repo madoe21/enigma2_player --title
+  "Enigma2 Player $TAG" --notes-file public-notes.md --latest`, rendered from the source repo's
+  `CHANGELOG.md` (§1). Creating a release through that API also creates the `v*` tag ref here —
+  and because a PAT, not `GITHUB_TOKEN`, signs it, the event **does** dispatch tag-triggered
+  workflows in this repository.
+- **A tag-triggered workflow in this repository is therefore a defect, and it has already been
+  one.** The aiflow template shipped `.github/workflows/release.yml` (`on: push: tags: ['v*.*.*']`).
+  It ran four times — v1.0.1, v1.0.2, v1.0.3, v1.0.4 — each time a few seconds after the source
+  pipeline had published that release, and its `generate_release_notes: true` replaced the body
+  with GitHub's auto-generated change list; that is why those four releases carried no download
+  table until the notes were re-published (the source workflow's `notes_tag` input exists for
+  exactly that repair). It was deleted on `main` in `0495fca` on 2026-09-23 and stays deleted: do
+  not add a workflow here that triggers on `push: tags`, and when a branch cut before `0495fca`
+  still carries the file, resolve the modify/delete conflict in favour of the deletion rather than
+  letting it come back (`enigma2_player-imj`).
 - **Nothing mechanical enforces the model here — do not assume a safety net.** The `pre-push` hook
   reads `.aiflow/branching.json`, but in this repository every branching check it holds is
   switched off by that file: `pullRequests.required: false` (so a direct push to `main` or
