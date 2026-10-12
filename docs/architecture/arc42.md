@@ -174,7 +174,9 @@ and `content` depend on nothing internal.
   framework across both web projects. **Current.**
 - `docs/adr/0001-static-site-astro.md` — Astro over Eleventy/plain HTML.
   **Superseded by 0002**; its constraints still bind.
-- `docs/architecture/adr/0001-record-architecture-decisions.md` — use ADRs.
+All ADRs live in `docs/adr/`, numbered sequentially; `docs/adr/README.md` holds the
+numbering and supersession rules (`enigma2_player-5y2` removed the second ADR
+directory that the aiflow template had created).
 
 ## 10. Risks & tech debt
 

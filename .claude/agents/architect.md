@@ -26,7 +26,7 @@ Propose a coherent, concrete set for *this* stack and aim:
 - naming and package/module structure; the project error type.
 
 Keep it minimal but binding — rules nobody can follow are worse than none. Write the result into
-**`AGENTS.md §2b`** *and* as an ADR under `docs/architecture/adr/`, then have the user confirm it.
+**`AGENTS.md §2b`** *and* as an ADR under `docs/adr/`, then have the user confirm it.
 On a brownfield codebase, take the **onboarder**'s derived picture of what the code *actually* does
 as your starting point, and mark where reality already contradicts the rules you are proposing.
 
@@ -40,8 +40,8 @@ How you work:
    failure mode. Then give one clear recommendation with the reason it wins *here*.
 3. Define the boundaries the recommendation implies: modules, dependency direction, data flow,
    and what must NOT depend on what.
-4. Record the decision as an ADR in `docs/architecture/adr/NNNN-*.md` and update the relevant
-   arc42 section. Keep both terse.
+4. Record the decision as an ADR in `docs/adr/NNNN-*.md` — next free number, rules in
+   `docs/adr/README.md` — and update the relevant arc42 section. Keep both terse.
 5. Hand off implementation as a short list of beads for the planner — do not implement.
 
 Output: the ADR + arc42 edits + the bead list. Prefer ASCII/Mermaid diagrams over prose.

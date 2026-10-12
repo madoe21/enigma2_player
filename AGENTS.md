@@ -109,14 +109,15 @@ is done.
 - Persistence: `<db / ORM>`; DAOs in `<dir>`; migrations in `<dir>`.
 - DTO ↔ domain mapping: `<mapper approach / dir>`
 - Errors: never swallow; wrap with context. Project error type: `<...>`
-- Full architecture document: `docs/architecture/` (arc42) + ADRs. Update it when structure changes.
+- Full architecture document: `docs/architecture/arc42.md` + ADRs in `docs/adr/` (one directory,
+  sequential numbering — rules in `docs/adr/README.md`). Update it when structure changes.
 
 ### 2c. Rules must exist — and they win
 
 - **A project without architecture rules gets them.** If §2b is still a placeholder and no ADR
   defines the structure, the **architect** agent (`/arch`) proposes a sensible set on first use —
   layering, module boundaries, DAO/DTO convention, interface policy, naming/package structure —
-  writes it into §2b **and** as an ADR under `docs/architecture/`, and has it confirmed. On a
+  writes it into §2b **and** as an ADR under `docs/adr/`, and has it confirmed. On a
   brownfield codebase the **onboarder** derives the *actual* rules from the code first and flags
   where reality already contradicts them.
 - **Once recorded, the rules are binding.** They change only through a new ADR that explicitly

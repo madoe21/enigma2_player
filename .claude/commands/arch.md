@@ -6,7 +6,7 @@ argument-hint: <design question / change>
 Architecture work for: **$ARGUMENTS**
 
 Use the **architect** agent. Clarify constraints → present ≥2 options with trade-offs →
-recommend with rationale → record an ADR under `docs/architecture/adr/` →
+recommend with rationale → record an ADR under `docs/adr/` (rules: `docs/adr/README.md`) →
 update the relevant arc42 section in `docs/architecture/`. If `AGENTS.md §2b` is still an unfilled
 `[EDIT ME]` and no ADR defines the structure, establish the rules first ("Rule zero"): layering,
 module boundaries, DAO/DTO convention, interface policy — into §2b **and** an ADR, confirmed by
