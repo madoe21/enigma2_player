@@ -675,6 +675,21 @@ on the task yourself until AC are met, checking back against §4 at each step.
   `Co-Authored-By: Claude <noreply@anthropic.com>`, `Co-Authored-By: GitHub Copilot
   <noreply@github.com>`, or `Co-Authored-By: OpenAI Codex <noreply@openai.com>`.
 
+### 7a. Shell commands run non-interactively (MANDATORY)
+
+Every command an agent runs has to finish without a human at the keyboard. `cp`, `mv` and `rm` are
+aliased to their `-i` form on plenty of systems, and an agent that meets a y/n prompt does not
+fail — it waits. That costs the whole session and looks like a hang rather than an error.
+
+- **File operations:** `cp -f`, `mv -f`, `rm -f`, `rm -rf`, `cp -rf` — never the bare form.
+- **Remote:** `scp`/`ssh -o BatchMode=yes`, so a missing key fails instead of asking for a
+  password.
+- **Package managers:** `apt-get -y`, `HOMEBREW_NO_AUTO_UPDATE=1` for `brew`.
+- **Git:** no `-i` flags. `git rebase -i` and `git add -i`/`-p` cannot run here at all; split a
+  commit by writing the intermediate file state instead.
+- Anything that genuinely needs a person (`gcloud auth login`, a passphrase) is handed to the user
+  to run — not attempted and not worked around.
+
 ---
 
 ## 8. Memory (optional)
