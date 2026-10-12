@@ -5,8 +5,10 @@
 
 This file governs how AI coding agents work in this repo — **agent-agnostic**: Claude Code,
 GitHub Copilot, OpenAI Codex CLI, or any tool that reads a repo-root instructions file. It is the
-single source of truth shared by interactive sessions and headless/CI runs. Edit the sections
-marked **[EDIT ME]** for your project.
+single source of truth shared by interactive sessions and headless/CI runs. §1 (what this project
+is) and §2b (its architecture) are the project-specific parts — they were the template's
+`[EDIT ME]` blocks and are now filled from the code (`enigma2_player-4y3`,
+`docs/adr/0004-site-architecture-rules.md`). §2b changes only through a superseding ADR.
 
 Sections marked **(Claude Code only)** describe subagents/hooks/slash-commands that only Claude
 Code can invoke automatically. Every other agent still follows the same workflow and rules —
@@ -17,22 +19,40 @@ GitHub Copilot reads `.github/copilot-instructions.md`, which also just points h
 
 ---
 
-## 1. Project overview  [EDIT ME]
+## 1. Project overview
 
-> One paragraph: what this project is, who uses it, the tech stack.
-> Replace this block.
+**This repository is the product website, not the application.** It is the public page for
+*Enigma2 Player* — a Flutter client for Enigma2/OpenWebIF receivers whose source lives in the
+private sibling repository `madoe21/enigma2_player_source`. Visitors read the marketing content
+(features, screenshots, FAQ, docs, pricing) in **de/en/es/fr/it**; buying and account management
+happen in the licence server's shop, embedded as an iframe behind a cookie consent gate. The same
+repository also carries the GitHub **Releases**, which are both the site's download source and the
+application's update path (`api.github.com/repos/madoe21/enigma2_player/releases/latest`) —
+desktop artefacts only, iOS/Android ship through the stores. The site itself is **not versioned**
+and stays at 1.0.0 (PO, 2026-10-09).
 
-- **Stack:** <language / framework>
-- **Entry point:** <main file / app start>
-- **Run locally:** <command>
-- **Test:** <command>
+- **Stack:** TypeScript / **Angular 22** standalone + signals, prerendered to static HTML
+  (`@angular/build:application`, `outputMode: "static"`, 66 routes), deployed to GitHub Pages
+  under `/enigma2_player/`. No runtime server, no HTTP client, no runtime `fetch`. The repository
+  root is toolchain-only (the single pinned Prettier, the git hooks and their bats tests).
+- **Entry point:** `site/src/main.ts` → shell `site/src/app/app.ts`; the page list is
+  `site/src/app/app.routes.ts` (everything — router, nav, sitemap, prerender set — derives from
+  it); `site/src/server.ts` exists for the prerenderer only.
+- **Run locally:** in `site/`: `npm start` (`ng serve`), or `npm run build` then
+  `npm run serve:dist` to exercise the files that actually get deployed.
+- **Test:** in `site/`: `npm run check` (literals → translations → placeholders → Vitest),
+  `npm run test:e2e` (Playwright against the built files), `npm run test:a11y` (axe-core over all
+  66 pages in both consent states). At the root: `npm run check:format`, `check:encoding`,
+  `test:scripts`, `test:hooks`.
 
-> **Project aim (fill it in — the cheapest quality lever).** Every agent reads the aim before
-> planning or coding; without it it works generically instead of tuned to *this* project.
-> Set it via `aiflow init` / `aiflow change-settings`, or write it manually here **and** in
-> `.claude/memory/project-aim.md`. 2–4 plain sentences: *what* the product does, *for whom*,
-> the *target architecture*, the *quality bar*. On a brownfield project, `aiflow onboard`
-> proposes an aim from the code — confirm or correct it, never leave it `PROPOSED`.
+**Project aim.** Sell a desktop receiver client from a page that is cheap to host, honest about
+what it loads, and usable by someone who cannot see it. Every page is prebuilt HTML with the
+content baked in, so the site works with JavaScript off and sends nothing to a third party before
+consent — that is why there is no runtime I/O at all, not an optimisation. Buying stays the licence
+server's job, framed here and blocked until consent exists. The quality bar is a page that is
+complete in its prerendered HTML in all five languages and passes WCAG 2.2 AA: axe-core over every
+page in both consent states, keyboard-only operation with visible focus, and no reader-visible
+text outside the dictionaries.
 
 ---
 
@@ -98,17 +118,56 @@ duplication, not to build speculative abstraction layers (§3a: YAGNI).
 **Style.** Google Style per §3 — mandatory, no exceptions. Formatter and linter run before a task
 is done.
 
-### 2b. This project's architecture  [EDIT ME]
+### 2b. This project's architecture
 
-> Concrete decisions for **this** codebase. Replace the placeholders. If this block is still
-> unfilled when the first real task arrives, the **architect** agent fills it (see below).
+Recorded in `docs/adr/0004-site-architecture-rules.md` (Rule zero, 2026-10-12) from what the code
+actually does. Binding per §2c: changing any of it needs a superseding ADR, not a feature task.
+A static site has no request, no database and no service call, so three of §2a's seams do not
+exist here — what they are replaced by is written out below, because the alternative is the next
+agent inventing a DAO layer for a page that fetches nothing.
 
-- Layer names + directories: `<dir> -> <dir> -> <dir>`
-- Module/package boundaries and what may depend on what: `<...>`
-- Public API lives in `<dir>`; internal helpers in `<dir>`.
-- Persistence: `<db / ORM>`; DAOs in `<dir>`; migrations in `<dir>`.
-- DTO ↔ domain mapping: `<mapper approach / dir>`
-- Errors: never swallow; wrap with context. Project error type: `<...>`
+- **Layers + directories** (one tree, `site/src/app/`):
+  `pages/` + `shell/` (presentation) → `consent/` · `legal/` · `i18n/` (page-level behaviour) →
+  `content/` (the texts and the data baked in at build time, imports nothing internal).
+  Build-time `tool/*.mjs` is the only thing that ever touches the network; it runs on a developer's
+  or CI's machine and writes files, never at runtime.
+- **Dependency direction:** `pages → shell/consent/legal → content/i18n`. `i18n` and `content`
+  import nothing internal; no cycles. `app.routes.ts` is the **shared fact**, not a layer: it is
+  imported *by* `page-base`, `site-nav` and `legal-links`, and it reaches into `legal/` only for
+  `legal-locales.ts` (which imports nothing), which is what keeps that from becoming a cycle.
+- **Public API vs internal: visibility is the contract.** `protected readonly` = the template reads
+  it, `private readonly` = internal, public `readonly` = other code may. Components are standalone
+  with selector prefix `site-`; no class carries a `Component`/`Service` suffix
+  (`LegalPageComponent` is the one leftover — don't copy it).
+- **Seams are substitutable by construction.** Baked-in data is read through the `SiteContent`
+  signals, never imported into a page; a module constant a test must swap gets an `InjectionToken`
+  with a factory defaulting to the constant (`DEMO_MODE` → `DEMO_MODE_FLAG`), because Angular's
+  test runner refuses `vi.mock` on relative imports and DI is then the only seam. A page is a
+  component extending `PageBase` plus one `PageDefinition`; the language comes from route
+  `data.lang`, never from the URL.
+- **Persistence: none, deliberately.** No database, no ORM, no DAO — there is no store to abstract.
+  The only thing written on the client is one cookie, `e2p_consent`, and `consent/consent-store.ts`
+  is the only code allowed to write it. Build-time data lands in `content/site-data.json` via
+  `tool/fetch-site-data.mjs` and is committed (`docs/adr/0003-*`). Adding a persistence layer
+  needs an ADR, not a commit.
+- **DTO ↔ domain:** nothing crosses a process boundary at runtime, because there is no runtime I/O.
+  The one wire format is the build-time JSON from the GitHub and licence-server APIs, mapped
+  **once** in `tool/fetch-site-data.mjs` into the shape the site stores; pages never see the raw
+  payload. If a runtime call is ever genuinely needed, it gets a mapper at that boundary and an
+  ADR explaining why the no-fetch property was given up.
+- **Errors: there is no error layer, and that is the decision** (arc42 §8). Absent data is a
+  **state**, not an error (no release → no download list; no price models → "soon"; no `shop.base`
+  → a notice instead of an iframe). Input outside our control is parsed defensively (an
+  unrecognised consent cookie counts as undecided; `formatDate` falls back to the ISO day). The
+  application code holds exactly **one** `throw` — `legal/legal-links.ts`, a legal link pointing
+  at a route that no longer exists, which must be loud rather than silently land on the start
+  page — and the build-time tools `process.exit(1)` instead of emitting a half-built site. (The
+  other `throw` in the tree is the scaffold's listen-error rethrow in `src/server.ts`, the
+  prerender entry; nothing is deployed as a server.) No project error type; introducing one needs
+  an ADR.
+- **i18n and accessibility are structure here, not polish.** No reader-visible text in a template
+  (`check:literals` fails the build); languages are named only in `i18n/locales.ts`; URLs are built
+  only by `localePath`/`pathOf`; WCAG 2.2 AA with axe-core over every page in both consent states.
 - Full architecture document: `docs/architecture/arc42.md` + ADRs in `docs/adr/` (one directory,
   sequential numbering — rules in `docs/adr/README.md`). Update it when structure changes.
 

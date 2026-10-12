@@ -34,6 +34,7 @@ the code they constrain.
 
 | ADR | Subject | Status |
 | --- | --- | --- |
+| [0004](0004-site-architecture-rules.md) | Architecture rules for the site (Rule zero, `AGENTS.md §2b`) | Accepted |
 | [0003](0003-public-shop-api-key-stays-tracked.md) | The shop's public API key stays in the tracked site data | Accepted |
 | [0002](0002-product-site-angular-prerender.md) | Product site on Angular 22, prerendered | Accepted; supersedes 0001 |
 | [0001](0001-static-site-astro.md) | Static site on Astro | Superseded by 0002; its constraints still bind |

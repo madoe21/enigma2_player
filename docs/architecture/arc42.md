@@ -147,9 +147,11 @@ and `content` depend on nothing internal.
   not an error` (no release → no download list, no price models → "soon", no
   `shop.base` → a notice instead of an iframe), defensive parsing where input is
   outside the code's control (an unrecognised consent cookie counts as
-  undecided; `formatDate` falls back to the ISO day), and exactly one `throw` —
-  a legal link pointing at a route that no longer exists, which is a defect that
-  must be loud rather than silently land on the start page.
+  undecided; `formatDate` falls back to the ISO day), and exactly one `throw` in
+  the application code (`legal/legal-links.ts`) — a legal link pointing at a
+  route that no longer exists, which is a defect that must be loud rather than
+  silently land on the start page. `src/server.ts:56` rethrows a listen error in
+  the prerender entry; that is scaffold, and nothing is deployed as a server.
   `provideBrowserGlobalErrorListeners()` is in the app config; the build-time
   tools fail hard (`process.exit(1)`) instead of emitting a half-built site.
 - **i18n**: fallback-to-`de` translator (`content/translate.ts`); hreflang
@@ -167,6 +169,9 @@ and `content` depend on nothing internal.
 
 ## 9. Decisions
 
+- `docs/adr/0004-site-architecture-rules.md` — the layering, the no-runtime-I/O
+  property, and the three deliberate absences (no persistence/DAO, no runtime
+  DTO layer, no project error type) as the binding `AGENTS.md §2b`. **Current.**
 - `docs/adr/0003-public-shop-api-key-stays-tracked.md` — the product API key
   stays in the tracked site data; the exception to "never commit secrets" covers
   client-published keys only. **Current.**
