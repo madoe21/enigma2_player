@@ -141,11 +141,13 @@ imports back.
 ## Risks / debt (observed)
 
 - `es`, `fr`, `it` are machine translations nobody has reviewed, which is why
-  `check-translations.mjs` only fails on a key missing from **de/en**. The
-  comments used to point at `enigma2_player_source-4dx`, which covers the
-  **app's** `.lng` files and not this site's dictionaries; they now name
-  `enigma2_player-60g`, the site's own translation debt, and that bead stays
-  open because it is what those comments promise somebody is tracking.
+  `check-translations.mjs` only fails on a key missing from **de/en**. Accepted
+  as it stands by the PO on 2026-10-12 (`enigma2_player-60g`, closed): the
+  product is sold in Germany only. The code comments therefore name no bead at
+  all — they used to cite `enigma2_player_source-4dx` (the **app's** `.lng`
+  files, wrong subject) and then `-60g` (right subject, but a promise nobody
+  had given). A native-speaker pass is the precondition for selling in those
+  markets, not an open task.
 - The shop's public API key sits in the tracked `site-data.json` **on purpose**
   — not debt, decided in `docs/adr/0003-public-shop-api-key-stays-tracked.md`
   (`enigma2_player-9c9`). Do not "fix" it into an Actions variable; the key is

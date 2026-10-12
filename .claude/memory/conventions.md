@@ -69,8 +69,9 @@ follow Google TS style where the two have an opinion each. Structural map:
   `pathOf(page, lang)`; the base href is added by Angular, so it must not appear
   in a path (that is how you get `/enigma2_player/enigma2_player/features`).
 - Missing keys fall back to `de` on purpose. `es`/`fr`/`it` are unreviewed
-  machine translations (`enigma2_player-60g`; the similar-looking
-  `enigma2_player_source-4dx` is about the app's `.lng` files, not these), so
+  machine translations and stay that way while the product is sold in Germany
+  only (PO, 2026-10-12, `enigma2_player-60g` closed — the code comments name no
+  bead, deliberately), so
   `check:translations` **fails** on three things and only those: a key missing
   from **de/en**, a key a language has and `de` does not, and a key no source
   file reads. The third one used to be reported without failing, against the

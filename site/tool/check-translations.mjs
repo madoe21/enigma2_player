@@ -15,9 +15,10 @@
  *  - a key no source file reads, because that is dead weight either way.
  *
  * It does NOT fail on a key missing from es, fr or it: those three are
- * unreviewed machine translations (`enigma2_player-60g`), so a red build there
- * would say something everyone already knows. They are reported, and the
- * report says `falls back to de` rather than `MISSING`.
+ * unreviewed machine translations, accepted as such by the PO on 2026-10-12
+ * because the product is sold in Germany only, so a red build there would say
+ * something everyone already knows. They are reported, and the report says
+ * `falls back to de` rather than `MISSING`.
  *
  * COMPUTED KEYS: a key can be assembled - `of(`legal.${id}`)` in
  * `legal-links.ts` - and a text scan cannot resolve it. Every literal prefix in
