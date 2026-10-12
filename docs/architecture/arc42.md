@@ -20,7 +20,7 @@ Quality goals (derived from ADR 0002 and bead #13):
 1. **Static & cheap to host** — every page is prebuilt HTML on GitHub Pages;
    Angular prerender (SSG), no Node process at runtime.
 2. **No secrets in the browser** — only a public API base URL and a public
-   product API key ever reach the client (see §8 and `enigma2_player-9c9`).
+   product API key ever reach the client (see §8 and ADR 0003).
 3. **SEO/i18n correctness** — canonical URLs, hreflang alternates, sitemap,
    `de` default locale with `en/es/fr/it` mirrors and graceful fallback.
 4. **Operable with a screen reader** — WCAG 2.2 AA, checked by axe-core over
@@ -136,9 +136,11 @@ and `content` depend on nothing internal.
 
 - **Auth/security**: this site holds no session and performs no authenticated
   call; the shop iframe owns that. The one credential in the client is the
-  public product API key (bead #13) — it currently sits in the tracked
-  `site-data.json` rather than in an Actions variable, which is filed as
-  `enigma2_player-9c9`.
+  public product API key (bead #13) — it sits in the tracked `site-data.json`
+  by decision (ADR 0003, `enigma2_player-9c9`), because it is published to every
+  visitor by design and an Actions variable would hide it from the repository
+  but not from the page. That exception covers client-published keys only;
+  anything authenticating a server stays out of the tree (`AGENTS.md §7`).
 - **Error handling**: there is no error layer, because there is no runtime I/O —
   the Astro-era `ApiError` client is gone and nothing replaced it (derived from
   the code, `enigma2_player-0ii`). What exists instead: `absent data is a state,
@@ -165,6 +167,9 @@ and `content` depend on nothing internal.
 
 ## 9. Decisions
 
+- `docs/adr/0003-public-shop-api-key-stays-tracked.md` — the product API key
+  stays in the tracked site data; the exception to "never commit secrets" covers
+  client-published keys only. **Current.**
 - `docs/adr/0002-product-site-angular-prerender.md` — Angular 22 prerender; one
   framework across both web projects. **Current.**
 - `docs/adr/0001-static-site-astro.md` — Astro over Eleventy/plain HTML.

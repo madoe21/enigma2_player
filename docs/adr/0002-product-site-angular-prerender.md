@@ -72,7 +72,9 @@ Prettier versions because Prettier reads one config per invocation directory.
   `site/src/app/content/site-data.json`, regenerated deliberately by
   `npm run data:refresh`. The Actions variables can be deleted once this is
   deployed. That the API key now sits in a tracked file rather than in a repo
-  variable is a change in posture, filed separately (`enigma2_player-9c9`).
+  variable is a change in posture, decided separately in
+  [ADR 0003](0003-public-shop-api-key-stays-tracked.md): it stays tracked,
+  because it is published to every visitor either way.
 - **The declared-page-language guard moved rather than disappearing.** The root
   `npm run check:lang` (`-w83`, WCAG 2.2 SC 3.1.1) is replaced by `<html lang>`
   assertions over every prerendered route in `site/e2e/pages.spec.ts`,

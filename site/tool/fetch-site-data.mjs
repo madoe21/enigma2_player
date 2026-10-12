@@ -167,6 +167,12 @@ const data = {
    * the api key is the application's PUBLIC key, which ships inside every
    * build of the app anyway. Carried here because a static site has no
    * environment at runtime - a browser is the runtime.
+   *
+   * That this lands in a TRACKED file is a decision, not an oversight:
+   * `docs/adr/0003-public-shop-api-key-stays-tracked.md`. It is the one
+   * documented exception to "never commit secrets" (AGENTS.md §7), and it
+   * covers client-published keys only - nothing that authenticates a server
+   * belongs in this file.
    */
   shop: {
     base: process.env['LICENSE_API_BASE'] ?? existing.shop?.base ?? null,

@@ -146,8 +146,11 @@ imports back.
   **app's** `.lng` files and not this site's dictionaries; they now name
   `enigma2_player-60g`, the site's own translation debt, and that bead stays
   open because it is what those comments promise somebody is tracking.
-- The shop's public API key sits in the tracked `site-data.json`
-  (`enigma2_player-9c9`).
+- The shop's public API key sits in the tracked `site-data.json` **on purpose**
+  — not debt, decided in `docs/adr/0003-public-shop-api-key-stays-tracked.md`
+  (`enigma2_player-9c9`). Do not "fix" it into an Actions variable; the key is
+  published to every visitor either way. The exception covers client-published
+  keys only — a server credential in the tree is still a blocker.
 - `angular.json` still declares `prefix: "app"` while every component uses
   `site-` (only `app-root` is `app-`) — scaffold leftover, harmless.
 - `LegalPageComponent` is the one class carrying a `Component` suffix; the other

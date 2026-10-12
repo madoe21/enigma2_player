@@ -645,6 +645,11 @@ on the task yourself until AC are met, checking back against §4 at each step.
   them — and when you add a branch, add its case: a hook branch that silently does nothing looks
   exactly like one that passed. See `test/hooks/README.md`.
 - Never commit `.env` or secrets. Never `--no-verify`. Never force-push shared branches.
+  The **one** recorded exception is the licence server's client-published product API key in
+  `site/src/app/content/site-data.json` — see
+  `docs/adr/0003-public-shop-api-key-stays-tracked.md`, which also says why it does not extend
+  to anything else. A credential that is not already in every visitor's browser by design has
+  no exception, and "this one is low risk" is not an argument that has been accepted here.
 - Branch per task: `task/bd-<id>-short-slug` (unless the branching model defines a type — then use it).
 - **Branching model:** follow `docs/branching.md` / `.aiflow/branching.json` — allowed branch
   sources, merge directions, PR rules, and release/versioning. Enforced by the `pre-push` hook
