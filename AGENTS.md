@@ -710,27 +710,37 @@ on the task yourself until AC are met, checking back against §4 at each step.
   `docs/adr/0003-public-shop-api-key-stays-tracked.md`, which also says why it does not extend
   to anything else. A credential that is not already in every visitor's browser by design has
   no exception, and "this one is low risk" is not an argument that has been accepted here.
-- Branch per task: `task/bd-<id>-short-slug` (unless the branching model defines a type — then use it).
-- **Branching model:** follow `docs/branching.md` / `.aiflow/branching.json` — allowed branch
-  sources, merge directions, PR rules, and release/versioning. Enforced by the `pre-push` hook
-  (git-level, works no matter which agent or human pushes); releases via `aiflow release`. Do not
-  bypass it.
-- **gitflow model — picking a branch type:**
-  - `feature/*`, `bugfix/*` — branch from `develop`, merge back to `develop`. Never target `main`.
-  - `chore/*` — docs-only changes and CI/workflow-file-only changes (`.github/workflows/**`)
-    count as `chore/*`, not `feature/*`, even if the diff is substantial. May target `develop`
-    or `main`. Never triggers a release.
-  - `hotfix/*` — for an urgent production fix only. Start with `aiflow hotfix <name>` (branches
-    off `main`, bumps `VERSION` to `X.Y.(Z+1)-HOTFIX`). Merges to `main` (triggers a patch
-    release) and is also merged into `develop` so the fix isn't lost there.
-- **`main` never carries an in-progress version.** Only `develop` carries `-SNAPSHOT` and only
-  `hotfix/*` carries `-HOTFIX`; `aiflow release` strips the suffix before it lands on `main`.
-  A pre-push guard rejects any push to `main` with a `-SNAPSHOT`/`-HOTFIX` version.
-- **Releasing is never automatic.** A release is only cut by merging `develop` → `main` (minor,
-  strips `-SNAPSHOT`) or `hotfix/*` → `main` (patch, strips `-HOTFIX`); `chore/*` → `main`
-  never releases. Always ask the user for explicit confirmation before merging into `main` or
-  running `aiflow release --yes` — never decide on your own that "it's time to release." This
-  applies to every agent equally — Claude Code, Copilot, and Codex CLI alike.
+- Branch per task, started from `develop`. The name is free — the model sets
+  `branchNaming: "not enforced"` — and what this repo uses is `task/<slug>`.
+- **Branching model: `simple`.** `docs/branching.md` / `.aiflow/branching.json` are the source of
+  truth; this list is what they say, and it is the whole model (`enigma2_player-sq1`):
+  - Permanent branches: `main` and `develop`. **`main` is the published site** —
+    `.github/workflows/pages.yml` deploys every push to it — so anything that lands there is live
+    within a minute. `develop` is where work accumulates.
+  - One declared branch type: `chore/*`, for docs-only and CI/workflow-file-only changes
+    (`.github/workflows/**`), branched from `develop` or `main`. Any other temporary branch
+    (`task/*`) is branched from `develop`.
+  - Allowed merges: `develop → main`, `main → develop`, `chore/* → develop`, `chore/* → main`.
+  - There is **no `feature/*`, `bugfix/*` or `hotfix/*`** here, and no `VERSION` file: the site is
+    deliberately unversioned at 1.0.0 (§1), so `aiflow release` / `aiflow hotfix` and the
+    `-SNAPSHOT` / `-HOTFIX` suffixes they manage have nothing to act on and are not used. The
+    `v*` tags and GitHub Releases in this repository belong to the **application**, not to the
+    site (`enigma2_player-imj`).
+- **Nothing mechanical enforces the model here — do not assume a safety net.** The `pre-push` hook
+  reads `.aiflow/branching.json`, but in this repository every branching check it holds is
+  switched off by that file: `pullRequests.required: false` (so a direct push to `main` or
+  `develop` passes), `branchNaming: "not enforced"` (the name check never runs),
+  `mainRestricted: null` (the "only `develop` or `chore/*` may reach `main`" check never runs),
+  and no `VERSION` file for the version guard to read. Neither `main` nor `develop` carries
+  GitHub branch protection (checked 2026-10-12). That is the accepted setting for a
+  one-developer repository, not an oversight — and it is why the next rule is a rule rather than
+  a convenience. Changing it to real enforcement is `enigma2_player-6tw`.
+  The hook still does the rest of its job: it syncs Beads to GitHub before a push.
+- **Never merge into `main` without explicit confirmation from the user** — asked for that merge,
+  not inferred from earlier approval. A merge to `main` publishes the site; nothing will stop a
+  wrong one, and "it looked ready" is not a reason. Same for pushing a `v*` tag, which is the
+  application's release channel, not the site's. This applies to every agent equally — Claude
+  Code, Copilot, and Codex CLI alike.
 - End agent-authored commit messages with a trailer naming whichever agent made the commit, e.g.
   `Co-Authored-By: Claude <noreply@anthropic.com>`, `Co-Authored-By: GitHub Copilot
   <noreply@github.com>`, or `Co-Authored-By: OpenAI Codex <noreply@openai.com>`.

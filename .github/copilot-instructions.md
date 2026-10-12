@@ -11,15 +11,22 @@ have (subagents, slash-commands, hooks) — follow the same rules and steps manu
 Key points from `AGENTS.md` that apply directly to you:
 - Work is tracked in Beads (`bd`) — check `bd ready`, claim with `bd update <id> --claim`, close
   with `bd close <id> --reason "…"`. Don't invent your own TODO list.
-- Follow the branching model in `docs/branching.md` / `.aiflow/branching.json` — which branch
-  type to use, and that `main` only ever receives `develop`/`hotfix/*`/`chore/*`.
-- Never cut a release (`aiflow release --yes`, or merging into `main`) without the user's
-  explicit go-ahead first.
+- Follow the branching model in `docs/branching.md` / `.aiflow/branching.json` — model `simple`:
+  permanent `main` + `develop`, one branch type `chore/*`, merges `develop → main`,
+  `main → develop`, `chore/* → develop`, `chore/* → main`. No `feature/*`, `bugfix/*` or
+  `hotfix/*`, and no `VERSION` file — see `AGENTS.md` §7.
+- **Nothing enforces that mechanically here**: the `pre-push` branching checks are switched off by
+  the model file and neither branch has GitHub protection, so a push to `main` succeeds and
+  deploys the live site. Never merge into `main` without the user's explicit go-ahead for that
+  merge. `aiflow release` is not used in this repository; the `v*` tags are the application's.
 - Google Style Guides for code, mandatory tests (unit + BDD e2e, >80% coverage), no code smells,
   logging, `.http` files for REST changes — see `AGENTS.md` §3/§3a/§3b/§3c for the full detail.
 - Respect `AGENTS.md` §2 architecture rules — layering with inward dependencies, interfaces at
-  every seam, DAO for data access, DTO on the wire, domain objects never leaving the domain. A task
-  that doesn't fit is **not** built as-is: ask first, record the answer.
+  every seam, DAO for data access, DTO on the wire, domain objects never leaving the domain. §2b
+  then says what **this** project has: a static site with no runtime I/O, so there is no store, no
+  DAO and no runtime DTO layer, and adding one needs an ADR superseding
+  `docs/adr/0004-site-architecture-rules.md`. A task that doesn't fit is **not** built as-is: ask
+  first, record the answer.
 - Before adding new code/dependencies/abstractions, check `.claude/skills/ponytail/SKILL.md`'s
   decision ladder (needed? already in the codebase? stdlib? platform feature? installed dep? a
   one-liner? only then write it) if `ponytail.enabled` is set in `.aiflow/config.json` — see
