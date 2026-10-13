@@ -175,6 +175,43 @@ teardown() { drop_repo; }
   contains "dolt push"
 }
 
+@test "close-sync: the PowerShell entry point runs the shell script and passes the answers on" {
+  local cmd
+  cmd="$(ps_invocation .aiflow/bd-close-sync.ps1 bead-under-test)" ||
+    skip "no powershell/pwsh on this machine to run the .ps1 entry point"
+  write_file "$TEST_REPO/work/new.txt" new
+  git add -A
+  git commit -qm "work pushed through the shim"
+  export AIFLOW_SYNC_TTY="$TEST_REPO/no-such-device"
+
+  run bash -c "printf 'y\nn\n' | $cmd"
+
+  [ "$status" -eq 0 ]
+  contains "done."
+  run origin_log
+  contains "work pushed through the shim"
+}
+
+@test "close-sync: the PowerShell entry point passes a refused sync back as a failure" {
+  local cmd
+  cmd="$(ps_invocation .aiflow/bd-close-sync.ps1 bead-under-test)" ||
+    skip "no powershell/pwsh on this machine to run the .ps1 entry point"
+  origin_rejects_pushes
+  write_file "$TEST_REPO/work/new.txt" new
+  git add -A
+  git commit -qm "work the remote will refuse"
+  export AIFLOW_SYNC_TTY="$TEST_REPO/no-such-device"
+
+  run bash -c "printf 'y\nn\n' | $cmd"
+
+  # the exit code has to survive the hand-over, or the caller cannot tell a refused sync from a
+  # finished one - which is the whole point of the pair
+  [ "$status" -eq 1 ]
+  lacks "done."
+  run origin_log
+  lacks "work the remote will refuse"
+}
+
 @test "close-sync: sync-on-close disabled in the config stops before touching anything" {
   printf '%s\n' '{"sync":{"askOnClose":false},"remote":{"type":"github"}}' > .aiflow/config.json
   answers y y

@@ -80,6 +80,7 @@ make_sync_repo() {
 
   mkdir -p .aiflow
   cp "$SYNC_SRC" .aiflow/bd-close-sync.sh
+  cp "$REPO_ROOT/.aiflow/bd-close-sync.ps1" .aiflow/bd-close-sync.ps1
   printf '%s\n' '{"sync":{"askOnClose":true},"remote":{"type":"github"}}' > .aiflow/config.json
   write_file base.txt base
   git add -A
@@ -100,6 +101,21 @@ make_sync_repo() {
 answers() {
   printf '%s\n' "$@" > "$TEST_REPO/answers"
   export AIFLOW_SYNC_TTY="$TEST_REPO/answers"
+}
+
+# ps_invocation <script> <arg> - the command line for running a .ps1, or failure when this
+# machine has no PowerShell (then the case says `skip` with the reason instead of passing
+# quietly). `-ExecutionPolicy` exists only on Windows PowerShell - pwsh on a Linux runner
+# rejects it - so it is added per binary rather than written into the case.
+ps_invocation() {
+  local ps policy=""
+  for ps in powershell pwsh; do
+    command -v "$ps" >/dev/null 2>&1 && break
+    ps=""
+  done
+  [ -n "$ps" ] || return 1
+  [ "$ps" = powershell ] && policy=" -ExecutionPolicy Bypass"
+  printf 'MSYS_NO_PATHCONV=1 %s -NoProfile%s -File %s %s' "$ps" "$policy" "$1" "$2"
 }
 
 # run_sync - the script under test, from the work tree, the way the rule invokes it.

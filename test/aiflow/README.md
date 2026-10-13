@@ -5,9 +5,9 @@
 (`enigma2_player-p6p`).
 
 ```bash
-npm run test:aiflow   # the suite (13 cases)
+npm run test:aiflow   # the suite (15 cases)
 
-# the same suite against the version that shipped the defect: 8 of the 13 must go red
+# the same suite against the version that shipped the defect: 9 of the 15 must go red
 SYNC_SRC="$PWD/test/aiflow/regressions/bd-close-sync.pre-p6p.sh" npx bats test/aiflow
 ```
 
@@ -58,7 +58,10 @@ The suite needs `jq`, because the script reads `.aiflow/config.json` through it 
 "sync-on-close disabled" exit without it; a case that cannot be observed says so (`skip`) rather
 than passing quietly. CI asserts `jq --version` before the step for that reason.
 
-**Not covered: the PowerShell twin.** `.aiflow/bd-close-sync.ps1` carries the same three fixes and
-no automated test — bats is bash. It was verified by hand against a throwaway repository instead
-(headless: nothing pushed, "assuming no", exit 0; with `y` piped in: pushed). That asymmetry is
-`enigma2_player-jjt`, and it points the wrong way: Windows is where the `.ps1` actually runs.
+**The PowerShell entry point is a shim, and that is why it is testable.**
+`.aiflow/bd-close-sync.ps1` used to be a second implementation of the same ninety lines, which is
+how the untested copy became the one most likely to run on a Windows machine: the three fixes had
+to be made twice by hand, and only the shell version got this suite (`enigma2_player-jjt`). It now
+finds `bash` and hands over, so there is one procedure to test and one exit code to pass back —
+two cases cover exactly that hand-over, and they `skip` where no `powershell`/`pwsh` exists rather
+than passing quietly.
