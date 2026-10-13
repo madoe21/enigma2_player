@@ -787,6 +787,15 @@ on the task yourself until AC are met, checking back against §4 at each step.
 - End agent-authored commit messages with a trailer naming whichever agent made the commit, e.g.
   `Co-Authored-By: Claude <noreply@anthropic.com>`, `Co-Authored-By: GitHub Copilot
   <noreply@github.com>`, or `Co-Authored-By: OpenAI Codex <noreply@openai.com>`.
+- **Where this file and the generated Beads block disagree, this file wins.** The
+  `<!-- BEGIN BEADS INTEGRATION -->` block at the end of this file, and the identical one in
+  `CLAUDE.md`, are written by `bd setup` and carry their own git recipe. Theirs said
+  `git pull --rebase`, which §4 step 0 forbids here and for a demonstrated reason
+  (`enigma2_player-p6p`); both are corrected to `--rebase=merges` in place, and `bd setup claude`
+  was re-run to confirm it leaves an edited block alone (2026-10-13, bd as installed then —
+  `--check` reports `(current)` regardless, so it is not telling you whether the content drifted).
+  If a future `bd` does regenerate it, the restored recipe is **superseded by §4 step 0**, not a
+  second opinion — fix it again rather than following it (`enigma2_player-c9y`).
 
 ### 7a. Shell commands run non-interactively (MANDATORY)
 
@@ -948,7 +957,9 @@ This protocol applies when ending a Beads implementation workflow. It is subordi
    git status
 
    # Team-maintainer opt-in only, unless current instructions forbid it:
-   git pull --rebase
+   # Never bare `git pull --rebase` here - it flattens merge commits and destroys a task
+   # branch that updated itself by merging main (AGENTS.md section 4 step 0, enigma2_player-p6p).
+   git pull --rebase=merges
    bd dolt push
    git push
    git status

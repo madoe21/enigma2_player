@@ -54,7 +54,9 @@ This protocol applies when ending a Beads implementation workflow. It is subordi
    git status
 
    # Team-maintainer opt-in only, unless current instructions forbid it:
-   git pull --rebase
+   # Never bare `git pull --rebase` here - it flattens merge commits and destroys a task
+   # branch that updated itself by merging main (AGENTS.md section 4 step 0, enigma2_player-p6p).
+   git pull --rebase=merges
    bd dolt push
    git push
    git status
