@@ -159,6 +159,26 @@ jobs:
         if: hashFiles('package.json') != ''
         run: npm run test:hooks:mutate
 
+      # The .aiflow scripts an agent runs after every `bd close`, under bats too
+      # (enigma2_player-p6p). Same reason as the hooks: `bd-close-sync.sh` ends
+      # in `git push` and `bd dolt push`, every branch of it ends in `exit 0`,
+      # and the version this replaced printed "done." over a pull that had left
+      # the repository mid-rebase. It is also the only place these run on a
+      # machine where /dev/tty does not exist, which is the state a CI agent and
+      # a headless Ralph run are both in - and the state in which the old script
+      # took the `[y]` default and pushed unasked.
+      #
+      # `jq --version` first, and not as decoration: the script reads
+      # .aiflow/config.json through jq and takes the "disabled" exit when it is
+      # missing, so without jq every case here would skip and the step would go
+      # green having tested nothing. ubuntu-latest ships it; the line is there
+      # to make its removal a failure rather than a silence.
+      - name: Agent sync-gate tests (bats)
+        if: hashFiles('package.json') != ''
+        run: |
+          jq --version
+          npm run test:aiflow
+
       # Its own step, and hard. It used to be
       # `npx --yes prettier --check . || echo "::warning::prettier issues"`
       # buried in the step above: a warning in a log nobody opens, which is

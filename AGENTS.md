@@ -43,7 +43,8 @@ and stays at 1.0.0 (PO, 2026-10-09).
 - **Test:** in `site/`: `npm run check` (literals → translations → placeholders → Vitest),
   `npm run test:e2e` (Playwright against the built files), `npm run test:a11y` (axe-core over all
   66 pages in both consent states). At the root: `npm run check:format`, `check:encoding`,
-  `test:scripts`, `test:hooks`.
+  `test:scripts`, `test:hooks`, `test:aiflow` (the sync gate agents run after `bd close` —
+  `test/aiflow/README.md`).
 
 **Project aim.** Sell a desktop receiver client from a page that is cheap to host, honest about
 what it loads, and usable by someone who cannot see it. Every page is prebuilt HTML with the
@@ -401,8 +402,21 @@ regardless of which agent is driving it. Multi-step or multi-session work MUST b
 issues live in a Dolt DB and sync via `refs/dolt/data` on the git remote — so several members
 share one issue graph.
 
-0. **Sync first (start of every session):** `aiflow sync` (= `git pull --rebase` + `bd dolt pull`)
-   so you see teammates' latest issues/status before picking work. Never work off a stale DB.
+0. **Sync first (start of every session):** `git fetch --all --prune` + `bd dolt pull`, so you see
+   teammates' latest issues/status before picking work. Never work off a stale DB.
+   **Not `git pull --rebase`** — this step used to say that (via `aiflow sync`) and it is how a
+   session destroyed its own branch before doing any work (`enigma2_player-p6p`): plain
+   `--rebase` flattens merge commits, so a `task/*` branch that had updated itself by merging
+   `main` got the merged side replayed commit by commit and landed in a modify/delete conflict,
+   mid-rebase, with its own edits rolled back. Fetching shows you the same information and
+   changes nothing. When you do need to integrate, `git merge origin/main` or
+   `git pull --rebase=merges`, never bare `--rebase`.
+   **There is no `aiflow` CLI in this repository** — it is not on `PATH`, and `.aiflow/` holds no
+   `sync` script. The commands this file names as `aiflow <x>` exist here only as the scripts
+   that are present: `bash .aiflow/next-task.sh` and `bash .aiflow/bd-close-sync.sh <bead-id>`
+   (PowerShell twins alongside). Anything else — `aiflow sync`, `aiflow init`,
+   `aiflow change-settings`, the audit entry points — has no implementation here; do the step by
+   hand rather than reporting that a command failed.
 1. **Pick + claim work atomically:** `bd ready --claim --json` claims the first ready, unassigned
    bead (sets assignee = you, status = in_progress) in one step. To claim a specific one:
    `bd update <id> --claim`. **Only work a bead you have claimed.** Check `bd ready --unassigned`
@@ -425,10 +439,17 @@ share one issue graph.
 7. **Commit:** reference the bead id in the message (see §7).
 8. **Close** the bead with a note on how AC were verified: `bd close <id> --reason "…"`.
 9. **Sync gate (mandatory when enabled):** the moment a bead is closed locally, if
-   `.aiflow/config.json → sync.askOnClose` is `true`, run `aiflow close-sync <bead-id>`.
+   `.aiflow/config.json → sync.askOnClose` is `true`, run `bash .aiflow/bd-close-sync.sh <bead-id>`
+   (`powershell -File .aiflow/bd-close-sync.ps1 <bead-id>`; there is no `aiflow` CLI here — step 0).
    It **asks** (never automatic) whether to `git push` and whether to Dolt-sync the issue DB.
    It **pulls before it pushes** (`bd dolt pull` → `bd dolt push`) so it never clobbers a
    teammate's changes. Do not push or sync silently, and do not skip the prompt.
+   **Read its exit code.** Non-zero means the sync did *not* happen and needs you — it says so
+   on stderr and deliberately does not print `done.`. It also treats "no answer available" as
+   **no**, so a headless run syncs nothing rather than pushing unasked; when you need the push
+   from a headless context, do it by hand after deciding. All of that is tested
+   (`npm run test:aiflow`, `test/aiflow/README.md`) because none of it used to be true
+   (`enigma2_player-p6p`).
 10. **Continue the queue:** refresh it (`aiflow next`, or `bd ready --json`) and start the next
     task. Closing a bead ends a *task*, not the session — see §4b.
 
@@ -485,8 +506,10 @@ especially "never merge to `main` or release without explicit confirmation" — 
 - **Single source of truth:** Beads only. Do NOT use TodoWrite / markdown TODOs / ad-hoc lists.
 - **Claim before you touch it.** The atomic `--claim` prevents two people grabbing the same bead.
   If `bd` says a bead is already claimed by someone else, pick another.
-- **Pull before push, always.** Issue state is shared; `aiflow sync` / `aiflow close-sync` pull
-  first. On a Dolt conflict: `bd dolt pull` (merge), resolve, then push. Never force-push.
+- **Pull before push, always.** Issue state is shared; step 0 above and
+  `bash .aiflow/bd-close-sync.sh` pull first — and when that pull fails, the script now stops
+  instead of pushing over it. On a Dolt conflict: `bd dolt pull` (merge), resolve, then push.
+  Never force-push.
 - **Small, frequent syncs** beat big ones — push closed/updated beads promptly so others see them.
 - **Assignee + status are the coordination signal.** Keep status current (`in_progress` when you
   start via `--claim`, `closed` when done). Stale status = wasted duplicate work.

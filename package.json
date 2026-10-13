@@ -9,6 +9,7 @@
     "check:format": "prettier --check .",
     "check:hooks": "bash .github/scripts/check-hook-sync.sh",
     "format": "prettier --write .",
+    "test:aiflow": "bats test/aiflow",
     "test:hooks": "bats test/hooks",
     "test:scripts": "node --test \"test/scripts/*.test.mjs\"",
     "test:hooks:mutate": "node test/hooks/mutation-check.mjs"
