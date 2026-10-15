@@ -6,10 +6,10 @@ import { Page, expect, test } from '@playwright/test';
  *
  * Mechanical rather than a review, because a review happens once and a gate
  * happens on every run (enigma2_player-iaa). axe cannot judge whether a label
- * makes sense - that is what the NVDA pass is for - but it catches the whole
- * class of defects that are decidable: contrast below the threshold, a control
- * without a name, a heading level skipped, a missing document title, a
- * landmark nested wrongly.
+ * makes sense - that is what the NVDA pass is for, scripted in
+ * `docs/a11y/nvda-protocol.md` - but it catches the whole class of defects that
+ * are decidable: contrast below the threshold, a control without a name, a
+ * heading level skipped, a missing document title, a landmark nested wrongly.
  *
  * WCAG 2.2 AA is the bar the PO set, so the rule tags are pinned to it. The
  * best-practice rules are included as well: they are not law, but every one
