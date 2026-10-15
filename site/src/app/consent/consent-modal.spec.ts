@@ -69,6 +69,19 @@ describe('ConsentModal', () => {
     expect(fixture.nativeElement.querySelector(`#${bodyId}`)?.textContent).toBeTruthy();
   });
 
+  it('opens with the question, not with a link in the middle of it', () => {
+    // The CDK's auto-capture takes the first tabbable element unless something
+    // claims it - which was the imprint link below the body text. Focus has to
+    // start on the title: a screen reader then reads the question, and a
+    // 256 px window at 400 % zoom shows it (enigma2_player-ulv). The accept
+    // button must NOT have it, or Enter consents to an unread text.
+    const title = fixture.nativeElement.querySelector('.consent-dialog__title');
+
+    expect(title?.hasAttribute('cdkFocusInitial')).toBe(true);
+    expect(title?.getAttribute('tabindex')).toBe('-1');
+    expect(button('Einverstanden').hasAttribute('cdkFocusInitial')).toBe(false);
+  });
+
   it('announces itself, so it is not a silent change of context', () => {
     expect(announced.join(' ')).toContain('Cookies');
   });

@@ -39,7 +39,18 @@ import { ConsentStore } from './consent-store';
           cdkTrapFocus
           [cdkTrapFocusAutoCapture]="true"
         >
-          <h2 class="consent-dialog__title" [id]="titleId">{{ copy().title }}</h2>
+          <!--
+            Focus lands on the TITLE, not on the first tabbable element
+            (enigma2_player-ulv). Auto-capture would otherwise start at the
+            imprint link in the middle of the dialog - which a screen reader
+            reads as a link out of context, and which at 400 % zoom scrolls the
+            256 px window straight past the question being asked. The accept
+            button would be worse: focus on it means Enter consents to
+            something nobody has read yet.
+          -->
+          <h2 class="consent-dialog__title" [id]="titleId" tabindex="-1" cdkFocusInitial>
+            {{ copy().title }}
+          </h2>
           <p class="consent-dialog__body" [id]="bodyId">{{ copy().body }}</p>
           <!--
             The legal texts, reachable BEFORE the answer is given: consent to

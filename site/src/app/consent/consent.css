@@ -13,8 +13,18 @@
   position: fixed;
   inset: 0;
   display: flex;
-  align-items: center;
-  justify-content: center;
+  /*
+   * Centred by `margin: auto` on the dialog, NOT by `align-items: center`, and
+   * scrollable (enigma2_player-ulv).
+   *
+   * At 400 % zoom the window is 256 px tall and this dialog is taller. A
+   * centred flex item overflows such a container in both directions, and the
+   * part that leaves the top cannot be scrolled back to - which left the
+   * accept button unreachable in the one state every first-time visitor is in.
+   * `auto` margins centre the item while it fits and keep the overflow
+   * scrollable once it does not.
+   */
+  overflow: auto;
   padding: var(--space-4);
   /* Not pure black: the page behind stays legible, which is the point of a
      scrim rather than a curtain. */
@@ -24,6 +34,7 @@
 
 .consent-dialog {
   max-width: 34rem;
+  margin: auto;
   padding: var(--space-6);
   border: 1px solid var(--line-soft);
   border-radius: var(--radius-lg);
@@ -184,8 +195,15 @@
   list-style: none;
 }
 
-.consent-dialog__legal li,
-.site-footer__links li {
+/*
+ * The 44 px belongs to the LINK, not to the list item around it.
+ *
+ * 2.5.8 measures the target - the area that reacts to a tap - and a 44 px row
+ * with a 25 px link in it is still a 25 px target (enigma2_player-ulv found
+ * this one; the row looked right and the anchor was half the size).
+ */
+.consent-dialog__legal a,
+.site-footer__links a {
   display: flex;
   align-items: center;
   min-height: 2.75rem;
