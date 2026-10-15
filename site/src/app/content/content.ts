@@ -761,3 +761,15 @@ const screenshots: Record<Lang, Shot[]> = {
 export function getScreenshots(lang: Lang): Shot[] {
   return screenshots[lang] ?? screenshots[defaultLang];
 }
+
+/**
+ * Where a shot's file lives, relative to the deployed base.
+ *
+ * Here rather than in the components that show them: the gallery and the
+ * landing hero both render the same list, and the directory the files sit in
+ * is a fact about the data, not about either page. `base href` is prefixed by
+ * Angular, so never by us.
+ */
+export function shotSource(shot: Shot): string {
+  return `screenshots/${shot.file}`;
+}

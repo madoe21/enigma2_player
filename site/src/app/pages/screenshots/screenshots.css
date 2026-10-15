@@ -1,8 +1,14 @@
+/*
+ * The gallery, and the lightbox it opens into.
+ *
+ * `auto-fit` with a `rem` minimum keeps the grid to one column once the
+ * viewport is narrow or the text is large (WCAG 1.4.10).
+ */
 .shot-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(18rem, 1fr));
-  gap: 1.25rem;
-  margin-top: 1.5rem;
+  gap: var(--space-5);
+  margin-top: var(--space-5);
 }
 
 .shot {
@@ -12,10 +18,10 @@
 .shot__button {
   display: block;
   width: 100%;
-  padding: 0;
-  border: 1px solid var(--line);
-  border-radius: 0.5rem;
-  background: none;
+  padding: var(--space-1);
+  border: 1px solid var(--line-soft);
+  border-radius: var(--radius);
+  background: var(--paper-raised);
   cursor: zoom-in;
 }
 
@@ -23,14 +29,28 @@
   display: block;
   width: 100%;
   height: auto;
-  border-radius: 0.4rem;
+  border-radius: calc(var(--radius) - var(--space-1));
 }
 
 .shot figcaption {
-  margin-top: 0.5rem;
-  font-size: 0.9rem;
+  margin-top: var(--space-2);
+  color: var(--ink-muted);
+  font-size: var(--step--1);
 }
 
+@media (hover: hover) {
+  .shot__button:hover {
+    border-color: var(--accent);
+  }
+}
+
+/*
+ * The lightbox is black in both themes - it is a viewer, not a page surface.
+ *
+ * So its own colours are literal white rather than the theme tokens: in the
+ * dark palette `--paper` is almost black, and a border in it would be an
+ * invisible boundary around a control (WCAG 1.4.11).
+ */
 .lightbox {
   position: fixed;
   inset: 0;
@@ -38,31 +58,33 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 0.5rem;
-  padding: 1rem;
+  gap: var(--space-2);
+  padding: var(--space-4);
   background: rgb(0 0 0 / 80%);
 }
 
 .lightbox__figure {
-  margin: 0;
   max-width: min(90vw, 70rem);
-  text-align: center;
+  margin: 0;
   color: #fff;
+  text-align: center;
 }
 
 .lightbox__figure img {
   max-width: 100%;
   max-height: 80vh;
-  border-radius: 0.4rem;
+  border-radius: var(--radius);
 }
 
 .lightbox__control {
+  /* 44 px, the touch-target minimum (WCAG 2.5.8), on a control that is the
+     only way out of the viewer for a pointer user. */
   min-width: 2.75rem;
   min-height: 2.75rem;
-  border: 1px solid var(--paper);
-  border-radius: 0.4rem;
+  border: 1px solid #fff;
+  border-radius: var(--radius-sm);
   background: rgb(0 0 0 / 40%);
   color: #fff;
-  font-size: 1.25rem;
+  font-size: var(--step-2);
   cursor: pointer;
 }

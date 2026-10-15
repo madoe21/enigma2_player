@@ -1,30 +1,137 @@
+/*
+ * The start page, and the only page with a two-column layout.
+ *
+ * Everything shared with the other pages lives in page.css - this file holds
+ * the hero, the highlight list's marker and the purchase panel. The breakpoint
+ * is in `rem` on purpose: at 400 % zoom (WCAG 1.4.10) a `px` breakpoint still
+ * reports a wide viewport and the two columns would survive into a 320 px
+ * window; in `rem` the layout folds to one column with the text.
+ */
 .hero {
-  padding: 2rem 0 1rem;
+  display: grid;
+  align-items: center;
+  gap: var(--space-6);
+  padding: var(--space-4) 0 var(--space-5);
+}
+
+@media (min-width: 60rem) {
+  .hero {
+    /* The sentence gets the wider half: it is the part that has to be read,
+       and at 1fr/1fr the headline broke into three lines beside a picture
+       that had room to spare. */
+    grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+    gap: var(--space-7);
+  }
 }
 
 .hero h1 {
-  font-size: clamp(1.8rem, 4vw, 2.75rem);
-  line-height: 1.15;
-  margin: 0 0 0.75rem;
+  margin: 0 0 var(--space-3);
+  font-size: var(--step-4);
+  letter-spacing: -0.015em;
 }
 
 .hero__sub {
-  font-size: 1.15rem;
-  max-width: 44rem;
+  /* The promise of the page: larger than body text, still inside the readable
+     measure (1.4.8), and muted rather than faded (see page.css). */
+  max-width: var(--measure-text);
+  margin: 0;
+  color: var(--ink-muted);
+  font-size: var(--step-2);
 }
 
-.btn--primary {
+.hero__media {
+  position: relative;
+  min-width: 0;
+}
+
+/*
+ * The accent glow, behind the IMAGE and nowhere near text.
+ *
+ * A gradient under a paragraph makes its contrast ratio indeterminate - axe
+ * cannot decide it and neither can a reader. Here it sits under a photograph,
+ * where there is no ratio to keep. No negative z-index either: the image is
+ * lifted instead, so the glow cannot slip behind an ancestor's background.
+ */
+.hero__media::before {
+  content: '';
+  position: absolute;
+  inset: 6% 2% 10%;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, var(--accent-soft), transparent);
+  filter: blur(2rem);
+}
+
+.hero__image {
+  position: relative;
+  display: block;
+  width: 100%;
+  /* The intrinsic ratio comes from the width/height attributes, so the slot is
+     reserved before the file arrives and nothing jumps once it does. */
+  height: auto;
+  border: 1px solid var(--line-soft);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-2);
+}
+
+/*
+ * Five highlights, one row on a wide screen.
+ *
+ * Narrower than the shared card grid on purpose: 5 x 12.5rem plus four gaps
+ * fits inside the 68rem measure, so the fifth card does not sit alone on a
+ * second row. Below that width `auto-fit` folds them as usual.
+ */
+.features .card-grid {
+  grid-template-columns: repeat(auto-fit, minmax(12.5rem, 1fr));
+  gap: var(--space-3);
+}
+
+/* A highlight is one short line: a marker, then the sentence. */
+.card--highlight {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+  font-weight: 500;
+}
+
+/*
+ * A decorative dot - `content: ''` plus a background, never a character.
+ *
+ * Generated text IS announced by several screen readers, and a bullet that is
+ * not in the dictionaries would be announced in the wrong language.
+ */
+.card--highlight::before {
+  content: '';
+  flex: none;
+  width: 0.625rem;
+  height: 0.625rem;
+  margin-top: 0.45rem;
+  border-radius: 50%;
   background: var(--accent);
-  color: var(--accent-ink);
-  font-weight: 700;
 }
 
-.features,
+/* The purchase path, on the accent surface so it reads as the next step. */
 .buy-teaser {
-  margin-top: 2.5rem;
+  padding: var(--space-6);
+  border: 1px solid var(--line-soft);
+  border-radius: var(--radius-lg);
+  background: var(--accent-soft);
 }
 
-.features ul {
-  padding: 0;
-  list-style: none;
+.buy-teaser > h2 {
+  margin: 0;
+}
+
+.buy-teaser p {
+  margin: 0;
+}
+
+/* Wide enough for the question and its answer to share a line. */
+@media (min-width: 45rem) {
+  .buy-teaser {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-5);
+  }
 }

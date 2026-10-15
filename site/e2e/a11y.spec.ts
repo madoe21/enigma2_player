@@ -28,6 +28,14 @@ import { Page, expect, test } from '@playwright/test';
 // the site the way a visitor's browser does.
 test.use({ reducedMotion: 'reduce' });
 
+// One test in this file scans a dozen pages; Playwright's 30 s default is
+// sized for a test that touches one. Each run was already within a second or
+// two of that cap, and adding the dark-palette pair below pushed several over
+// it on a loaded machine - a timeout that says nothing about accessibility and
+// would have been a red CI run on a slower runner. The budget is per test, so
+// a generous one still bounds a genuine hang.
+test.describe.configure({ timeout: 180_000 });
+
 const PAGES = [
   '',
   'features',
@@ -92,6 +100,46 @@ for (const lang of LANGS) {
     }
   });
 }
+
+/*
+ * The palette axe did not see until now (enigma2_player-4t1).
+ *
+ * The site is dark by default and takes the light palette only for a visitor
+ * whose system asks for it - while Playwright's default context IS a light
+ * one, so every scan above measures the override and none of them measured the
+ * default. One language is enough here: what differs per locale is the length
+ * of the text, not its contrast, and the tokens are language-independent.
+ */
+test.describe('the dark palette', () => {
+  test.use({ colorScheme: 'dark' });
+
+  const DARK_PAGES = [...PAGES, 'impressum', 'datenschutz', 'cookies'];
+
+  test('every page passes axe in the dark palette, cookie question open', async ({
+    page,
+    context,
+  }) => {
+    for (const path of DARK_PAGES) {
+      await context.clearCookies();
+      await page.goto(path);
+      const results = await scan(page);
+
+      expect(results.violations, `dark /${path}\n${describe(results.violations)}`).toEqual([]);
+    }
+  });
+
+  test('every page passes axe in the dark palette, cookie accepted', async ({ page, context }) => {
+    await context.addCookies([
+      { name: 'e2p_consent', value: 'accepted', url: 'http://127.0.0.1:4321/enigma2_player/' },
+    ]);
+    for (const path of DARK_PAGES) {
+      await page.goto(path);
+      const results = await scan(page);
+
+      expect(results.violations, `dark /${path}\n${describe(results.violations)}`).toEqual([]);
+    }
+  });
+});
 
 test('the legal pages pass axe in both languages', async ({ page, context }) => {
   await context.addCookies([

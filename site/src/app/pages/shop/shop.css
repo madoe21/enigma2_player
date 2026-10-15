@@ -1,11 +1,20 @@
+/*
+ * The licence server's shop, framed.
+ *
+ * `min-height` in `px` on purpose: it has to match the height the shop itself
+ * renders at, which is a foreign document this site cannot measure - a `rem`
+ * value would change with the reader's font size and clip someone else's page.
+ */
 .shop-frame {
   width: 100%;
   min-height: 920px;
-  border: 1px solid var(--line);
-  border-radius: 0.75rem;
+  border: 1px solid var(--line-soft);
+  border-radius: var(--radius);
+  background: var(--paper-raised);
 }
 
 .shop-fallback {
+  color: var(--ink-muted);
+  font-size: var(--step--1);
   text-align: right;
-  font-size: 0.85rem;
 }

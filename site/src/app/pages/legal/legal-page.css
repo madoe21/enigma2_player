@@ -3,34 +3,43 @@
  *
  * The one value here that is not taste: the measure. A legal text at full
  * window width on a wide screen is a line a reader loses their place in, and
- * WCAG 1.4.8 names 80 characters as the limit for a block of text.
+ * WCAG 1.4.8 names 80 characters as the limit for a block of text - `ch`,
+ * because the limit is in characters and nothing else tracks the font.
  */
 .legal {
   max-width: 70ch;
   margin: 0 auto;
-  padding: 1rem;
+  padding: var(--space-6) var(--space-5) var(--space-8);
   line-height: 1.6;
 }
 
+.legal h1 {
+  margin: 0 0 var(--space-4);
+  font-size: var(--step-3);
+}
+
 .legal__lead {
-  font-size: 1.05rem;
+  color: var(--ink-muted);
+  font-size: var(--step-1);
 }
 
 .legal__section {
-  margin-block: 1.75rem;
+  margin-block: var(--space-6);
 }
 
 .legal__section h2 {
-  font-size: 1.15rem;
-  margin-bottom: 0.5rem;
+  margin-bottom: var(--space-2);
+  font-size: var(--step-1);
 }
 
 .legal__section p {
-  margin: 0 0 0.5rem;
+  margin: 0 0 var(--space-2);
 }
 
 .legal__note {
-  margin-top: 2rem;
-  padding: 0.75rem;
-  border-left: 3px solid var(--line);
+  margin-top: var(--space-6);
+  padding: var(--space-4);
+  border-left: 3px solid var(--accent);
+  background: var(--paper-raised);
+  color: var(--ink-muted);
 }

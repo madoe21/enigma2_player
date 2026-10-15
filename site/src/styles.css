@@ -1,38 +1,87 @@
 /*
- * The site's own colours and the few global rules.
+ * The site's design tokens and the few global rules.
  *
  * Explicit values rather than the browser's defaults, because the contrast
  * ratio is a promise the page makes (WCAG 1.4.3: 4.5:1 for text, 3:1 for
  * large text and for the boundary of a control). Relying on `Canvas` and
  * `CanvasText` hands that promise to whatever the user agent happens to pick.
  *
- * Measured against the pairs actually used, not estimated:
- *   light   #1f2328 on #ffffff  -> 14.9:1   body text
- *           #0b4fa8 on #ffffff  ->  7.0:1   links
- *           #ffffff on #0b4fa8  ->  7.0:1   primary button
- *           #595f66 on #ffffff  ->  5.6:1   muted text
- *           #8b9199 on #ffffff  ->  3.0:1   borders (non-text, 1.4.11)
- *   dark    #e6e8ea on #14161a  -> 13.2:1   body text
- *           #8fc0ff on #14161a  ->  8.1:1   links
- *           #14161a on #8fc0ff  ->  8.1:1   primary button
- *           #adb3ba on #14161a  ->  7.5:1   muted text
- *           #6b7280 on #14161a  ->  3.1:1   borders
+ * DARK IS THE DEFAULT (PO, 2026-10-15, enigma2_player-4t1): a receiver client
+ * is watched in a dark room, and the screenshots are dark. A visitor whose
+ * system asks for light gets the light palette - `prefers-color-scheme: light`
+ * is an expressed preference and outranks our taste. There is no toggle and
+ * nothing is stored: the one cookie this site sets is the consent record
+ * (enigma2_player-vmk).
  *
- * Dark is the `prefers-color-scheme` default rather than a toggle: there is no
- * preference to store and nothing to remember, and the one cookie this site
- * sets is the consent record (enigma2_player-vmk).
+ * Measured against the pairs actually used, not estimated (WCAG 2.x formula):
+ *   dark    #e8ecf1 on #0e1116  -> 15.9:1   body text
+ *           #a8b2c0 on #0e1116  ->  8.8:1   muted text
+ *           #5cc8ff on #0e1116  -> 10.1:1   links
+ *           #07111c on #5cc8ff  -> 10.1:1   primary button
+ *           #e8ecf1 on #161b22  -> 14.6:1   text on a raised card
+ *           #e8ecf1 on #16283a  -> 12.7:1   text on an accent-tinted surface
+ *           #a8b2c0 on #16283a  ->  7.0:1   muted text on that surface
+ *           #5cc8ff on #16283a  ->  8.0:1   links on that surface
+ *           #7d8694 on #0e1116  ->  5.1:1   control borders (1.4.11)
+ *   light   #15181d on #ffffff  -> 17.8:1   body text
+ *           #4f5663 on #ffffff  ->  7.4:1   muted text
+ *           #0b57b8 on #ffffff  ->  6.8:1   links
+ *           #ffffff on #0b57b8  ->  6.8:1   primary button
+ *           #15181d on #f5f7fa  -> 16.6:1   text on a raised card
+ *           #15181d on #e8f0fb  -> 15.5:1   text on an accent-tinted surface
+ *           #4f5663 on #e8f0fb  ->  6.4:1   muted text on that surface
+ *           #0b57b8 on #e8f0fb  ->  5.9:1   links on that surface
+ *           #747d8c on #ffffff  ->  4.2:1   control borders (1.4.11)
+ *
+ * `--line-soft` is the exception and is deliberately BELOW 3:1: it draws
+ * hairlines between sections, which carry no information a reader needs. Every
+ * border that is the boundary of a control uses `--line`.
  */
 :root {
-  color-scheme: light dark;
+  color-scheme: dark light;
 
-  --ink: #1f2328;
-  --ink-muted: #595f66;
-  --paper: #ffffff;
-  --paper-raised: #f6f7f9;
-  --accent: #0b4fa8;
-  --accent-ink: #ffffff;
-  --line: #8b9199;
-  --scrim: rgb(0 0 0 / 55%);
+  --ink: #e8ecf1;
+  --ink-muted: #a8b2c0;
+  --paper: #0e1116;
+  --paper-raised: #161b22;
+  --accent: #5cc8ff;
+  --accent-ink: #07111c;
+  --accent-soft: #16283a;
+  --line: #7d8694;
+  --line-soft: #242b35;
+  --scrim: rgb(0 0 0 / 72%);
+  --shadow-1: 0 1px 2px rgb(0 0 0 / 40%);
+  --shadow-2: 0 1rem 2.5rem rgb(0 0 0 / 45%);
+
+  /*
+   * One type scale for the whole site, fluid where it has to be. `clamp` keeps
+   * a heading from eating a 320 px viewport (= 400 % zoom, WCAG 1.4.10) while
+   * still being a heading on a desktop. `rem` throughout, so a reader who sets
+   * a larger default font size gets a larger site (1.4.4).
+   */
+  --step--1: 0.9rem;
+  --step-0: 1rem;
+  --step-1: 1.125rem;
+  --step-2: clamp(1.25rem, 1rem + 1vw, 1.5rem);
+  --step-3: clamp(1.5rem, 1.1rem + 1.8vw, 2rem);
+  --step-4: clamp(1.9rem, 1.2rem + 3.2vw, 3rem);
+
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.5rem;
+  --space-6: 2rem;
+  --space-7: 3rem;
+  --space-8: 4.5rem;
+
+  --radius-sm: 0.375rem;
+  --radius: 0.75rem;
+  --radius-lg: 1.25rem;
+
+  /* The page measure, and the narrower one a block of prose gets (1.4.8). */
+  --measure: 68rem;
+  --measure-text: 44rem;
 
   font-family:
     system-ui,
@@ -44,27 +93,62 @@
   line-height: 1.55;
 }
 
-@media (prefers-color-scheme: dark) {
+@media (prefers-color-scheme: light) {
   :root {
-    --ink: #e6e8ea;
-    --ink-muted: #adb3ba;
-    --paper: #14161a;
-    --paper-raised: #1c1f24;
-    --accent: #8fc0ff;
-    --accent-ink: #14161a;
-    --line: #6b7280;
-    --scrim: rgb(0 0 0 / 70%);
+    --ink: #15181d;
+    --ink-muted: #4f5663;
+    --paper: #ffffff;
+    --paper-raised: #f5f7fa;
+    --accent: #0b57b8;
+    --accent-ink: #ffffff;
+    --accent-soft: #e8f0fb;
+    --line: #747d8c;
+    --line-soft: #e3e7ee;
+    --scrim: rgb(0 0 0 / 55%);
+    --shadow-1: 0 1px 2px rgb(16 24 40 / 8%);
+    --shadow-2: 0 1rem 2.5rem rgb(16 24 40 / 14%);
   }
+}
+
+/*
+ * Room for the sticky header above anything scrolled to.
+ *
+ * WCAG 2.2 adds 2.4.11 (focus not obscured): tabbing to a link just below the
+ * fold scrolls it to the very top - underneath a sticky header - and the focus
+ * ring disappears. `scroll-padding-top` makes the browser stop short of that.
+ * It belongs here and not in site-nav.css: component styles are scoped, so an
+ * `html` selector in there would be rewritten and never match.
+ */
+html {
+  scroll-padding-top: 5rem;
 }
 
 body {
   margin: 0;
   background: var(--paper);
   color: var(--ink);
+  font-size: var(--step-0);
+  /* Kept out of the way of the fluid type scale: a hyphenated heading looks
+     broken, a hyphenated paragraph at 400 % zoom looks correct. */
+  text-wrap: pretty;
+  /* German compounds are longer than a narrow column - "plattformübergreifend"
+     is 21 characters. Without this they run out of the box they are in, and at
+     400 % zoom they would push the page sideways (WCAG 1.4.10). */
+  overflow-wrap: break-word;
+}
+
+h1,
+h2,
+h3 {
+  line-height: 1.2;
+  text-wrap: balance;
 }
 
 a {
   color: var(--accent);
+  /* The underline stays - colour alone must never be the only distinction
+     (WCAG 1.4.1), and this site puts links inside running prose. */
+  text-underline-offset: 0.2em;
 }
 
 /* Every border in the site resolves to this, so one value carries 1.4.11. */
@@ -74,6 +158,19 @@ a {
 
 .muted {
   color: var(--ink-muted);
+}
+
+/*
+ * A heading's eyebrow: the small line above it. Tracking and size only - the
+ * colour is the measured muted token, not an opacity (see page.css).
+ */
+.eyebrow {
+  margin: 0 0 var(--space-2);
+  color: var(--ink-muted);
+  font-size: var(--step--1);
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
 }
 
 /*
@@ -88,7 +185,8 @@ a {
   left: -100vw;
   top: 0;
   z-index: 300;
-  padding: 0.75rem 1rem;
+  padding: var(--space-3) var(--space-4);
+  border-radius: 0 0 var(--radius-sm) 0;
   background: var(--accent);
   color: var(--accent-ink);
   font-weight: 700;

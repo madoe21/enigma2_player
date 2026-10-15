@@ -2,7 +2,7 @@ import { A11yModule, LiveAnnouncer } from '@angular/cdk/a11y';
 import { Component, computed, inject, signal } from '@angular/core';
 
 import { PageBase } from '../page-base';
-import { getScreenshots } from '../../content/content';
+import { getScreenshots, shotSource } from '../../content/content';
 
 /**
  * The gallery, with a lightbox that is operable by keyboard.
@@ -32,7 +32,7 @@ import { getScreenshots } from '../../content/content';
             <button type="button" class="shot__button" (click)="open(i)">
               <img
                 class="shot__image"
-                [src]="source(shot.file)"
+                [src]="source(shot)"
                 [alt]="shot.caption"
                 width="1200"
                 height="675"
@@ -73,7 +73,7 @@ import { getScreenshots } from '../../content/content';
             ‹
           </button>
           <figure class="lightbox__figure">
-            <img [src]="source(current()!.file)" [alt]="current()!.caption" />
+            <img [src]="source(current()!)" [alt]="current()!.caption" />
             <figcaption>{{ current()!.caption }}</figcaption>
           </figure>
           <button
@@ -110,10 +110,8 @@ export class Screenshots extends PageBase {
     next: 'gallery.next',
   });
 
-  /** Where an image lives. `base href` is prefixed by Angular, not here. */
-  protected source(file: string): string {
-    return `screenshots/${file}`;
-  }
+  /** The shared path builder, reachable from the template. */
+  protected readonly source = shotSource;
 
   protected open(index: number): void {
     this.openIndex.set(index);
