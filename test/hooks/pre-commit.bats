@@ -112,12 +112,25 @@ teardown() { drop_repo; }
 # --- step 3: bead ids in the added lines --------------------------------------------------
 
 @test "pre-commit: says so when lib-bead-ids.sh is in neither location" {
+  # This hook alone, not a whole `git commit`: commit-msg prints the identical sentence, so
+  # through `git commit` each hook is the other's alibi and deleting this one's warning changed
+  # nothing the test could see - the mutant survived on the CI runner while reporting itself as
+  # killed here (enigma2_player-e1c). git runs the hook with no arguments, which is what this is.
   rm -f "$TEST_REPO/.githooks/lib-bead-ids.sh"
   stage a.txt hello
-  run git commit -m "chore: no library around"
+  run bash .githooks/pre-commit
   [ "$status" -eq 0 ]
   contains "no lib-bead-ids.sh"
   contains "bead ids NOT checked"
+}
+
+@test "pre-commit: with the library present it says nothing about it" {
+  # The other side of the same branch, and the one that would catch a library the hook can no
+  # longer resolve - it would start warning on every commit.
+  stage a.txt hello
+  run bash .githooks/pre-commit
+  [ "$status" -eq 0 ]
+  lacks "bead ids NOT checked"
 }
 
 # --- step 4: the two hook trees must not drift apart --------------------------------------

@@ -16,6 +16,18 @@ import { Page, expect, test } from '@playwright/test';
  * that fires here has been a real finding rather than noise.
  */
 
+// Animations off for this file only (enigma2_player-gxc). axe measures contrast
+// on what is painted at the moment it looks, and the consent dialog fades in
+// over 150 ms (`consent/consent.css`, under `prefers-reduced-motion:
+// no-preference`). A scan that lands inside those 150 ms computes the dialog's
+// links against the scrim showing through and reports a serious contrast
+// violation - which is how this suite went flaky on CI while the settled dialog
+// is compliant. `reduce` takes the `@media` guard's other branch, so axe judges
+// the state a visitor reads rather than a frame of the transition. Scoped here
+// and not in `playwright.config.ts`: the functional specs should keep meeting
+// the site the way a visitor's browser does.
+test.use({ reducedMotion: 'reduce' });
+
 const PAGES = [
   '',
   'features',

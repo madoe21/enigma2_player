@@ -16,6 +16,12 @@
 //
 // A `skip`ped test cannot kill a mutant (bats counts it as ok). That is deliberate: if a branch
 // cannot be observed on this machine, the honest outcome is a loud survivor, not a pass.
+//
+// A mutant that dies here and survives in CI means the test never measured that branch. Three did
+// (enigma2_player-e1c): they asserted on the output of a whole `git commit`, which runs both
+// hooks - and both print the same "bead ids NOT checked" warning, so each hook was the other's
+// alibi - while the revert case depended on whether the local git invokes commit-msg during
+// `git revert` at all. A test that pins one hook's branch invokes that hook, not git.
 
 import { spawnSync } from 'node:child_process';
 import { cpSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
@@ -120,7 +126,7 @@ const MUTANTS = [
     find: 'case "$msg" in "Merge "*|"Revert "*) exit 0 ;; esac',
     replace: ':',
     suite: 'commit-msg.bats',
-    filter: 'revert subject is let through',
+    filter: 'merge or revert subject is let through',
   },
   {
     branch: 'commit-msg: a missing bead-id library is skipped in silence',

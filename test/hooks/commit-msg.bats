@@ -77,17 +77,43 @@ teardown() { drop_repo; }
   [ "$output" = "Merge branch 'side'" ]
 }
 
-@test "commit-msg: a revert subject is let through" {
+@test "commit-msg: a merge or revert subject is let through, message file alone" {
+  # The hook is called the way git calls it - message file, no source argument - instead of
+  # through `git revert`, because whether revert invokes commit-msg at all depends on the git
+  # version: the end-to-end form below passed on this machine and tested nothing on the CI
+  # runner, where the mutant that deletes the Merge/Revert bypass survived (enigma2_player-e1c).
+  # Both prefixes, because both are arms of that one line; lines 10-11 (the `merge` source and
+  # MERGE_HEAD) are what the `git merge` case above exercises.
+  write_file "$TEST_REPO/msg.txt" 'Revert "chore: base"' '' 'This reverts commit 0123456789.'
+  run bash .githooks/commit-msg msg.txt
+  [ "$status" -eq 0 ]
+  lacks "not a Conventional Commit"
+
+  write_file "$TEST_REPO/msg.txt" "Merge branch 'side'"
+  run bash .githooks/commit-msg msg.txt
+  [ "$status" -eq 0 ]
+  lacks "not a Conventional Commit"
+}
+
+@test "commit-msg: git revert completes with its generated subject" {
+  # The integration counterpart: a revert must not be blocked, whichever way the local git
+  # builds it. It cannot be the test for the bypass branch - on a git that does not run
+  # commit-msg here it would pass with the hook deleted.
   stage a.txt hello
   git commit -q -m "chore: base"
   run git revert --no-edit HEAD
   [ "$status" -eq 0 ]
+  run git log -1 --format=%s
+  contains 'Revert "chore: base"'
 }
 
 @test "commit-msg: the bead-id check says so when its library is missing" {
+  # This hook alone, not a whole `git commit`: pre-commit prints the identical sentence, so
+  # through `git commit` each hook is the other's alibi and deleting this one's warning changed
+  # nothing the test could see (enigma2_player-e1c).
   rm -f "$TEST_REPO/.githooks/lib-bead-ids.sh"
-  stage a.txt hello
-  run git commit -m "chore: no library around"
+  write_file "$TEST_REPO/msg.txt" "chore: no library around"
+  run bash .githooks/commit-msg msg.txt
   [ "$status" -eq 0 ]
   contains "no lib-bead-ids.sh"
   contains "bead ids NOT checked"
