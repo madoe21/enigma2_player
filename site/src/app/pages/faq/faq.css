@@ -1,0 +1,76 @@
+/*
+ * The disclosure list.
+ *
+ * Everything here is appearance only. The behaviour - opening, closing, the
+ * keyboard, the state reported to assistive technology - belongs to
+ * `<details>` and is deliberately untouched (see `faq.ts`).
+ */
+.faq {
+  margin-top: var(--space-5);
+}
+
+.faq__item {
+  border-bottom: 1px solid var(--line-soft);
+}
+
+/*
+ * The row that opens the answer.
+ *
+ * `display: flex` removes the engine's own triangle, which is why the chevron
+ * below is drawn by hand: the default marker sits outside the row and cannot
+ * be aligned with a heading that wraps to three lines at 320 px.
+ */
+.faq__summary {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-3);
+  /* Tall enough for a thumb (the PO's 44 px), and the whole row is the target. */
+  min-height: 44px;
+  padding: var(--space-4) 0;
+  cursor: pointer;
+}
+
+.faq__summary::-webkit-details-marker {
+  display: none;
+}
+
+.faq__summary::after {
+  /*
+   * A chevron, not a plus sign: the shape says "there is more below this" and
+   * it rotates into "this is open". It is decorative - the state itself is
+   * announced by the element, so this must not be the only cue, and the
+   * question stays legible with no CSS at all.
+   */
+  content: '';
+  flex: none;
+  width: 0.5em;
+  height: 0.5em;
+  margin-left: auto;
+  border-right: 2px solid var(--ink-muted);
+  border-bottom: 2px solid var(--ink-muted);
+  transform: rotate(45deg);
+  transform-origin: center;
+}
+
+.faq__item[open] .faq__summary::after {
+  transform: rotate(-135deg);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .faq__summary::after {
+    transition: transform 150ms ease-out;
+  }
+}
+
+.faq__question {
+  /* The heading is inside the control, so it carries no spacing of its own. */
+  margin: 0;
+  font-size: var(--step-1);
+  font-weight: 600;
+}
+
+.faq__answer {
+  margin: 0 0 var(--space-4);
+  max-width: var(--measure-text);
+  color: var(--ink-muted);
+}

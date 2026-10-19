@@ -3,6 +3,7 @@ import { Router, provideRouter } from '@angular/router';
 
 import { PageLanguage } from '../i18n/page-language';
 import { SiteNav } from './site-nav';
+import { languageNames, locales } from '../i18n/locales';
 import { pageRoutes, routes } from '../app.routes';
 
 describe('SiteNav', () => {
@@ -25,6 +26,19 @@ describe('SiteNav', () => {
 
   function labels(): string[] {
     return links('.nav__links a').map((link) => link.textContent?.trim() ?? '');
+  }
+
+  /**
+   * The language entries by the name they are announced under.
+   *
+   * The visible label is the flag plus a two-letter code; the name is what the
+   * link is CALLED, so a test looking for "English" has to look where a screen
+   * reader does.
+   */
+  function langLink(name: string): HTMLAnchorElement | undefined {
+    return links('.nav__langs a').find(
+      (link) => link.querySelector('.nav__lang-name')?.textContent?.trim() === name,
+    );
   }
 
   it('links the start page by name, not only through the brand', () => {
@@ -58,14 +72,62 @@ describe('SiteNav', () => {
     await fixture.whenStable();
 
     expect(labels()).toContain('Features');
-    expect(labels()).toContain('Documentation');
+    expect(labels()).toContain('Manual');
+    expect(labels()).toContain('Security');
     expect(labels()).not.toContain('Funktionen');
+    expect(labels()).not.toContain('Anleitung');
   });
 
   it('offers every language in its own name', () => {
-    const names = links('.nav__langs a').map((link) => link.textContent?.trim());
+    const names = links('.nav__langs a').map((link) =>
+      link.querySelector('.nav__lang-name')?.textContent?.trim(),
+    );
 
+    // The PO asked for flags, and this is the line that keeps that from
+    // costing a reader the entry: whatever the eye gets, the name is the
+    // language's own (enigma2_player-13h).
     expect(names).toEqual(['Deutsch', 'English', 'Español', 'Français', 'Italiano']);
+  });
+
+  it('shows a flag and the language tag, and offers the name as the tooltip', () => {
+    const entries = links('.nav__langs a');
+    expect(entries.length).toBe(locales.length);
+
+    for (const [index, link] of entries.entries()) {
+      const lang = locales[index];
+      // One flag per entry, drawn inline rather than fetched.
+      expect(link.querySelectorAll('site-lang-flag svg').length, lang).toBe(1);
+      expect(link.querySelectorAll('img').length, lang).toBe(0);
+      // The code is the language tag itself, not a second list of five.
+      expect(link.querySelector('.nav__lang-code')?.textContent?.trim(), lang).toBe(
+        lang.toUpperCase(),
+      );
+      expect(link.getAttribute('title'), lang).toBe(languageNames[lang]);
+    }
+  });
+
+  it('announces the name rather than the flag or the code', () => {
+    for (const link of links('.nav__langs a')) {
+      // The flag is decoration and the code is an abbreviation of the name;
+      // both are hidden so the entry is announced once, as "Deutsch", not as
+      // "image DE Deutsch" (the AC of enigma2_player-13h).
+      expect(link.querySelector('site-lang-flag svg')?.getAttribute('aria-hidden')).toBe('true');
+      expect(link.querySelector('.nav__lang-code')?.getAttribute('aria-hidden')).toBe('true');
+      expect(link.querySelector('.nav__lang-name')?.hasAttribute('aria-hidden')).toBe(false);
+      // No `aria-label`: the name is real text, reachable by find-in-page and
+      // present with no CSS at all.
+      expect(link.hasAttribute('aria-label')).toBe(false);
+    }
+  });
+
+  it('keeps the visible code inside the accessible name', () => {
+    // WCAG 2.5.3: someone saying "Deutsch" to a voice control must hit the
+    // link labelled DE. It holds because every endonym starts with its own
+    // language tag - a test rather than a comment, because a sixth language
+    // could be the one where it stops holding (Suomi/fi would).
+    for (const lang of locales) {
+      expect(languageNames[lang].toLowerCase().startsWith(lang), lang).toBe(true);
+    }
   });
 
   it('marks each language link with the language it leads to', () => {
@@ -81,20 +143,18 @@ describe('SiteNav', () => {
     await TestBed.inject(Router).navigateByUrl('/faq');
     await fixture.whenStable();
 
-    const english = links('.nav__langs a').find((link) => link.textContent?.trim() === 'English');
     // Not back to the start page: someone reading the FAQ who switches
     // language wants the FAQ.
-    expect(english?.getAttribute('href')).toBe('/en/faq');
+    expect(langLink('English')?.getAttribute('href')).toBe('/en/faq');
   });
 
   it('falls back to the start page for a page that language does not have', async () => {
     await TestBed.inject(Router).navigateByUrl('/impressum');
     await fixture.whenStable();
 
-    const italian = links('.nav__langs a').find((link) => link.textContent?.trim() === 'Italiano');
     // The legal texts exist in German and English only, deliberately, so the
     // Italian link leads somewhere that exists rather than to a dead URL.
     // `/it` without the trailing slash: the router normalises it in the href.
-    expect(italian?.getAttribute('href')).toBe('/it');
+    expect(langLink('Italiano')?.getAttribute('href')).toBe('/it');
   });
 });

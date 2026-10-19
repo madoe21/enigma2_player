@@ -1,32 +1,50 @@
+/*
+ * The price models, side by side while there is room for them.
+ *
+ * `flex: 1 1 14rem` with a `rem` basis, not a `px` grid: the cards fall under
+ * each other when the text grows, which is what 200-400 % zoom does (WCAG
+ * 1.4.4 / 1.4.10).
+ */
 .price-list {
   display: flex;
   flex-wrap: wrap;
-  gap: 1rem;
-  margin-top: 1.5rem;
+  gap: var(--space-4);
+  margin-top: var(--space-5);
+  padding: 0;
+  list-style: none;
 }
 
 .price-card {
   flex: 1 1 14rem;
   max-width: 18rem;
-  padding: 1.25rem;
-  border: 1px solid var(--line);
-  border-radius: 0.8rem;
+  padding: var(--space-5);
+  border: 1px solid var(--line-soft);
+  border-radius: var(--radius);
+  background: var(--paper-raised);
+  box-shadow: var(--shadow-1);
   text-align: center;
 }
 
 .price-card__name {
   margin: 0;
-  font-size: 1rem;
+  color: var(--ink-muted);
+  font-size: var(--step--1);
   font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
 }
 
 .price-card__amount {
-  margin: 0.4rem 0;
-  font-size: 1.6rem;
+  /* The number is what the page is for: the one place a display size earns
+     its keep. */
+  margin: var(--space-2) 0 0;
+  font-size: var(--step-3);
   font-weight: 700;
+  letter-spacing: -0.02em;
 }
 
 .price-card__period {
-  margin: 0 0 1rem;
-  font-size: 0.9rem;
+  margin: 0 0 var(--space-4);
+  color: var(--ink-muted);
+  font-size: var(--step--1);
 }

@@ -1,36 +1,85 @@
-/* Ported from SiteNav.astro, with the colours left to the page's own theme. */
+/*
+ * The header: brand, page links, language switcher.
+ *
+ * It sticks to the top, with two deliberate limits. The background is a SOLID
+ * token, not a translucent one - text over a blur has no decidable contrast
+ * ratio (WCAG 1.4.3), and `backdrop-filter` is exactly the kind of decoration
+ * that buys nothing on a page this small. And it stops sticking on a short
+ * viewport, which is what 400 % zoom produces (WCAG 1.4.10): a fixed header
+ * there would own half the screen.
+ */
 .nav {
-  display: flex;
-  flex-wrap: wrap;
+  position: sticky;
+  top: 0;
+  z-index: 200;
+  /*
+   * Two rows, always: brand and language switcher on the first, the page
+   * links on the second. A single wrapping flex row sounds simpler and is
+   * what this was - with twelve pages it wrapped the links into a ragged
+   * column beside the brand at 1280 px, and into a one-link-per-line stack on
+   * a phone. A grid row of its own for the links costs nothing and holds at
+   * every width.
+   */
+  display: grid;
+  grid-template-columns: 1fr auto;
   align-items: center;
-  gap: 1rem;
-  padding: 0.75rem 1.25rem;
-  border-bottom: 1px solid var(--line);
+  gap: var(--space-2) var(--space-4);
+  max-width: var(--measure);
+  margin: 0 auto;
+  padding: var(--space-3) var(--space-5);
+  border-bottom: 1px solid var(--line-soft);
+  background: var(--paper);
+}
+
+@media (max-height: 30rem) {
+  .nav {
+    position: static;
+  }
+}
+
+/* On a narrow screen the brand and the five language entries stop fitting on
+   one line together, so each gets its own row rather than being squeezed. */
+@media (max-width: 40rem) {
+  .nav {
+    grid-template-columns: 1fr;
+  }
 }
 
 .nav__brand {
-  font-weight: 700;
-  font-size: 1.1rem;
-  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
   color: inherit;
+  font-size: var(--step-1);
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  text-decoration: none;
+}
+
+/* The brand mark: decorative, so it is a shape and not a character - a glyph
+   in generated content gets announced, and this one has no translation. */
+.nav__brand::before {
+  content: '';
+  width: 0.75rem;
+  height: 0.75rem;
+  border-radius: 50%;
+  background: var(--accent);
 }
 
 .nav__links,
 .nav__langs {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.75rem;
+  gap: var(--space-2);
   margin: 0;
   padding: 0;
   list-style: none;
 }
 
 .nav__links {
-  flex: 1;
-}
-
-.nav__langs {
-  font-variant: small-caps;
+  grid-column: 1 / -1;
+  border-top: 1px solid var(--line-soft);
+  padding-top: var(--space-1);
 }
 
 .nav a {
@@ -38,10 +87,67 @@
   display: inline-flex;
   align-items: center;
   min-height: 2.75rem;
+  padding: 0 var(--space-3);
+  border-radius: var(--radius-sm);
+  color: var(--ink-muted);
+  font-size: var(--step--1);
+  text-decoration: none;
 }
 
+/* Flag, then code, with the padding of a nav link around both. */
+.nav__lang {
+  gap: var(--space-2);
+}
+
+.nav__lang-code {
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+/*
+ * The language's own name: there for a screen reader, not on the screen.
+ *
+ * This is what the entry is called (`aria-current` and the tooltip aside, it
+ * is the only word in the link), so it must be TEXT and not an `aria-label` -
+ * a label attribute is invisible to find-in-page and to a translation tool,
+ * and it would put the name out of reach of anyone browsing with our CSS off.
+ * `display: none` or `visibility: hidden` would hide it from the reader too;
+ * the clipped 1 px box is the pattern that does not.
+ *
+ * The code beside it is `aria-hidden` instead, because "DE Deutsch" announced
+ * for one link is noise: the code is an abbreviation of the name, not a second
+ * piece of information. The visible label stays inside the accessible name
+ * either way (WCAG 2.5.3) - every endonym begins with its own language tag.
+ */
+.nav__lang-name {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+/*
+ * The current page, said twice: in colour and on its own surface.
+ *
+ * `aria-current` is what carries it to a screen reader (set in the template);
+ * these two rules are the visible half, and neither is colour alone (1.4.1).
+ */
 .nav a[aria-current] {
+  background: var(--accent-soft);
+  color: var(--ink);
   font-weight: 700;
+}
+
+@media (hover: hover) {
+  .nav a:hover {
+    color: var(--ink);
+    text-decoration: underline;
+  }
 }
 
 .nav a:focus-visible {

@@ -3,8 +3,9 @@ import { toSignal } from '@angular/core/rxjs-interop';
 import { NavigationEnd, Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { filter, map } from 'rxjs';
 
+import { LangFlag } from './lang-flag';
 import { Translate } from '../content/translate';
-import { Lang, locales, localePath } from '../i18n/locales';
+import { languageNames, locales, localePath } from '../i18n/locales';
 import { PageLanguage } from '../i18n/page-language';
 import { languagesOf, pageOfPath, pageRoutes, pathOf } from '../app.routes';
 import { UiKey } from '../content/ui';
@@ -31,7 +32,7 @@ interface NavItem {
  */
 @Component({
   selector: 'site-nav',
-  imports: [RouterLink, RouterLinkActive],
+  imports: [LangFlag, RouterLink, RouterLinkActive],
   template: `
     <nav class="nav" [attr.aria-label]="copy().mainNav">
       <a class="nav__brand" [routerLink]="home()">{{ copy().title }}</a>
@@ -53,12 +54,16 @@ interface NavItem {
         @for (option of languages(); track option.lang) {
           <li>
             <a
+              class="nav__lang"
               [routerLink]="option.href"
               [attr.aria-current]="option.lang === current() ? 'true' : null"
               [attr.lang]="option.lang"
               [attr.hreflang]="option.lang"
+              [attr.title]="option.name"
             >
-              {{ option.name }}
+              <site-lang-flag [lang]="option.lang" />
+              <span class="nav__lang-code" aria-hidden="true">{{ option.code }}</span>
+              <span class="nav__lang-name">{{ option.name }}</span>
             </a>
           </li>
         }
@@ -132,27 +137,20 @@ export class SiteNav {
    * wants the English FAQ, not the start page. Where a page does not exist in
    * the other language - the legal texts - the switcher falls back to that
    * language's landing page rather than offering a dead link.
+   *
+   * Each entry carries three things: the flag (decorative, see `LangFlag`),
+   * the code a sighted visitor reads, and the language's own name, which is
+   * what the entry is CALLED - for a screen reader, for the tooltip, and for
+   * anyone browsing without our CSS. `code` is derived, not listed: the
+   * language tag in capitals.
    */
   protected readonly languages = computed(() => {
     const page = pageOfPath(this.url().split('?')[0].split('#')[0]);
     return locales.map((lang) => ({
       lang,
-      name: LANGUAGE_NAMES[lang],
+      name: languageNames[lang],
+      code: lang.toUpperCase(),
       href: page && languagesOf(page).includes(lang) ? pathOf(page, lang) : localePath('', lang),
     }));
   });
 }
-
-/**
- * The languages in their own names.
- *
- * "Deutsch", not "German": a language switcher is read by someone looking for
- * their own language, and they recognise its own name.
- */
-const LANGUAGE_NAMES: Record<Lang, string> = {
-  de: 'Deutsch',
-  en: 'English',
-  es: 'Español',
-  fr: 'Français',
-  it: 'Italiano',
-};

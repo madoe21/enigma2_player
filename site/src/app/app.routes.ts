@@ -29,6 +29,32 @@ export interface PageDefinition {
   readonly navKey?: UiKey;
   /** Extra route data, e.g. which legal text or which shop view to render. */
   readonly data?: Readonly<Record<string, unknown>>;
+  /**
+   * Whether this page has to be readable WITHOUT answering the cookie question
+   * first (enigma2_player-dki).
+   *
+   * True for the three legal texts and for nothing else. §5 DDG wants the
+   * imprint "directly accessible" and the privacy policy is what a visitor
+   * reads in order to decide - a modal dialog in front of either makes the
+   * reading conditional on the answer, which is the one thing it must not be.
+   * The flag lives here because this list is where the site's pages are
+   * declared; the shell reads it through `ConsentPrompt` rather than keeping a
+   * second list of paths.
+   */
+  readonly unconditional?: boolean;
+  /**
+   * The id of the page whose URL is the canonical one for this path.
+   *
+   * Set on the two paths that were separate pages until the PO merged pricing,
+   * licence information and buying into one (enigma2_player-eer): `/license`
+   * and `/buy` keep resolving, because they are linked from the application
+   * and from the sitemap of the Astro site, but they render the merged page
+   * and point a crawler at it. A redirect would be the tidier answer and is
+   * not available: this site is prerendered files on a host with no
+   * configuration, so a path that is not written out as a file is a 404 rather
+   * than a redirect.
+   */
+  readonly canonicalOf?: string;
 }
 
 /** The same slug in every language, for pages whose name stays as it is. */
@@ -77,10 +103,28 @@ export const pageRoutes: readonly PageDefinition[] = [
     load: () => import('./pages/changelog/changelog').then((m) => m.Changelog),
   },
   {
-    id: 'docs',
-    slug: everywhere('docs'),
-    navKey: 'nav.docs',
-    load: () => import('./pages/docs/docs').then((m) => m.Docs),
+    id: 'manual',
+    slug: {
+      de: 'anleitung',
+      en: 'manual',
+      es: 'manual',
+      fr: 'manuel',
+      it: 'manuale',
+    },
+    navKey: 'nav.manual',
+    load: () => import('./pages/manual/manual').then((m) => m.Manual),
+  },
+  {
+    id: 'security',
+    slug: {
+      de: 'sicherheit',
+      en: 'security',
+      es: 'seguridad',
+      fr: 'securite',
+      it: 'sicurezza',
+    },
+    navKey: 'nav.security',
+    load: () => import('./pages/security/security').then((m) => m.Security),
   },
   {
     id: 'faq',
@@ -94,12 +138,21 @@ export const pageRoutes: readonly PageDefinition[] = [
     navKey: 'nav.pricing',
     load: () => import('./pages/pricing/pricing').then((m) => m.Pricing),
   },
+  // `/buy` and `/license` were pages of their own until the PO merged the
+  // three into one (enigma2_player-eer). They stay as paths - the application
+  // links `/buy`, and both are in the sitemap the old site published - and
+  // render the merged page with `/pricing` as their canonical URL.
   {
     id: 'buy',
     slug: everywhere('buy'),
-    navKey: 'nav.buy',
-    data: { view: 'buy' },
-    load: () => import('./pages/shop/shop').then((m) => m.Shop),
+    canonicalOf: 'pricing',
+    load: () => import('./pages/pricing/pricing').then((m) => m.Pricing),
+  },
+  {
+    id: 'license',
+    slug: everywhere('license'),
+    canonicalOf: 'pricing',
+    load: () => import('./pages/pricing/pricing').then((m) => m.Pricing),
   },
   {
     id: 'account',
@@ -107,12 +160,6 @@ export const pageRoutes: readonly PageDefinition[] = [
     navKey: 'nav.account',
     data: { view: 'account' },
     load: () => import('./pages/shop/shop').then((m) => m.Shop),
-  },
-  {
-    id: 'license',
-    slug: everywhere('license'),
-    navKey: 'nav.license',
-    load: () => import('./pages/license/license').then((m) => m.License),
   },
   {
     id: 'contact',
@@ -131,6 +178,7 @@ export const pageRoutes: readonly PageDefinition[] = [
     },
     languages: legalLocales,
     data: { which: 'imprint' },
+    unconditional: true,
     load: () => import('./pages/legal/legal-page').then((m) => m.LegalPageComponent),
   },
   {
@@ -144,6 +192,7 @@ export const pageRoutes: readonly PageDefinition[] = [
     },
     languages: legalLocales,
     data: { which: 'privacy' },
+    unconditional: true,
     load: () => import('./pages/legal/legal-page').then((m) => m.LegalPageComponent),
   },
   {
@@ -151,6 +200,7 @@ export const pageRoutes: readonly PageDefinition[] = [
     slug: everywhere('cookies'),
     languages: legalLocales,
     data: { which: 'cookies' },
+    unconditional: true,
     load: () => import('./pages/legal/legal-page').then((m) => m.LegalPageComponent),
   },
 ];
@@ -158,6 +208,21 @@ export const pageRoutes: readonly PageDefinition[] = [
 /** The languages a page is published in. */
 export function languagesOf(page: PageDefinition): readonly Lang[] {
   return page.languages ?? locales;
+}
+
+/**
+ * The page whose URL is canonical for this one: itself, unless it is an alias.
+ *
+ * One function rather than the check at every call site, because three places
+ * need the same answer - the title, the canonical link and the `hreflang`
+ * alternates - and an alias that is canonical in one of them and not in the
+ * other two is worse than no alias at all.
+ */
+export function canonicalPage(page: PageDefinition): PageDefinition {
+  if (page.canonicalOf === undefined) {
+    return page;
+  }
+  return pageRoutes.find((candidate) => candidate.id === page.canonicalOf) ?? page;
 }
 
 /** The site path of a page in a language, without the base href. */

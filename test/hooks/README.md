@@ -2,11 +2,12 @@
 
 The three git hooks this repository ships — `commit-msg`, `pre-commit`, `pre-push` — under
 [bats](https://github.com/bats-core/bats-core), one case per branch
-(`enigma2_player-3c5`).
+(`enigma2_player-3c5`), plus `lib-bead-ids.bats` for the id extraction both hooks share
+(`enigma2_player-35d`).
 
 ```bash
-npm run test:hooks          # the suite (44 cases)
-npm run test:hooks:mutate   # proves the suite notices defects (16 mutants, ~12 s)
+npm run test:hooks          # the suite (54 cases)
+npm run test:hooks:mutate   # proves the suite notices defects (18 mutants, ~12 s)
 npm run check:hooks         # .githooks/ and .beads/hooks/ must be byte-identical
 ```
 

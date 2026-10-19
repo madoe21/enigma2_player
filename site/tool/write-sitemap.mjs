@@ -19,7 +19,7 @@
  *
  * Usage: npm run build (runs it) or node tool/write-sitemap.mjs
  */
-import { readdir, writeFile } from 'node:fs/promises';
+import { readFile, readdir, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 
 const DIST = 'dist/site/enigma2_player';
@@ -32,6 +32,13 @@ const BASE = '/enigma2_player';
  * The build has already decided what exists; walking its output means the
  * sitemap cannot list a page that was not emitted, which is the one error a
  * sitemap must not contain.
+ *
+ * A page that asks not to be indexed is left out. The pricing merge
+ * (enigma2_player-eer) left `/buy` and `/license` as files that render the
+ * merged page - they have to exist, because a static host cannot redirect, and
+ * they say `noindex, follow` in their own head. The page's head is the single
+ * place that decides: a second list of alias paths here is how the sitemap ends
+ * up announcing a URL the page itself disowns.
  */
 async function prerenderedPaths(dir = DIST, prefix = '') {
   const out = [];
@@ -39,10 +46,26 @@ async function prerenderedPaths(dir = DIST, prefix = '') {
     if (entry.isDirectory()) {
       out.push(...(await prerenderedPaths(join(dir, entry.name), `${prefix}${entry.name}/`)));
     } else if (entry.name === 'index.html') {
-      out.push(prefix);
+      if (await indexable(join(dir, entry.name))) {
+        out.push(prefix);
+      }
     }
   }
   return out;
+}
+
+/** Whether a prerendered file wants to be in the index. */
+async function indexable(file) {
+  const html = await readFile(file, 'utf8');
+  // Tag by tag, and each tag's attributes in either order: the renderer is
+  // free to emit `content` before `name`, and a regex that assumes one order
+  // silently stops filtering when it does.
+  for (const tag of html.match(/<meta\b[^>]*>/gi) ?? []) {
+    if (/name="robots"/i.test(tag) && /content="[^"]*noindex/i.test(tag)) {
+      return false;
+    }
+  }
+  return true;
 }
 
 /** The language a path belongs to, and the page key within that language. */

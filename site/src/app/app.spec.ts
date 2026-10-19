@@ -51,6 +51,23 @@ describe('App', () => {
     );
   });
 
+  it('gives the skip link a target that can actually take the focus', async () => {
+    const fixture = TestBed.createComponent(App);
+    await fixture.whenStable();
+    const element = fixture.nativeElement as HTMLElement;
+
+    const skip = element.querySelector<HTMLAnchorElement>('a.skip-link');
+    const target = element.querySelector<HTMLElement>('#content');
+    expect(skip?.getAttribute('href')).toBe('#content');
+    // Without a tabindex the hash jump scrolls and the focus stays put, which
+    // leaves a screen reader's cursor in the navigation the reader asked to
+    // skip (enigma2_player-dp3). -1, so it is reachable by the link and not
+    // an extra Tab stop of its own.
+    expect(target?.getAttribute('tabindex')).toBe('-1');
+    target?.focus();
+    expect(document.activeElement).toBe(target);
+  });
+
   it('has exactly one h1 - the page supplies it, not the shell', async () => {
     // The scaffold shell shipped Angular's welcome markup, which gave every
     // page a second h1. Playwright caught that here before a human would.

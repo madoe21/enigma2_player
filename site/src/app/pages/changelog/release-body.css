@@ -1,0 +1,81 @@
+/*
+ * The inside of a release note: sections, lists, quotes, tables, code.
+ *
+ * Everything here is `rem`-based and wraps, because a release note is the
+ * longest text on the site and it has to survive 400 % zoom in a 320 px
+ * viewport without pushing the page sideways (WCAG 1.4.10).
+ */
+.note__heading {
+  margin: var(--space-6) 0 var(--space-3);
+  font-size: var(--step-1);
+}
+
+/*
+ * The prose measure, repeated here on purpose.
+ *
+ * `page.css` sets it for the page's own paragraphs, but component styles are
+ * scoped: a rule written there cannot reach an element rendered by this
+ * component. One line beats routing a release note's text back into the page
+ * template (WCAG 1.4.8: no unlimited line length).
+ */
+p,
+li {
+  max-width: var(--measure-text);
+}
+
+.note__list {
+  margin: 0 0 var(--space-4);
+  padding-left: var(--space-5);
+}
+
+.note__list li {
+  margin-bottom: var(--space-3);
+}
+
+/*
+ * A quoted remark - "needs licence server 0.4.0 or newer" and the like.
+ *
+ * The bar on the side is decoration; what marks it as a quote for a screen
+ * reader is the `blockquote` element, which is why it is one.
+ */
+.note__quote {
+  margin: var(--space-4) 0;
+  padding: var(--space-2) 0 var(--space-2) var(--space-4);
+  border-left: 3px solid var(--line-soft);
+  color: var(--ink-muted);
+}
+
+.note__quote p {
+  margin: var(--space-2) 0;
+}
+
+.note__table-wrap {
+  margin: var(--space-4) 0 var(--space-5);
+  overflow-x: auto;
+}
+
+.note__table {
+  border-collapse: collapse;
+  /* Not `100%`: the cells hold file names and shell commands, so the table is
+     allowed to be wider than the column and scroll inside its wrapper. */
+  min-width: 100%;
+  font-size: var(--step--1);
+  text-align: left;
+}
+
+.note__table th,
+.note__table td {
+  padding: var(--space-2) var(--space-3);
+  border-bottom: 1px solid var(--line-soft);
+  /* The prose measure from page.css would squeeze a cell to 44rem and then
+     wrap a file name mid-word; a cell gets as much room as it needs. */
+  max-width: none;
+  vertical-align: top;
+}
+
+.note__table th {
+  color: var(--ink-muted);
+  font-size: var(--step--1);
+  font-weight: 600;
+  white-space: nowrap;
+}

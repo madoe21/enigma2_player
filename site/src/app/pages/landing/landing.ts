@@ -3,6 +3,7 @@ import { RouterLink } from '@angular/router';
 
 import { ConsentGate } from '../../consent/consent-gate';
 import { PageBase } from '../page-base';
+import { getScreenshots, shotSource } from '../../content/content';
 import { localePath } from '../../i18n/locales';
 import { SiteContent } from '../../content/site-content';
 
@@ -20,14 +21,34 @@ import { SiteContent } from '../../content/site-content';
   template: `
     <main class="page">
       <section class="hero">
-        <h1>{{ copy().heroTitle }}</h1>
-        <p class="hero__sub">{{ copy().heroSub }}</p>
-        <div class="cta-row">
-          <a class="btn btn--primary" [routerLink]="downloadsHref()">{{ copy().ctaDownload }}</a>
-          <a class="btn" [routerLink]="buyHref()">{{ copy().ctaBuy }}</a>
+        <div class="hero__text">
+          <h1>{{ copy().heroTitle }}</h1>
+          <p class="hero__sub">{{ copy().heroSub }}</p>
+          <div class="cta-row">
+            <a class="btn btn--primary" [routerLink]="downloadsHref()">{{ copy().ctaDownload }}</a>
+            <a class="btn" [routerLink]="buyHref()" fragment="buy">{{ copy().ctaBuy }}</a>
+          </div>
+          @if (release(); as release) {
+            <p class="muted">{{ copy().latest }}: {{ release.version }}</p>
+          }
         </div>
-        @if (release(); as release) {
-          <p class="muted">{{ copy().latest }}: {{ release.version }}</p>
+
+        <!--
+          The product, shown rather than described (PO, 2026-10-15). The image
+          and its alternative text are the gallery's own first screenshot, so
+          the sentence a screen reader gets is translated with everything else
+          and no new key had to be invented for a picture.
+        -->
+        @if (heroShot(); as shot) {
+          <div class="hero__media">
+            <img
+              class="hero__image"
+              [src]="shotSource(shot)"
+              [alt]="shot.caption"
+              width="1200"
+              height="675"
+            />
+          </div>
         }
       </section>
 
@@ -35,7 +56,7 @@ import { SiteContent } from '../../content/site-content';
         <h2>{{ copy().featuresTitle }}</h2>
         <ul class="card-grid">
           @for (highlight of highlights(); track highlight) {
-            <li class="card">{{ highlight }}</li>
+            <li class="card card--highlight">{{ highlight }}</li>
           }
         </ul>
       </section>
@@ -49,7 +70,9 @@ import { SiteContent } from '../../content/site-content';
         <h2>{{ copy().ctaBuy }}</h2>
         <site-consent-gate>
           <p>
-            <a class="btn btn--primary" [routerLink]="buyHref()">{{ copy().ctaBuy }}</a>
+            <a class="btn btn--primary" [routerLink]="buyHref()" fragment="buy">
+              {{ copy().ctaBuy }}
+            </a>
           </p>
         </site-consent-gate>
       </section>
@@ -80,6 +103,19 @@ export class Landing extends PageBase {
     return [copy.multi, copy.stream, copy.subs, copy.cross, copy.license];
   });
 
+  /**
+   * The gallery's first screenshot, borrowed as the hero image.
+   *
+   * Borrowed on purpose: its `caption` is already translated in all five
+   * languages, so the hero needs no new dictionary key and no literal in the
+   * template (`check:literals`). `?? null` because `@if` wants a falsy value,
+   * and because a locale without screenshots must drop the image, not crash.
+   */
+  protected readonly heroShot = computed(() => getScreenshots(this.lang())[0] ?? null);
+
+  /** The shared path builder, reachable from the template. */
+  protected readonly shotSource = shotSource;
+
   /** The start page is titled with the site name, not with a page name. */
   protected override titleKey() {
     return null;
@@ -90,5 +126,14 @@ export class Landing extends PageBase {
   }
 
   protected readonly downloadsHref = computed(() => localePath('downloads', this.lang()));
-  protected readonly buyHref = computed(() => localePath('buy', this.lang()));
+  /**
+   * The purchase call to action: the merged pricing page, at its buy section.
+   *
+   * It pointed at `/buy` until the three pages became one
+   * (enigma2_player-eer). `/buy` still resolves, and linking it from here
+   * would send every visitor through a path whose own head says `noindex` -
+   * the canonical page with a fragment is the same destination, named
+   * correctly.
+   */
+  protected readonly buyHref = computed(() => localePath('pricing', this.lang()));
 }

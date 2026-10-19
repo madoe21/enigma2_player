@@ -5,6 +5,7 @@ import { RouterLink } from '@angular/router';
 import { LegalLinks } from '../legal/legal-links';
 import { PageLanguage } from '../i18n/page-language';
 import { CONSENT_COPY } from './consent-copy';
+import { ConsentPrompt } from './consent-prompt';
 import { ConsentStore } from './consent-store';
 
 /**
@@ -28,7 +29,7 @@ import { ConsentStore } from './consent-store';
   selector: 'site-consent-modal',
   imports: [A11yModule, RouterLink],
   template: `
-    @if (!store.decided()) {
+    @if (prompt.visible()) {
       <div class="consent-scrim">
         <div
           class="consent-dialog"
@@ -39,7 +40,18 @@ import { ConsentStore } from './consent-store';
           cdkTrapFocus
           [cdkTrapFocusAutoCapture]="true"
         >
-          <h2 class="consent-dialog__title" [id]="titleId">{{ copy().title }}</h2>
+          <!--
+            Focus lands on the TITLE, not on the first tabbable element
+            (enigma2_player-ulv). Auto-capture would otherwise start at the
+            imprint link in the middle of the dialog - which a screen reader
+            reads as a link out of context, and which at 400 % zoom scrolls the
+            256 px window straight past the question being asked. The accept
+            button would be worse: focus on it means Enter consents to
+            something nobody has read yet.
+          -->
+          <h2 class="consent-dialog__title" [id]="titleId" tabindex="-1" cdkFocusInitial>
+            {{ copy().title }}
+          </h2>
           <p class="consent-dialog__body" [id]="bodyId">{{ copy().body }}</p>
           <!--
             The legal texts, reachable BEFORE the answer is given: consent to
@@ -88,6 +100,15 @@ import { ConsentStore } from './consent-store';
 })
 export class ConsentModal {
   protected readonly store = inject(ConsentStore);
+
+  /**
+   * Whether to ask at all.
+   *
+   * Not `store.decided()` directly: the legal texts have to be readable
+   * before the decision, so the condition is "undecided AND this page asks"
+   * (enigma2_player-dki).
+   */
+  protected readonly prompt = inject(ConsentPrompt);
   private readonly pageLanguage = inject(PageLanguage);
   private readonly announcer = inject(LiveAnnouncer);
 
@@ -108,7 +129,7 @@ export class ConsentModal {
     // region. And a live region should start empty: text baked into it is text
     // a screen reader may read at load, out of context.
     afterNextRender(() => {
-      if (!this.store.decided()) {
+      if (this.prompt.visible()) {
         this.announcer.announce(this.copy().announce, 'assertive');
       }
     });

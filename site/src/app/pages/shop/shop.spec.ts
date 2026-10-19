@@ -3,28 +3,29 @@ import { ActivatedRoute, provideRouter } from '@angular/router';
 
 import { CONSENT_COOKIE, ConsentStore } from '../../consent/consent-store';
 import { Shop } from './shop';
+import { routeStub } from '../page-route.stub';
 
 /**
- * Buying and the account, both framed from the licence server.
+ * The account page, which frames the licence server's account view.
  *
- * The point of these tests is the gate. Loading the frame sends the visitor's
- * request and their IP to the licence server, so it must not happen before
- * they accepted - that is what `enigma2_player-vmk` decided for the shop, and
- * an iframe that loads anyway would make the cookie dialog decorative.
+ * The gate in front of that frame is tested once, in `shop-frame.spec.ts`:
+ * both pages that embed the shop use the same component since the pricing
+ * merge (enigma2_player-eer). What is left here is this page's own job - the
+ * right view, the right heading, the right language.
  */
 describe('Shop', () => {
   function clearCookie(): void {
     document.cookie = `${CONSENT_COOKIE}=; Max-Age=0; Path=${new URL(document.baseURI).pathname}`;
   }
 
-  async function render(view: 'buy' | 'account', lang = 'de'): Promise<ComponentFixture<Shop>> {
+  async function render(lang = 'de'): Promise<ComponentFixture<Shop>> {
     TestBed.resetTestingModule();
     clearCookie();
     await TestBed.configureTestingModule({
       imports: [Shop],
       providers: [
         provideRouter([]),
-        { provide: ActivatedRoute, useValue: routeStub({ lang, view }) },
+        { provide: ActivatedRoute, useValue: routeStub({ lang, view: 'account' }) },
       ],
     }).compileComponents();
     const fixture = TestBed.createComponent(Shop);
@@ -38,40 +39,8 @@ describe('Shop', () => {
     return (fixture.nativeElement as HTMLElement).querySelector('iframe');
   }
 
-  it('does not load the frame before consent', async () => {
-    const fixture = await render('buy');
-
-    expect(frame(fixture)).toBeNull();
-    // And it says why, rather than leaving a hole where the shop should be.
-    expect((fixture.nativeElement as HTMLElement).querySelector('[role="note"]')).not.toBeNull();
-  });
-
-  it('loads the frame once consent exists', async () => {
-    const fixture = await render('buy');
-    TestBed.inject(ConsentStore).accept();
-    fixture.detectChanges();
-    await fixture.whenStable();
-
-    const iframe = frame(fixture);
-    expect(iframe).not.toBeNull();
-    expect(iframe?.getAttribute('src')).toContain('/shop/');
-    // Lazy even then: after consent it is still only fetched when it is seen.
-    expect(iframe?.getAttribute('loading')).toBe('lazy');
-    // The licence server has no business knowing which page of ours framed it.
-    expect(iframe?.getAttribute('referrerpolicy')).toBe('no-referrer');
-  });
-
-  it('keeps the frame out after a refusal', async () => {
-    const fixture = await render('account');
-    TestBed.inject(ConsentStore).reject();
-    fixture.detectChanges();
-    await fixture.whenStable();
-
-    expect(frame(fixture)).toBeNull();
-  });
-
-  it('frames the account view for the account route', async () => {
-    const fixture = await render('account');
+  it('frames the account view, not the shop', async () => {
+    const fixture = await render();
     TestBed.inject(ConsentStore).accept();
     fixture.detectChanges();
     await fixture.whenStable();
@@ -79,39 +48,37 @@ describe('Shop', () => {
     expect(frame(fixture)?.getAttribute('src')).toContain('/account/');
   });
 
-  it('passes the page language into the shop', async () => {
-    const fixture = await render('buy', 'fr');
+  it('waits for consent like every other embed', async () => {
+    const fixture = await render();
+
+    expect(frame(fixture)).toBeNull();
+    expect((fixture.nativeElement as HTMLElement).querySelector('[role="note"]')).not.toBeNull();
+  });
+
+  it('names the frame after the licence server, not after its own heading', async () => {
+    const fixture = await render();
     TestBed.inject(ConsentStore).accept();
     fixture.detectChanges();
     await fixture.whenStable();
+    const element = fixture.nativeElement as HTMLElement;
 
-    // Otherwise a French visitor gets a German shop inside a French page.
-    expect(frame(fixture)?.getAttribute('src')).toContain('lang=fr');
+    const title = frame(fixture)?.getAttribute('title');
+    expect(title).toBe('Kundenkonto beim Lizenzserver');
+    // The defect this replaces: the frame carried the h1's own words, so a
+    // screen reader read "heading Mein Konto ... frame Mein Konto" and the
+    // embedded application sounded like the heading said twice
+    // (enigma2_player-dp3).
+    expect(title).not.toBe(element.querySelector('h1')?.textContent?.trim());
   });
 
-  it('titles the two views differently', async () => {
-    const buy = (await render('buy')).nativeElement as HTMLElement;
-    const account = (await render('account')).nativeElement as HTMLElement;
+  it('is headed as the account, in the page language', async () => {
+    const german = (await render()).nativeElement as HTMLElement;
+    const english = (await render('en')).nativeElement as HTMLElement;
 
-    expect(buy.querySelector('h1')?.textContent?.trim()).toBe('Lizenz kaufen');
-    expect(account.querySelector('h1')?.textContent?.trim()).toBe('Konto');
+    // "Mein Konto" rather than "Konto": the nav entry was relabelled so a
+    // visitor can tell a page about their own account from a page about
+    // licences (enigma2_player-amx).
+    expect(german.querySelector('h1')?.textContent?.trim()).toBe('Mein Konto');
+    expect(english.querySelector('h1')?.textContent?.trim()).toBe('My Account');
   });
 });
-
-/**
- * A route as the pages read it: the data, and the path it was reached under.
- *
- * The path is there because `PageBase` builds the document title, the
- * canonical URL and the hreflang set from it - a stub without it would test a
- * page that cannot say which page it is.
- */
-function routeStub(data: Record<string, unknown>) {
-  const segments =
-    data['lang'] === 'de' || data['lang'] === undefined ? [] : [String(data['lang'])];
-  return {
-    snapshot: {
-      data,
-      pathFromRoot: [{ url: segments.map((path) => ({ path })) }],
-    },
-  };
-}

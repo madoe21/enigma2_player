@@ -1,72 +1,97 @@
 /*
- * The shared look of a content page, ported from the Astro components' own
- * <style> blocks (cards, blocks, grids). One file instead of twelve, because
- * what differed between them was the content, not the layout.
+ * The shared look of a content page: the container, the section rhythm, the
+ * cards, the buttons and the two list shapes every page uses.
+ *
+ * One file instead of twelve, because what differs between the pages is the
+ * content, not the layout. Every value that is not taste is marked as such -
+ * those are accessibility requirements and a later redesign has to keep them
+ * (the redesign of 2026-10-15 did: enigma2_player-4t1).
  */
 .page {
-  max-width: 60rem;
+  max-width: var(--measure);
   margin: 0 auto;
-  padding: 2rem 1.25rem;
+  padding: var(--space-6) var(--space-5) var(--space-8);
 }
 
-.page h1 {
-  font-size: clamp(1.6rem, 3vw, 2.25rem);
-  line-height: 1.2;
-  margin: 0 0 0.75rem;
+.page > h1 {
+  margin: 0 0 var(--space-3);
+  font-size: var(--step-4);
+  letter-spacing: -0.015em;
+}
+
+/* The sentence under a page heading: wider type, narrow measure (1.4.8). */
+.page > h1 + p {
+  max-width: var(--measure-text);
+  margin: 0 0 var(--space-5);
+  color: var(--ink-muted);
+  font-size: var(--step-1);
+}
+
+.page h2 {
+  font-size: var(--step-2);
+}
+
+.page section {
+  margin-top: var(--space-7);
+}
+
+.page section > h2 {
+  margin: 0 0 var(--space-4);
+}
+
+/* Prose keeps the readable measure even when its section does not. */
+.page p,
+.page dd,
+.page li {
+  max-width: var(--measure-text);
 }
 
 .card-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
-  gap: 1rem 1.5rem;
-  margin-top: 1.5rem;
+  /* `auto-fit` plus a minimum that is smaller than 320 px, so the grid is one
+     column at 400 % zoom instead of overflowing sideways (WCAG 1.4.10). */
+  grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+  gap: var(--space-4);
+  margin: var(--space-5) 0 0;
+  padding: 0;
+  list-style: none;
 }
 
 .card {
-  padding: 1rem 1.2rem;
-  border: 1px solid var(--line);
-  border-radius: 0.6rem;
+  margin: 0;
+  padding: var(--space-5);
+  border: 1px solid var(--line-soft);
+  border-radius: var(--radius);
+  background: var(--paper-raised);
+  box-shadow: var(--shadow-1);
 }
 
-.card h2 {
-  margin: 0 0 0.4rem;
-  font-size: 1.15rem;
+.card h2,
+.card h3 {
+  margin: 0 0 var(--space-2);
+  font-size: var(--step-1);
 }
 
 .card p {
   margin: 0;
+  color: var(--ink-muted);
 }
 
 .block {
-  margin-top: 1.25rem;
+  margin-top: var(--space-5);
+  padding-left: var(--space-4);
+  border-left: 3px solid var(--accent);
 }
 
 .block h2 {
-  font-size: 1.15rem;
-  margin: 0 0 0.35rem;
+  margin: 0 0 var(--space-2);
+  font-size: var(--step-1);
 }
 
 .block p {
   margin: 0;
+  /* The source text carries its own line breaks and they are meaningful. */
   white-space: pre-line;
-}
-
-.qa-list {
-  margin-top: 1.5rem;
-}
-
-.qa {
-  padding: 1rem 0;
-  border-bottom: 1px solid var(--line);
-}
-
-.qa dt {
-  font-weight: 600;
-  margin-bottom: 0.35rem;
-}
-
-.qa dd {
-  margin: 0;
 }
 
 /*
@@ -85,22 +110,45 @@
  * success criterion 2.5.8 (target size), not a design preference.
  */
 .btn {
-  color: var(--accent);
   display: inline-flex;
   align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
   min-height: 2.75rem;
-  padding: 0 1.1rem;
+  padding: 0 var(--space-5);
   border: 1px solid var(--line);
-  border-radius: 0.5rem;
-  text-decoration: none;
+  border-radius: var(--radius-sm);
+  background: var(--paper-raised);
+  color: var(--accent);
   font-weight: 600;
+  text-decoration: none;
+}
+
+.btn--primary {
+  border-color: var(--accent);
+  background: var(--accent);
+  color: var(--accent-ink);
+  font-weight: 700;
+  box-shadow: var(--shadow-1);
+}
+
+/* Hover is a hint, never the only state: the border and the label carry the
+   control on their own for anyone who never hovers (touch, keyboard). */
+@media (hover: hover) {
+  .btn:hover {
+    border-color: var(--accent);
+  }
+
+  .card:hover {
+    border-color: var(--line);
+  }
 }
 
 .cta-row {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.75rem;
-  margin-top: 1.5rem;
+  gap: var(--space-3);
+  margin-top: var(--space-5);
 }
 
 a:focus-visible,
@@ -117,7 +165,7 @@ button:focus-visible {
  * is a coin toss between two of them.
  */
 .link-list {
-  margin: 1rem 0;
+  margin: var(--space-4) 0;
   padding: 0;
   list-style: none;
 }
@@ -126,4 +174,5 @@ button:focus-visible {
   display: flex;
   align-items: center;
   min-height: 2.75rem;
+  border-bottom: 1px solid var(--line-soft);
 }

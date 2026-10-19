@@ -5,13 +5,13 @@
  * strip: this is a statement of fact about the site, not an error.
  */
 .demo-notice {
-  padding: 0.6rem 1.25rem;
-  background: var(--paper-raised);
-  border-bottom: 1px solid var(--line);
+  padding: var(--space-3) var(--space-5);
+  border-bottom: 1px solid var(--line-soft);
+  background: var(--accent-soft);
 }
 
 .demo-notice p {
-  max-width: 60rem;
+  max-width: var(--measure);
   margin: 0 auto;
-  font-size: 0.95rem;
+  font-size: var(--step--1);
 }

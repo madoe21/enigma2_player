@@ -1,6 +1,8 @@
 import AxeBuilder from '@axe-core/playwright';
 import { Page, expect, test } from '@playwright/test';
 
+import { LANGS, canonicalPaths, contentPaths, legalPaths } from './site-pages';
+
 /**
  * The accessibility gate: axe-core over every page, in every language.
  *
@@ -16,21 +18,25 @@ import { Page, expect, test } from '@playwright/test';
  * that fires here has been a real finding rather than noise.
  */
 
-const PAGES = [
-  '',
-  'features',
-  'screenshots',
-  'downloads',
-  'changelog',
-  'docs',
-  'faq',
-  'pricing',
-  'buy',
-  'account',
-  'license',
-  'contact',
-];
-const LANGS = ['de', 'en', 'es', 'fr', 'it'] as const;
+// Animations off for this file only (enigma2_player-gxc). axe measures contrast
+// on what is painted at the moment it looks, and the consent dialog fades in
+// over 150 ms (`consent/consent.css`, under `prefers-reduced-motion:
+// no-preference`). A scan that lands inside those 150 ms computes the dialog's
+// links against the scrim showing through and reports a serious contrast
+// violation - which is how this suite went flaky on CI while the settled dialog
+// is compliant. `reduce` takes the `@media` guard's other branch, so axe judges
+// the state a visitor reads rather than a frame of the transition. Scoped here
+// and not in `playwright.config.ts`: the functional specs should keep meeting
+// the site the way a visitor's browser does.
+test.use({ reducedMotion: 'reduce' });
+
+// One test in this file scans a dozen pages; Playwright's 30 s default is
+// sized for a test that touches one. Each run was already within a second or
+// two of that cap, and adding the dark-palette pair below pushed several over
+// it on a loaded machine - a timeout that says nothing about accessibility and
+// would have been a red CI run on a slower runner. The budget is per test, so
+// a generous one still bounds a genuine hang.
+test.describe.configure({ timeout: 180_000 });
 
 const TAGS = ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa', 'best-practice'];
 
@@ -51,17 +57,15 @@ function describe(violations: Awaited<ReturnType<typeof scan>>['violations']): s
 }
 
 for (const lang of LANGS) {
-  const prefix = lang === 'de' ? '' : `${lang}/`;
-
   test(`every ${lang} page passes axe with the cookie question open`, async ({ page }) => {
     // The undecided state first, because it is what every first-time visitor
     // gets - and it is the state with a modal dialog in it.
-    for (const path of PAGES) {
+    for (const path of contentPaths(lang)) {
       await page.context().clearCookies();
-      await page.goto(`${prefix}${path}`);
+      await page.goto(path);
       const results = await scan(page);
 
-      expect(results.violations, `/${prefix}${path}\n${describe(results.violations)}`).toEqual([]);
+      expect(results.violations, `/${path}\n${describe(results.violations)}`).toEqual([]);
     }
   });
 
@@ -72,27 +76,60 @@ for (const lang of LANGS) {
     await context.addCookies([
       { name: 'e2p_consent', value: 'accepted', url: 'http://127.0.0.1:4321/enigma2_player/' },
     ]);
-    for (const path of PAGES) {
-      await page.goto(`${prefix}${path}`);
+    for (const path of contentPaths(lang)) {
+      await page.goto(path);
       const results = await scan(page);
 
-      expect(results.violations, `/${prefix}${path}\n${describe(results.violations)}`).toEqual([]);
+      expect(results.violations, `/${path}\n${describe(results.violations)}`).toEqual([]);
     }
   });
 }
+
+/*
+ * The palette axe did not see until now (enigma2_player-4t1).
+ *
+ * The site is dark by default and takes the light palette only for a visitor
+ * whose system asks for it - while Playwright's default context IS a light
+ * one, so every scan above measures the override and none of them measured the
+ * default. One language is enough here: what differs per locale is the length
+ * of the text, not its contrast, and the tokens are language-independent.
+ */
+test.describe('the dark palette', () => {
+  test.use({ colorScheme: 'dark' });
+
+  const DARK_PAGES = [...contentPaths('de'), ...legalPaths('de')];
+
+  test('every page passes axe in the dark palette, cookie question open', async ({
+    page,
+    context,
+  }) => {
+    for (const path of DARK_PAGES) {
+      await context.clearCookies();
+      await page.goto(path);
+      const results = await scan(page);
+
+      expect(results.violations, `dark /${path}\n${describe(results.violations)}`).toEqual([]);
+    }
+  });
+
+  test('every page passes axe in the dark palette, cookie accepted', async ({ page, context }) => {
+    await context.addCookies([
+      { name: 'e2p_consent', value: 'accepted', url: 'http://127.0.0.1:4321/enigma2_player/' },
+    ]);
+    for (const path of DARK_PAGES) {
+      await page.goto(path);
+      const results = await scan(page);
+
+      expect(results.violations, `dark /${path}\n${describe(results.violations)}`).toEqual([]);
+    }
+  });
+});
 
 test('the legal pages pass axe in both languages', async ({ page, context }) => {
   await context.addCookies([
     { name: 'e2p_consent', value: 'accepted', url: 'http://127.0.0.1:4321/enigma2_player/' },
   ]);
-  for (const path of [
-    'impressum',
-    'datenschutz',
-    'cookies',
-    'en/imprint',
-    'en/privacy',
-    'en/cookies',
-  ]) {
+  for (const path of [...legalPaths('de'), ...legalPaths('en')]) {
     await page.goto(path);
     const results = await scan(page);
 
@@ -137,6 +174,11 @@ test('every page is reachable by keyboard alone, with the focus visible', async 
   // And it has to actually move the reading position.
   await page.keyboard.press('Enter');
   await expect(page).toHaveURL(/#content$/);
+  // The URL is the cheap half of that: what has to move is the FOCUS, because
+  // a screen reader's reading cursor follows it. A hash jump to an element
+  // that cannot hold focus scrolls the page and leaves the cursor in the
+  // navigation (enigma2_player-dp3).
+  await expect(page.locator('#content')).toBeFocused();
 
   // Every focusable element must show a focus indicator of its own rather than
   // relying on the browser default being switched off somewhere.
@@ -163,9 +205,11 @@ test('every page has a title of its own', async ({ page, context }) => {
   ]);
   const seen = new Map<string, string>();
 
-  // PAGES already starts with the landing page; listing it twice made the
-  // test accuse the site of duplicate titles for the same page.
-  for (const path of [...PAGES, 'impressum', 'datenschutz', 'cookies']) {
+  // The canonical pages only: the landing page is already the first of them
+  // (listing it twice made the test accuse the site of duplicate titles for
+  // the same page), and the two alias paths share the merged page's title on
+  // purpose - `seo.spec.ts` asserts that rather than this forbidding it.
+  for (const path of [...canonicalPaths('de'), ...legalPaths('de')]) {
     await page.goto(path);
     const title = await page.title();
 
@@ -189,10 +233,19 @@ test('a page change and a language change are announced', async ({ page, context
   // The CDK's live region, which is where LiveAnnouncer writes.
   const liveRegion = page.locator('.cdk-live-announcer-element');
 
+  // The arrival is awaited before the announcement is: the announcer writes on
+  // NavigationEnd, so asserting on the region first makes the test a race
+  // against the router rather than a statement about the announcement - and it
+  // lost that race once in a loaded run.
   await page.locator('.nav__links').getByRole('link', { name: 'FAQ' }).click();
+  await expect(page).toHaveURL(/\/faq$/);
   await expect(liveRegion).toContainText('FAQ');
 
+  // The entry shows a flag and "EN" now; what the link is CALLED
+  // is still "English", which is the half of enigma2_player-13h that matters
+  // here - this selector is a screen reader asking for the control by name.
   await page.locator('.nav__langs').getByRole('link', { name: 'English' }).click();
+  await expect(page).toHaveURL(/\/en\/faq$/);
   // In the language it switched TO: "Language changed: English" read with a
   // German voice is the joke that tells the user it did not work.
   await expect(liveRegion).toContainText('Language changed: English');

@@ -111,9 +111,14 @@ Shell order is deliberate: skip link, demo notice, dialog, navigation (`app.html
 
 ### 4.4 The language switcher
 
-Each link carries `lang` and `hreflang` (`site-nav.ts:58-59`) and its own name — "Español", not
-"Spanish".
+Each link carries `lang` and `hreflang` (`site-nav.ts:60-61`) and its own name — "Español", not
+"Spanish". Since `enigma2_player-13h` the *visible* entry is a flag plus a two-letter code, and the
+name is text that only a reader gets (`site-nav.ts:64-66`): the flag is `aria-hidden` because it is
+a picture of a country rather than a language, and the code is `aria-hidden` because "DE Deutsch"
+for one link is noise. This section is therefore the test of that decision, not a formality.
 
+- Does the entry announce as the language's own name **alone** — no "graphic", no "image", no
+  spelled-out "D E" before it?
 - With automatic language switching on: is "Español" spoken *in Spanish*, "Français" in French?
 - After switching: "Language changed: X" **in the language switched to**, exactly once
   (`route-announcer.ts:56-62`) — and **not** followed by a page-change announcement for the same

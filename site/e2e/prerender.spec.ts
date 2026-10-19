@@ -1,3 +1,5 @@
+import { readFile } from 'node:fs/promises';
+
 import { expect, test } from '@playwright/test';
 
 /**
@@ -50,6 +52,26 @@ for (const entry of pages) {
     await expect(page.getByText(entry.text).first()).toBeVisible();
   });
 }
+
+test('the release notes are markup in the file, not markdown on the page', async () => {
+  // The notes come out of the GitHub API as markdown and used to be printed
+  // verbatim (enigma2_player-ryy). Checked in the FILE and not through the
+  // browser, because the parse happens at build time: a visitor with
+  // JavaScript off gets exactly these bytes.
+  for (const path of ['changelog', 'en/changelog']) {
+    const html = await readFile(`dist/site/enigma2_player/${path}/index.html`, 'utf8');
+    const body = html.slice(html.indexOf('<main'), html.indexOf('</main>'));
+    const text = body.replace(/<[^>]+>/g, ' ');
+
+    expect(body, `/${path} lists the changes as a list`).toContain('<ul');
+    expect(body, `/${path} keeps the download table a table`).toContain('scope="col"');
+    expect(body, `/${path} emphasises what the note emphasised`).toContain('<strong>');
+
+    for (const marker of ['**', '|---', '### ', '- **']) {
+      expect(text, `/${path} still shows the marker ${marker}`).not.toContain(marker);
+    }
+  }
+});
 
 test('the base href is the sub path the site is deployed under', async ({ page }) => {
   // Forgetting this produces a build that works locally and loses every asset
