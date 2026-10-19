@@ -84,6 +84,22 @@ const MUTANTS = [
     filter: 'lib-bead-ids.sh is in neither location',
   },
   {
+    branch: 'lib-bead-ids: an id may run on into a longer token',
+    hook: 'lib-bead-ids.sh',
+    find: '  grep -oE "${prefix}-[a-z0-9]{3}(\\.[0-9]+)?([^a-zA-Z0-9_-]|$)" \\',
+    replace: '  grep -oE "${prefix}-[a-z0-9]{3}(\\.[0-9]+)?" \\',
+    suite: 'lib-bead-ids.bats',
+    filter: 'download file name is not an id',
+  },
+  {
+    branch: 'lib-bead-ids: a full stop ends the token instead of delimiting it',
+    hook: 'lib-bead-ids.sh',
+    find: '    | grep -oE "${prefix}-[a-z0-9]{3}(\\.[0-9]+)?" \\',
+    replace: '    | grep -oE "${prefix}-[a-z0-9]{3}" \\',
+    suite: 'lib-bead-ids.bats',
+    filter: 'sub-task id keeps its number',
+  },
+  {
     branch: 'pre-commit 4: drift never blocks a commit that changes a hook',
     hook: 'pre-commit',
     find: '      fail "this commit changes a hook and the two copies disagree (see above)"',
