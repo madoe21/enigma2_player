@@ -36,6 +36,28 @@
   margin: 0 0 var(--space-2);
 }
 
+/*
+ * The labelled facts of a section: purpose, legal basis, retention.
+ *
+ * Indented definitions rather than a two-column grid on purpose. A grid of
+ * term and detail looks tidier and breaks at 320 px (400 % zoom, WCAG 1.4.10),
+ * because the longest German term here is 'Datenübertragbarkeit' and the
+ * detail next to it would get a 12-character column.
+ */
+.legal__facts {
+  margin: var(--space-3) 0 0;
+}
+
+.legal__facts dt {
+  font-weight: 600;
+}
+
+.legal__facts dd {
+  margin: 0 0 var(--space-3);
+  padding-left: var(--space-3);
+  border-left: 2px solid var(--line);
+}
+
 .legal__note {
   margin-top: var(--space-6);
   padding: var(--space-4);

@@ -16,6 +16,9 @@ export type LegalPageId = 'imprint' | 'privacy' | 'cookies';
  * The headings are a real `h1` followed by `h2`s with nothing skipped, because
  * a screen reader user navigates a long legal text by its heading list - a
  * page of `<p><strong>` would be one flat wall of text (WCAG 1.3.1, 2.4.6).
+ * A section's labelled facts (purpose, legal basis, retention) are a `<dl>` for
+ * the same reason: they are term/definition pairs, and promoting each of them
+ * to a heading would bury the section list they belong to in sixty entries.
  */
 @Component({
   selector: 'site-legal-page',
@@ -30,6 +33,14 @@ export type LegalPageId = 'imprint' | 'privacy' | 'cookies';
           <h2>{{ section.heading }}</h2>
           @for (line of section.lines; track line) {
             <p>{{ line }}</p>
+          }
+          @if (section.entries) {
+            <dl class="legal__facts">
+              @for (entry of section.entries; track entry.term) {
+                <dt>{{ entry.term }}</dt>
+                <dd>{{ entry.detail }}</dd>
+              }
+            </dl>
           }
         </section>
       }
