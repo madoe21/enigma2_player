@@ -25,6 +25,30 @@ export const defaultLang: Lang = 'de';
 /** The languages that live under a prefix: everything except [defaultLang]. */
 export const prefixedLocales: readonly Lang[] = locales.filter((lang) => lang !== defaultLang);
 
+/**
+ * The languages in their own names - the accessible name of a switcher entry.
+ *
+ * "Deutsch", not "German": a language switcher is read by someone looking for
+ * their own language, and the only word they are certain to recognise is the
+ * one their language calls itself. That is why these are not in the five
+ * dictionaries - an endonym does not change with the page's language, and a
+ * name repeated five times is a name that disagrees with itself eventually
+ * (the lesson at the top of this file).
+ *
+ * They live here because this file is where languages are named, full stop
+ * (AGENTS.md §2b). The visible short code is `lang.toUpperCase()` and is
+ * deliberately not a second list: it is the language tag itself, and every one
+ * of these names starts with it, which is what keeps the visible label inside
+ * the accessible name (WCAG 2.5.3).
+ */
+export const languageNames: Record<Lang, string> = {
+  de: 'Deutsch',
+  en: 'English',
+  es: 'Español',
+  fr: 'Français',
+  it: 'Italiano',
+};
+
 /** Whether `value` is one of the languages this site publishes. */
 export function isLang(value: string | null | undefined): value is Lang {
   return value != null && (locales as readonly string[]).includes(value);

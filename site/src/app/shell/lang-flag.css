@@ -1,0 +1,33 @@
+/*
+ * The flag itself: a 20 px rectangle with a hairline round it.
+ *
+ * The hairline is not decoration. Three of the five flags have a white field,
+ * and the light theme's paper is white - without the ring the French flag
+ * would be a blue and a red stripe with a gap between them.
+ */
+:host {
+  display: flex;
+  flex: none;
+}
+
+.flag {
+  display: block;
+  width: 1.25rem;
+  /* The viewBox carries the 3:2 ratio, so the height follows the width. */
+  height: auto;
+  border-radius: 1px;
+  box-shadow: 0 0 0 1px var(--line);
+}
+
+/*
+ * In a forced-colours mode the system replaces every colour, which turns all
+ * five flags into the same two-tone rectangle. They are allowed to keep their
+ * own colours because they are pictures of flags - and nothing is lost if a
+ * mode overrides them anyway, since the code and the name beside them carry
+ * the entry on their own.
+ */
+@media (forced-colors: active) {
+  .flag {
+    forced-color-adjust: none;
+  }
+}
