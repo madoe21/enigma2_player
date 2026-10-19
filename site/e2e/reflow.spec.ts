@@ -155,8 +155,21 @@ function describe(findings: Finding[]): string {
 async function findSmallTargets(page: Page): Promise<Finding[]> {
   return page.evaluate(() => {
     const findings: { what: string; detail: string }[] = [];
+    /*
+     * The dialog contributes its legal links and its buttons, not every
+     * anchor it contains.
+     *
+     * `.consent-dialog a` used to be the selector, which also caught the
+     * policy link - and that one sits in a sentence, the case 2.5.8 exempts
+     * by name (consent.css says so where it styles the others). An inline
+     * link's rectangle is its line box, so at 320 px the wrapped German
+     * label measured about 43.x px across two lines and reported itself as a
+     * finding: a verdict decided by where the text happened to break rather
+     * than by the size of anything a thumb aims at (enigma2_player-f1p).
+     */
     const controls = document.body.querySelectorAll<HTMLElement>(
-      'button, .btn, .nav a, .nav__langs a, .site-footer__links a, .consent-dialog a, .shot__button',
+      'button, .btn, .nav a, .nav__langs a, .site-footer__links a, .consent-dialog__legal a,' +
+        ' .shot__button',
     );
 
     for (const control of Array.from(controls)) {
@@ -168,7 +181,10 @@ async function findSmallTargets(page: Page): Promise<Finding[]> {
       if (box.height < 44 || box.width < 24) {
         findings.push({
           what: control.outerHTML.slice(0, 60).replace(/\s+/g, ' '),
-          detail: `${Math.round(box.width)}x${Math.round(box.height)} px, text "${(control.textContent ?? '').trim().slice(0, 24)}"`,
+          // Unrounded: the bar is `< 44`, so a box of 43.6 px fails it - and
+          // `Math.round` printed that as "44 px", a finding that reads as
+          // compliant and sends the next reader looking in the wrong place.
+          detail: `${box.width.toFixed(1)}x${box.height.toFixed(1)} px, text "${(control.textContent ?? '').trim().slice(0, 24)}"`,
         });
       }
     }
@@ -178,6 +194,11 @@ async function findSmallTargets(page: Page): Promise<Finding[]> {
 
 async function expectNoOverflow(page: Page, where: string) {
   const findings = await findOverflow(page);
+  expect(findings, `${where}\n${describe(findings)}`).toEqual([]);
+}
+
+async function expectUsableTargets(page: Page, where: string) {
+  const findings = await findSmallTargets(page);
   expect(findings, `${where}\n${describe(findings)}`).toEqual([]);
 }
 
@@ -316,14 +337,81 @@ test('the consent dialog stays operable at 400 % zoom', async ({ page }) => {
 });
 
 test('every control keeps a usable target at 400 % zoom', async ({ page, context }) => {
+  await page.setViewportSize({ width: 320, height: 256 });
+  const paths = ['', 'downloads', 'screenshots', 'pricing', 'faq'];
+
+  /*
+   * Both consent states, and each one waited for.
+   *
+   * The prerendered HTML carries the dialog whichever cookie the visitor has:
+   * it is static, so it cannot know, and the component removes itself only
+   * once Angular has hydrated. Measuring between those two moments measures a
+   * page nobody is looking at - which is how this test failed at 224 ms and
+   * passed at 1.0 s on retry with the site unchanged (enigma2_player-f1p).
+   * `toBeVisible` / `toHaveCount(0)` is the wait that makes the sweep land on
+   * the state it claims to be checking.
+   *
+   * Undecided is checked rather than skipped because the dialog is the only
+   * thing a first-time visitor can touch, and its own controls had never been
+   * measured here at all.
+   */
+  for (const path of paths) {
+    await page.goto(path);
+    await expect(page.getByRole('dialog')).toBeVisible();
+    await expectUsableTargets(page, `/${path} at 320x256, undecided`);
+  }
+
   await context.addCookies([
     { name: 'e2p_consent', value: 'accepted', url: 'http://127.0.0.1:4321/enigma2_player/' },
   ]);
-  await page.setViewportSize({ width: 320, height: 256 });
-
-  for (const path of ['', 'downloads', 'screenshots', 'pricing', 'faq']) {
+  for (const path of paths) {
     await page.goto(path);
-    const findings = await findSmallTargets(page);
-    expect(findings, `/${path}\n${describe(findings)}`).toEqual([]);
+    await expect(page.getByRole('dialog')).toHaveCount(0);
+    await expectUsableTargets(page, `/${path} at 320x256, accepted`);
   }
+});
+
+test('the target detector reports a control that is too small', async ({ page }) => {
+  // Same reason as the overflow detector above: everything else here passes,
+  // and a mistyped class in that selector list would make this gate blind
+  // while leaving the suite green - which is the failure this repository has
+  // shipped more than once. So the detector is handed a box it has to name.
+  await page.setViewportSize({ width: 320, height: 256 });
+  await page.goto('');
+  await page.evaluate(() => {
+    const small = document.createElement('button');
+    small.id = 'deliberately-too-small';
+    small.style.cssText = 'width: 60px; height: 20px';
+    document.body.append(small);
+  });
+
+  const findings = await findSmallTargets(page);
+  const reported = findings.find((finding) => finding.what.includes('deliberately-too-small'));
+  expect(reported, 'the detector did not name a 20 px button').toBeDefined();
+  // The exact figure, because the rounded one is what hid the real defect.
+  expect(reported?.detail).toContain('60.0x20.0 px');
+});
+
+test('a link inside running prose is exempt from the target bar', async ({ page }) => {
+  // The dialog's policy link sits in a sentence, which 2.5.8 exempts by name,
+  // and measuring it is what made this gate flake (enigma2_player-f1p). Two
+  // things have to hold: the link is still there - an exemption that works
+  // because the link vanished would be a worse bug - and it is not reported.
+  await page.setViewportSize({ width: 320, height: 256 });
+  await page.goto('');
+  const link = page.locator('.consent-dialog__policy a');
+  await expect(link).toBeVisible();
+
+  /*
+   * No assertion on its height, deliberately: the label wraps to two lines at
+   * 320 px and the line box that comes out of that is a platform figure -
+   * 45.8 px on Windows, 43.x on the Linux runner, from the same markup and
+   * the same CSS, because the font stack resolves differently. That spread is
+   * the argument for the exemption rather than a detail of it: an inline link
+   * in prose cannot be held to a target size that its platform's metrics
+   * decide. What has to hold is that it is prose - inside a paragraph, not a
+   * control in a row of controls - and that the sweep leaves it alone.
+   */
+  await expect(link.locator('xpath=..')).toHaveJSProperty('tagName', 'P');
+  await expectUsableTargets(page, 'the dialog with its policy link in prose');
 });
