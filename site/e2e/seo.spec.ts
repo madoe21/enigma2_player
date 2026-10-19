@@ -2,6 +2,8 @@ import { readFile } from 'node:fs/promises';
 
 import { expect, test } from '@playwright/test';
 
+import { LANGS, aliasPaths, canonicalPaths, legalPaths } from './site-pages';
+
 /**
  * What a crawler and a shared link see.
  *
@@ -13,32 +15,50 @@ import { expect, test } from '@playwright/test';
 
 const PAGES = ['', 'features', 'downloads', 'faq', 'pricing', 'contact'];
 
-test('sitemap.xml lists every prerendered page', async () => {
+/** The absolute URL the sitemap uses for a site path - one trailing slash. */
+function location(path: string): string {
+  const clean = path.replace(/\/+$/, '');
+  return `https://madoe21.github.io/enigma2_player/${clean === '' ? '' : `${clean}/`}`;
+}
+
+/** Every page that should be announced: the canonical ones, in every language. */
+const ANNOUNCED = LANGS.flatMap((lang) => [...canonicalPaths(lang), ...legalPaths(lang)]);
+
+/** The alias paths, which are served and deliberately NOT announced. */
+const ALIASES = LANGS.flatMap((lang) => aliasPaths(lang));
+
+test('sitemap.xml lists every prerendered page and no alias', async () => {
   const [sitemap, routes] = await Promise.all([
     readFile('dist/site/enigma2_player/sitemap.xml', 'utf8'),
     readFile('dist/site/enigma2_player/../prerendered-routes.json', 'utf8').catch(() => null),
   ]);
 
   const locations = [...sitemap.matchAll(/<loc>([^<]+)<\/loc>/g)].map((match) => match[1]);
-  expect(locations.length).toBe(66);
 
-  // Against the build's own list where it exists, so the two cannot drift.
+  // Derived from the page list rather than a number to keep in step with it:
+  // a count written down by hand is a test that passes after the page it was
+  // counting disappeared.
+  expect(locations.length).toBe(ANNOUNCED.length);
+  for (const path of ANNOUNCED) {
+    expect(locations, `${location(path)} missing from the sitemap`).toContain(location(path));
+  }
+
+  // `/buy` and `/license` render the merged pricing page (enigma2_player-eer).
+  // They have to be files - a static host cannot redirect - and they must not
+  // be announced, or a crawler is handed two more URLs for one page.
+  for (const path of ALIASES) {
+    expect(locations, `${location(path)} is an alias and must not be announced`).not.toContain(
+      location(path),
+    );
+  }
+
+  // Against the build's own list where it exists, so the two cannot drift:
+  // every route is emitted, and the aliases are the only ones left out.
   if (routes) {
     const declared = Object.keys(JSON.parse(routes).routes ?? {});
     if (declared.length > 0) {
-      expect(locations.length).toBe(declared.length);
+      expect(declared.length).toBe(ANNOUNCED.length + ALIASES.length);
     }
-  }
-
-  // Every language tree, and the translated legal slugs.
-  for (const expected of [
-    'https://madoe21.github.io/enigma2_player/',
-    'https://madoe21.github.io/enigma2_player/en/faq/',
-    'https://madoe21.github.io/enigma2_player/it/downloads/',
-    'https://madoe21.github.io/enigma2_player/impressum/',
-    'https://madoe21.github.io/enigma2_player/en/imprint/',
-  ]) {
-    expect(locations, `${expected} missing from the sitemap`).toContain(expected);
   }
 });
 
@@ -130,4 +150,35 @@ test('the social image is a file that exists', async ({ page, request }) => {
   const path = new URL(image!).pathname.replace('/enigma2_player/', '');
   const response = await request.get(`http://127.0.0.1:4321/enigma2_player/${path}`);
   expect(response.status(), `${path} is referenced but not deployed`).toBe(200);
+});
+
+test('the alias paths point a crawler at the merged pricing page', async ({ page }) => {
+  // `/buy` and `/license` are still linked - from the application, and from
+  // the sitemap the Astro site published - and since the merge they show the
+  // pricing page (enigma2_player-eer). What they must not do is compete with
+  // it: `noindex, follow` plus a canonical URL naming the page they show.
+  const pricing = await page.goto('pricing').then(() => page.title());
+
+  for (const [path, canonical] of [
+    ['buy', 'https://madoe21.github.io/enigma2_player/pricing'],
+    ['license', 'https://madoe21.github.io/enigma2_player/pricing'],
+    ['en/buy', 'https://madoe21.github.io/enigma2_player/en/pricing'],
+    ['it/license', 'https://madoe21.github.io/enigma2_player/it/pricing'],
+  ]) {
+    const response = await page.goto(path);
+    expect(response?.status(), `/${path} has to exist as a file`).toBe(200);
+
+    await expect(page.locator('link[rel="canonical"]'), `/${path}`).toHaveAttribute(
+      'href',
+      canonical,
+    );
+    await expect(page.locator('meta[name="robots"]'), `/${path}`).toHaveAttribute(
+      'content',
+      'noindex, follow',
+    );
+  }
+
+  // And the German alias is the same page, title included.
+  await page.goto('buy');
+  expect(await page.title()).toBe(pricing);
 });

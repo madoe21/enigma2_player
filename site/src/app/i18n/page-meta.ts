@@ -16,6 +16,16 @@ export interface PageMetaInput {
   readonly lang: Lang;
   /** Where this page exists in other languages, for hreflang. */
   readonly alternates?: readonly { readonly lang: Lang; readonly path: string }[];
+  /**
+   * Whether this path is the one a search engine should list. Defaults to true.
+   *
+   * False on the two alias paths of the merged pricing page
+   * (enigma2_player-eer): they have to exist as files, because a static host
+   * cannot redirect, and `noindex, follow` is how a file says "index the
+   * canonical one instead" without hiding the links on it. The sitemap writer
+   * reads this out of the built HTML, so the alias cannot end up announced.
+   */
+  readonly index?: boolean;
 }
 
 /** Where the site is published; needed for absolute URLs in the head. */
@@ -72,7 +82,10 @@ export class PageMeta {
     this.title.setTitle(full);
     this.current.set({ title: full, lang: input.lang });
     this.meta.updateTag({ name: 'description', content: description });
-    this.meta.updateTag({ name: 'robots', content: 'index, follow' });
+    this.meta.updateTag({
+      name: 'robots',
+      content: input.index === false ? 'noindex, follow' : 'index, follow',
+    });
 
     // Open Graph and Twitter: what a shared link looks like. Same values as
     // the title and description rather than a second set to keep in step.

@@ -5,6 +5,7 @@ import { RouterLink } from '@angular/router';
 import { LegalLinks } from '../legal/legal-links';
 import { PageLanguage } from '../i18n/page-language';
 import { CONSENT_COPY } from './consent-copy';
+import { ConsentPrompt } from './consent-prompt';
 import { ConsentStore } from './consent-store';
 
 /**
@@ -28,7 +29,7 @@ import { ConsentStore } from './consent-store';
   selector: 'site-consent-modal',
   imports: [A11yModule, RouterLink],
   template: `
-    @if (!store.decided()) {
+    @if (prompt.visible()) {
       <div class="consent-scrim">
         <div
           class="consent-dialog"
@@ -99,6 +100,15 @@ import { ConsentStore } from './consent-store';
 })
 export class ConsentModal {
   protected readonly store = inject(ConsentStore);
+
+  /**
+   * Whether to ask at all.
+   *
+   * Not `store.decided()` directly: the legal texts have to be readable
+   * before the decision, so the condition is "undecided AND this page asks"
+   * (enigma2_player-dki).
+   */
+  protected readonly prompt = inject(ConsentPrompt);
   private readonly pageLanguage = inject(PageLanguage);
   private readonly announcer = inject(LiveAnnouncer);
 
@@ -119,7 +129,7 @@ export class ConsentModal {
     // region. And a live region should start empty: text baked into it is text
     // a screen reader may read at load, out of context.
     afterNextRender(() => {
-      if (!this.store.decided()) {
+      if (this.prompt.visible()) {
         this.announcer.announce(this.copy().announce, 'assertive');
       }
     });

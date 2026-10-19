@@ -75,14 +75,17 @@ describe('Landing', () => {
     expect(cards.length).toBe(5);
   });
 
-  it('leads to the download and to the shop', async () => {
+  it('leads to the download and to the merged pricing page', async () => {
     const hrefs = Array.from(
       (await render()).nativeElement.querySelectorAll('a'),
     ) as HTMLAnchorElement[];
     const targets = hrefs.map((link) => link.getAttribute('href'));
 
     expect(targets).toContain('/downloads');
-    expect(targets).toContain('/buy');
+    // `/pricing#buy`, not `/buy`: buying is the last section of the merged
+    // page since enigma2_player-eer, and `/buy` is an alias whose own head
+    // says `noindex`.
+    expect(targets).toContain('/pricing#buy');
   });
 });
 

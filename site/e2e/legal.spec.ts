@@ -28,6 +28,61 @@ for (const entry of pages) {
   });
 }
 
+for (const entry of pages) {
+  test(`/${entry.path} is readable without answering the cookie question`, async ({
+    page,
+    context,
+  }) => {
+    // Undecided: no cookie in the jar. German law is explicit for exactly
+    // these pages - the imprint has to be "directly accessible" and the
+    // privacy policy is what a visitor reads in order to decide, so a modal
+    // in front of either makes the reading conditional on the answer
+    // (enigma2_player-dki).
+    await context.clearCookies();
+    await page.goto(entry.path);
+
+    await expect(page.locator('h1')).toHaveText(entry.heading);
+    await expect(page.locator('[role="dialog"]')).toHaveCount(0);
+
+    // And no focus trap: the first Tab from the page body reaches the page
+    // itself rather than being pulled back into a dialog.
+    await page.keyboard.press('Tab');
+    const trapped = await page.evaluate(
+      () => document.activeElement?.closest('[cdkTrapFocus], [role="dialog"]') !== null,
+    );
+    expect(trapped, 'nothing may hold the keyboard on a legal page').toBe(false);
+  });
+}
+
+test('the footer control still opens the decision on a legal page', async ({ page, context }) => {
+  // A control that takes the decision back must not be dead on the three
+  // pages that explain the decision.
+  await context.clearCookies();
+  await page.goto('cookies');
+  await expect(page.locator('[role="dialog"]')).toHaveCount(0);
+
+  await page.getByRole('button', { name: 'Cookie-Entscheidung ändern' }).click();
+
+  await expect(page.locator('[role="dialog"]')).toBeVisible();
+});
+
+test('deciding on a legal page leaves a consistent state', async ({ page, context }) => {
+  await context.clearCookies();
+  await page.goto('datenschutz');
+
+  await page.getByRole('button', { name: 'Cookie-Entscheidung ändern' }).click();
+  await page.getByRole('dialog').getByRole('button', { name: 'Einverstanden' }).click();
+
+  await expect(page.locator('[role="dialog"]')).toHaveCount(0);
+  expect((await context.cookies()).map((c) => [c.name, c.value])).toEqual([
+    ['e2p_consent', 'accepted'],
+  ]);
+
+  // And the answer carries over to the page the visitor goes to next.
+  await page.goto('');
+  await expect(page.locator('[role="dialog"]')).toHaveCount(0);
+});
+
 test('every page carries the three legal links in its footer, and they work', async ({
   page,
   context,
@@ -111,9 +166,17 @@ test('the policy describes the cookie the code actually sets', async ({ page }) 
   await page.goto('cookies');
   // Name, value and lifetime as written in the policy, checked against what is
   // in the jar. A policy that drifts from the code is a promise nobody keeps.
+  // The value is matched without its quotation marks: the register is a legal
+  // text and its typography is the text's business, the stored word is not.
   await expect(page.getByText('e2p_consent')).toBeVisible();
-  await expect(page.getByText('„accepted"')).toBeVisible();
+  await expect(page.getByText(cookie!.value, { exact: false }).first()).toBeVisible();
+  await expect(page.locator('main')).toContainText('180 Tage');
   const sixMonthsInSeconds = 180 * 24 * 60 * 60;
   const lifetime = cookie!.expires - Date.now() / 1000;
   expect(Math.abs(lifetime - sixMonthsInSeconds)).toBeLessThan(600);
+
+  // And the register is a definition list, so each fact has its label read out
+  // with it rather than sitting in a wall of sentences (WCAG 1.3.1).
+  await expect(page.locator('main dl dt')).toHaveCount(9);
+  await expect(page.locator('main dl dd')).toHaveCount(9);
 });

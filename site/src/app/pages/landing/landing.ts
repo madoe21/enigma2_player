@@ -26,7 +26,7 @@ import { SiteContent } from '../../content/site-content';
           <p class="hero__sub">{{ copy().heroSub }}</p>
           <div class="cta-row">
             <a class="btn btn--primary" [routerLink]="downloadsHref()">{{ copy().ctaDownload }}</a>
-            <a class="btn" [routerLink]="buyHref()">{{ copy().ctaBuy }}</a>
+            <a class="btn" [routerLink]="buyHref()" fragment="buy">{{ copy().ctaBuy }}</a>
           </div>
           @if (release(); as release) {
             <p class="muted">{{ copy().latest }}: {{ release.version }}</p>
@@ -70,7 +70,9 @@ import { SiteContent } from '../../content/site-content';
         <h2>{{ copy().ctaBuy }}</h2>
         <site-consent-gate>
           <p>
-            <a class="btn btn--primary" [routerLink]="buyHref()">{{ copy().ctaBuy }}</a>
+            <a class="btn btn--primary" [routerLink]="buyHref()" fragment="buy">
+              {{ copy().ctaBuy }}
+            </a>
           </p>
         </site-consent-gate>
       </section>
@@ -124,5 +126,14 @@ export class Landing extends PageBase {
   }
 
   protected readonly downloadsHref = computed(() => localePath('downloads', this.lang()));
-  protected readonly buyHref = computed(() => localePath('buy', this.lang()));
+  /**
+   * The purchase call to action: the merged pricing page, at its buy section.
+   *
+   * It pointed at `/buy` until the three pages became one
+   * (enigma2_player-eer). `/buy` still resolves, and linking it from here
+   * would send every visitor through a path whose own head says `noindex` -
+   * the canonical page with a fragment is the same destination, named
+   * correctly.
+   */
+  protected readonly buyHref = computed(() => localePath('pricing', this.lang()));
 }

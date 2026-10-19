@@ -1,113 +1,45 @@
-import { Component, computed, inject } from '@angular/core';
-import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
+import { Component } from '@angular/core';
 
-import { ConsentGate } from '../../consent/consent-gate';
 import { PageBase } from '../page-base';
-import { SHOP_CONFIG } from '../../content/shop-config';
-
-/** Which of the licence server's two views this route wants. */
-export type ShopView = 'buy' | 'account';
+import { ShopFrame } from './shop-frame';
 
 /**
- * Buying and the customer account, both of which happen on the licence server.
+ * The customer account, which lives on the licence server.
  *
- * This page only frames them. Purchase, login and account management are
+ * This page only frames it. Login, licences, devices and invoices are
  * implemented there (licence server ADR-0005), and the server must allow this
  * origin via `EMBED_ALLOWED_ORIGINS`.
  *
- * The iframe is INSIDE the consent gate, and that is the one thing about this
- * page that is not a port but a decision (PO, 2026-10-09): loading it sends
- * the visitor's IP and their request to the licence server, so it waits for
- * acceptance. Before that the gate explains why nothing is there - a blocked
- * area with a reason beats an empty one.
- *
- * `loading="lazy"` on top of that: even after consent the frame is only
- * fetched when it comes into view.
+ * It framed buying as well until the PO merged pricing, licence information
+ * and buying into one page (enigma2_player-eer); the buy view now sits in the
+ * merged page's last section, through the same `ShopFrame`.
  */
 @Component({
   selector: 'site-shop',
-  imports: [ConsentGate],
+  imports: [ShopFrame],
   template: `
     <main class="page">
-      <h1>{{ title() }}</h1>
-      <p>{{ intro() }}</p>
+      <h1>{{ copy().account }}</h1>
+      <p>{{ copy().intro }}</p>
 
-      @if (src()) {
-        <site-consent-gate>
-          <iframe
-            class="shop-frame"
-            [src]="trustedSrc()"
-            [title]="title()"
-            loading="lazy"
-            referrerpolicy="no-referrer"
-          ></iframe>
-          <p class="shop-fallback">
-            <a [href]="src()" target="_blank" rel="noopener">{{ copy().openTab }}</a>
-          </p>
-        </site-consent-gate>
-      } @else {
-        <p>{{ copy().unavailable }}</p>
-      }
+      <site-shop-frame view="account" [frameTitle]="copy().frame" />
     </main>
   `,
   styleUrls: ['../page.css', './shop.css'],
 })
 export class Shop extends PageBase {
-  private readonly sanitizer = inject(DomSanitizer);
-
-  protected readonly view = computed<ShopView>(() =>
-    this.route.snapshot.data['view'] === 'account' ? 'account' : 'buy',
-  );
-
   protected readonly copy = this.translate.group({
-    buy: 'nav.buy',
-    buyIntro: 'buy.intro',
     account: 'nav.account',
-    accountIntro: 'account.intro',
-    openTab: 'shop.openTab',
-    unavailable: 'shop.unavailable',
+    intro: 'account.intro',
+    // The frame is named after what it IS - someone else's application - and
+    // deliberately not after this page's heading: a screen reader reads both,
+    // and "heading My Account ... frame My Account" sounds like the heading
+    // twice rather than like an embedded account view (enigma2_player-dp3).
+    frame: 'shop.frameAccount',
   });
 
-  protected readonly title = computed(() =>
-    this.view() === 'account' ? this.copy().account : this.copy().buy,
-  );
-
-  protected readonly intro = computed(() =>
-    this.view() === 'account' ? this.copy().accountIntro : this.copy().buyIntro,
-  );
-
-  /** Two views behind one component, so the title cannot come from the route. */
-  protected override titleKey() {
-    return this.view() === 'account' ? ('nav.account' as const) : ('nav.buy' as const);
+  /** The sentence a search result shows for the account page. */
+  protected override descriptionKey() {
+    return 'account.intro' as const;
   }
-
-  /**
-   * The licence server's view for this page and language, or null when the
-   * build had no shop configured - in which case the page says so instead of
-   * framing an empty box.
-   */
-  protected readonly src = computed(() => {
-    const { base, apiKey } = SHOP_CONFIG;
-    if (!base || !apiKey) {
-      return null;
-    }
-    const path = this.view() === 'account' ? 'account' : 'shop';
-    return `${base.replace(/\/+$/, '')}/${path}/${apiKey}?lang=${this.lang()}`;
-  });
-
-  /**
-   * The same URL, marked as trusted for an iframe.
-   *
-   * Angular refuses a plain string in a resource-URL position, and it is right
-   * to: that position executes whatever it is given. Bypassing the check is
-   * safe HERE and nowhere else in this file, because every part of the URL is
-   * ours - the base and the api key come from the data file the build wrote,
-   * and the language is one of five literals from the route tree. No visitor
-   * input reaches it, which is exactly the condition under which marking a URL
-   * trusted is a statement of fact rather than a hope.
-   */
-  protected readonly trustedSrc = computed<SafeResourceUrl | null>(() => {
-    const url = this.src();
-    return url === null ? null : this.sanitizer.bypassSecurityTrustResourceUrl(url);
-  });
 }

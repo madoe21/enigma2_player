@@ -3,6 +3,7 @@ import { Component, computed, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
 
 import { CONSENT_COPY } from '../consent/consent-copy';
+import { ConsentPrompt } from '../consent/consent-prompt';
 import { ConsentStore } from '../consent/consent-store';
 import { LegalLinks } from '../legal/legal-links';
 import { Translate } from '../content/translate';
@@ -46,6 +47,7 @@ import { PageLanguage } from '../i18n/page-language';
 })
 export class SiteFooter {
   private readonly store = inject(ConsentStore);
+  private readonly prompt = inject(ConsentPrompt);
   private readonly pageLanguage = inject(PageLanguage);
   private readonly announcer = inject(LiveAnnouncer);
 
@@ -65,6 +67,11 @@ export class SiteFooter {
    */
   protected revoke(): void {
     this.store.revoke();
+    // The legal pages suppress the dialog (enigma2_player-dki). Pressing this
+    // button there is the visitor asking for it, so the request is explicit -
+    // otherwise the one control that takes a decision back would do nothing on
+    // exactly the three pages that explain the decision.
+    this.prompt.request();
     this.announcer.announce(this.copy().revoked, 'polite');
   }
 }

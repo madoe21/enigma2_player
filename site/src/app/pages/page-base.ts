@@ -1,12 +1,13 @@
 import { Signal, computed, effect, inject } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 
+import { ConsentPrompt } from '../consent/consent-prompt';
 import { Translate } from '../content/translate';
 import { Lang, defaultLang, langFromSegment } from '../i18n/locales';
 import { PageLanguage } from '../i18n/page-language';
 import { PageMeta } from '../i18n/page-meta';
 import { UiKey } from '../content/ui';
-import { languagesOf, pageOfPath, pageRoutes, pathOf } from '../app.routes';
+import { canonicalPage, languagesOf, pageOfPath, pageRoutes, pathOf } from '../app.routes';
 
 /**
  * What every content page needs: its language, its strings, and its head.
@@ -35,6 +36,7 @@ export abstract class PageBase {
 
   private readonly pageLanguage = inject(PageLanguage);
   private readonly pageMeta = inject(PageMeta);
+  private readonly consentPrompt = inject(ConsentPrompt);
 
   protected readonly translate = inject(Translate);
 
@@ -53,6 +55,10 @@ export abstract class PageBase {
       const lang = this.lang();
       this.pageLanguage.set(lang);
       this.applyMeta(lang);
+      // Here rather than in the shell: the shell does not know which page the
+      // outlet rendered, and a page that has to opt out of the cookie dialog
+      // must not be able to forget to (enigma2_player-dki).
+      this.consentPrompt.enter(this.currentPage()?.unconditional === true);
     });
   }
 
@@ -65,7 +71,10 @@ export abstract class PageBase {
    */
   protected titleKey(): UiKey | null {
     const page = this.currentPage();
-    return page?.navKey ?? null;
+    // The canonical page's label, so an alias path (`/buy`, `/license` since
+    // enigma2_player-eer) is titled as the page it actually shows rather than
+    // falling back to the bare site name.
+    return page ? (canonicalPage(page).navKey ?? null) : null;
   }
 
   /** The UI key of a sentence for a search result, or null for the default. */
@@ -86,6 +95,10 @@ export abstract class PageBase {
 
   private applyMeta(lang: Lang): void {
     const page = this.currentPage();
+    // An alias points at the page it shows, in the canonical link and in the
+    // alternates alike: a crawler that is told `/buy` is its own page in five
+    // languages has been told the opposite of what the merge decided.
+    const canonical = page ? canonicalPage(page) : undefined;
     const titleKey = this.titleKey();
     const descriptionKey = this.descriptionKey();
     const text = this.titleText();
@@ -95,9 +108,10 @@ export abstract class PageBase {
         text ??
         (titleKey ? this.translate.of(titleKey, lang) : this.translate.of('site.title', lang)),
       description: descriptionKey ? this.translate.of(descriptionKey, lang) : undefined,
-      path: page ? pathOf(page, lang) : '/',
-      alternates: page
-        ? languagesOf(page).map((other) => ({ lang: other, path: pathOf(page, other) }))
+      path: canonical ? pathOf(canonical, lang) : '/',
+      index: page === canonical,
+      alternates: canonical
+        ? languagesOf(canonical).map((other) => ({ lang: other, path: pathOf(canonical, other) }))
         : undefined,
     });
   }
