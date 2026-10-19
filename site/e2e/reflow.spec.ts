@@ -1,5 +1,7 @@
 import { Page, expect, test } from '@playwright/test';
 
+import { allPaths, prefixOf } from './site-pages';
+
 /**
  * The reflow gate: every page at 400 % and at 200 % browser zoom.
  *
@@ -24,23 +26,7 @@ import { Page, expect, test } from '@playwright/test';
  * pages whose content differs most in length.
  */
 
-const PAGES = [
-  '',
-  'features',
-  'screenshots',
-  'downloads',
-  'changelog',
-  'docs',
-  'faq',
-  'pricing',
-  'buy',
-  'account',
-  'license',
-  'contact',
-  'impressum',
-  'datenschutz',
-  'cookies',
-];
+const PAGES = [...allPaths('de')];
 
 /** 400 % and 200 % zoom on a 1280 px screen, in CSS pixels. */
 const VIEWPORTS = [
@@ -48,8 +34,9 @@ const VIEWPORTS = [
   { label: '200 % zoom', width: 640, height: 512 },
 ];
 
-// A sweep is 15 pages x 2 viewports in one test; the 30 s default is sized for
-// a test that looks at one page (see a11y.spec.ts for the same reasoning).
+// A sweep is every German page x 2 viewports in one test; the 30 s default is
+// sized for a test that looks at one page (see a11y.spec.ts for the same
+// reasoning).
 test.describe.configure({ timeout: 180_000 });
 
 interface Finding {
@@ -81,6 +68,26 @@ async function findOverflow(page: Page): Promise<Finding[]> {
     // class list alone does not identify an anchor that carries none.
     const name = (element: Element) => element.outerHTML.slice(0, 60).replace(/\s+/g, ' ');
 
+    /**
+     * True when the element sits inside a box that scrolls sideways itself.
+     *
+     * WCAG 1.4.10 exempts "parts of the content which require two-dimensional
+     * layout", and a data table is its own example of that - the release
+     * notes carry one of platform, file name and install command
+     * (enigma2_player-ryy). The accepted pattern is a container that scrolls
+     * and is keyboard-reachable, so the exemption is granted to its contents
+     * and only while the container ITSELF fits: the page must still not
+     * scroll sideways, which is what the criterion is actually about.
+     */
+    const insideScroller = (element: Element) => {
+      for (let node = element.parentElement; node; node = node.parentElement) {
+        const overflow = getComputedStyle(node).overflowX;
+        const scrolls = overflow === 'auto' || overflow === 'scroll';
+        if (scrolls && node.getBoundingClientRect().right <= limit) return true;
+      }
+      return false;
+    };
+
     for (const element of Array.from(document.body.querySelectorAll('*'))) {
       // An iframe holds someone else's document: its own width is ours to
       // check, its contents are not (the shop is a cross-origin frame).
@@ -92,9 +99,26 @@ async function findOverflow(page: Page): Promise<Finding[]> {
       const box = element.getBoundingClientRect();
       if (box.width === 0 && box.height === 0) continue;
 
+      /*
+       * Text that is off the screen on purpose, for a screen reader only.
+       *
+       * The clipped 1 px box IS that pattern - ours (`.nav__lang-name`, which
+       * holds "Deutsch" behind the flag and the code) in its `clip-path`
+       * form, and the CDK's live region (`.cdk-visually-hidden`) in the older
+       * `clip: rect(...)` one. Clipping is how both work: `display: none`
+       * would take the text from the reader as well, so the box is kept and
+       * the paint is not. Nothing a sighted reader could lose is in there -
+       * and the live region in particular reports a finding only once it has
+       * announced something, which made this gate depend on when a test
+       * happened to measure. The exemption needs a clip AND a box too small
+       * to hold a character, so it stays an exemption rather than a hole.
+       */
+      const clipped = style.clipPath !== 'none' || style.clip !== 'auto';
+      if (clipped && box.width <= 1 && box.height <= 1) continue;
+
       // The skip link lives off-canvas to the LEFT until it has focus, which
       // no browser scrolls to in a left-to-right document.
-      if (box.right > limit && box.left >= 0) {
+      if (box.right > limit && box.left >= 0 && !insideScroller(element)) {
         findings.push({
           what: name(element),
           detail: `right edge ${Math.round(box.right)} past the ${window.innerWidth} px viewport`,
@@ -181,6 +205,39 @@ for (const viewport of VIEWPORTS) {
   });
 }
 
+test('the header stays the size the PO accepted at 400 % zoom', async ({ page, context }) => {
+  await context.addCookies([
+    { name: 'e2p_consent', value: 'accepted', url: 'http://127.0.0.1:4321/enigma2_player/' },
+  ]);
+  await page.setViewportSize({ width: 320, height: 256 });
+  await page.goto('');
+
+  /*
+   * The recorded decision of `enigma2_player-gf5`, as a number.
+   *
+   * At 320x256 the header is about 386 px tall: eleven page links wrapped
+   * into four rows, plus the language row, which the flag-and-code switcher
+   * holds to two (enigma2_player-13h). That is more than one screen and it
+   * was looked at deliberately: WCAG 1.4.10 permits vertical scrolling, the
+   * skip link bypasses the whole block for a keyboard (2.4.1), and the header
+   * stops being sticky below 30 rem of height so it does not follow a reader
+   * down the page. A disclosure menu would be a new interactive widget with
+   * its own keyboard and reader obligations, and it was not worth that.
+   *
+   * What the decision does not permit is the header growing back quietly.
+   * 440 px is the measurement plus one row of headroom: the twelfth nav link
+   * is a conversation, not a commit.
+   */
+  const header = await page.locator('.nav').boundingBox();
+  expect(Math.round(header?.height ?? 0), 'the header is taller than agreed').toBeLessThanOrEqual(
+    440,
+  );
+  const langs = await page.locator('.nav__langs').boundingBox();
+  expect(Math.round(langs?.height ?? 0), 'the language row needs a third row').toBeLessThanOrEqual(
+    100,
+  );
+});
+
 test('the detector reports an element that does not fit', async ({ page }) => {
   // A gate that cannot fail is not a gate. Everything above passes, which is
   // either a well-behaved layout or a broken measurement - so here is a box
@@ -202,10 +259,11 @@ test('the detector reports an element that does not fit', async ({ page }) => {
 test('the other four languages fit at 400 % zoom', async ({ page }) => {
   await page.setViewportSize({ width: 320, height: 256 });
 
-  for (const lang of ['en', 'es', 'fr', 'it']) {
-    for (const path of ['', 'changelog', 'downloads', 'faq']) {
-      await page.goto(`${lang}/${path}`);
-      await expectNoOverflow(page, `/${lang}/${path} at 320x256`);
+  for (const lang of ['en', 'es', 'fr', 'it'] as const) {
+    for (const slug of ['', 'changelog', 'downloads', 'faq']) {
+      const path = `${prefixOf(lang)}${slug}`;
+      await page.goto(path);
+      await expectNoOverflow(page, `/${path} at 320x256`);
     }
   }
 });

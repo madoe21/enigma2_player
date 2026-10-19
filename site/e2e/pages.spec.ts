@@ -1,5 +1,7 @@
 import { expect, test } from '@playwright/test';
 
+import { LANGS, contentPaths } from './site-pages';
+
 /**
  * Every page of the ported site, as a deployed file.
  *
@@ -9,33 +11,16 @@ import { expect, test } from '@playwright/test';
  * actually written in, and it has exactly one h1 (enigma2_player-n5j, -w83).
  */
 
-const PAGES = [
-  'features',
-  'screenshots',
-  'downloads',
-  'changelog',
-  'docs',
-  'faq',
-  'pricing',
-  'buy',
-  'account',
-  'license',
-  'contact',
-];
-const LANGS = ['de', 'en', 'es', 'fr', 'it'] as const;
-
 for (const lang of LANGS) {
-  const prefix = lang === 'de' ? '' : `${lang}/`;
+  test(`every ${lang} page exists as a file and declares ${lang}`, async ({ page }) => {
+    for (const path of contentPaths(lang)) {
+      const response = await page.goto(path);
 
-  test(`/${prefix} and all its pages exist and declare ${lang}`, async ({ page }) => {
-    for (const path of ['', ...PAGES]) {
-      const response = await page.goto(`${prefix}${path}`);
-
-      expect(response?.status(), `/${prefix}${path} has to exist as a file`).toBe(200);
+      expect(response?.status(), `/${path} has to exist as a file`).toBe(200);
       // The defect the old site shipped on every prefixed language: the
       // content was translated and the document still claimed German.
-      await expect(page.locator('html'), `/${prefix}${path}`).toHaveAttribute('lang', lang);
-      await expect(page.locator('h1'), `/${prefix}${path}`).toHaveCount(1);
+      await expect(page.locator('html'), `/${path}`).toHaveAttribute('lang', lang);
+      await expect(page.locator('h1'), `/${path}`).toHaveCount(1);
     }
   });
 }
@@ -78,14 +63,22 @@ test('the downloads page offers the files of the latest release', async ({ page 
   await expect(first).toHaveAttribute('href', /github\.com\/.+\/releases\/download\//);
 });
 
-test('the changelog shows the release notes, as text', async ({ page }) => {
+test('the changelog shows the release notes as structure, not as markdown', async ({ page }) => {
   await page.goto('changelog');
 
   // Scoped to the page: the cookie dialog's title is an h2 as well.
   await expect(page.locator('main h2').first()).toContainText('1.1.1');
-  // Rendered as text and never as markup: a release note is ours, but it
-  // travels through an API.
-  await expect(page.locator('main strong')).toHaveCount(0);
+  // The date next to it, through `formatDate` and therefore in German.
+  await expect(page.locator('main .release__date').first()).toContainText('2026');
+
+  // The markdown is parsed into blocks and rendered as elements - no markdown
+  // library, no `innerHTML`, so there is still no path from the API into the
+  // page as markup (enigma2_player-ryy).
+  await expect(page.locator('main li').first()).toBeVisible();
+  await expect(page.locator('main table th').first()).toBeVisible();
+  await expect(page.locator('main strong').first()).toBeVisible();
+  await expect(page.locator('main')).not.toContainText('**');
+
   // And the release template's own instruction to the maintainer is stripped.
   await expect(page.getByText('Do NOT write release notes by hand')).toHaveCount(0);
 });

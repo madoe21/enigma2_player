@@ -151,6 +151,23 @@ a {
   text-underline-offset: 0.2em;
 }
 
+/*
+ * A file name or a shell command inside running text.
+ *
+ * Global and not a component style: the release notes render their code runs
+ * in `site-note-text`, and a scoped rule cannot style an element another
+ * component's template produced. `em` units, so it scales with whatever text
+ * it sits in, and 0.9 rather than 0.8 because a monospace face at 80 % of the
+ * surrounding size is already smaller than it looks (WCAG 1.4.4).
+ */
+code {
+  padding: 0.1em 0.3em;
+  border-radius: var(--radius-sm);
+  background: var(--paper-raised);
+  font-family: ui-monospace, 'Cascadia Code', Consolas, monospace;
+  font-size: 0.9em;
+}
+
 /* Every border in the site resolves to this, so one value carries 1.4.11. */
 * {
   border-color: var(--line);
