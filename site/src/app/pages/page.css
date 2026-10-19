@@ -94,26 +94,6 @@
   white-space: pre-line;
 }
 
-.qa-list {
-  margin-top: var(--space-5);
-}
-
-.qa {
-  padding: var(--space-4) 0;
-  border-bottom: 1px solid var(--line-soft);
-}
-
-.qa dt {
-  margin-bottom: var(--space-2);
-  font-size: var(--step-1);
-  font-weight: 600;
-}
-
-.qa dd {
-  margin: 0;
-  color: var(--ink-muted);
-}
-
 /*
  * Muted text is a COLOUR, never an opacity.
  *
