@@ -10,13 +10,19 @@
   navigation. A keyboard and a screen reader both reach the question before the
   page it covers, and anyone who does not want to tab through twelve nav links
   on every page can jump past them (WCAG 2.4.1).
+
+  `tabindex="-1"` on the target is what makes the jump real: a hash link to an
+  element that cannot hold focus scrolls the page, and leaves the focus - which
+  is what a screen reader's reading cursor follows - sitting in the navigation
+  the reader just asked to skip. Not reachable by Tab, only by the link
+  (enigma2_player-dp3).
 -->
 <a class="skip-link" href="#content">{{ skipLabel() }}</a>
 <site-demo-notice />
 <site-consent-modal />
 <site-consent-state-notice />
 <site-nav />
-<div id="content">
+<div id="content" tabindex="-1">
   <router-outlet />
 </div>
 <site-footer />

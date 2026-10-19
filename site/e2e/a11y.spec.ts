@@ -1,6 +1,8 @@
 import AxeBuilder from '@axe-core/playwright';
 import { Page, expect, test } from '@playwright/test';
 
+import { LANGS, canonicalPaths, contentPaths, legalPaths } from './site-pages';
+
 /**
  * The accessibility gate: axe-core over every page, in every language.
  *
@@ -36,22 +38,6 @@ test.use({ reducedMotion: 'reduce' });
 // a generous one still bounds a genuine hang.
 test.describe.configure({ timeout: 180_000 });
 
-const PAGES = [
-  '',
-  'features',
-  'screenshots',
-  'downloads',
-  'changelog',
-  'docs',
-  'faq',
-  'pricing',
-  'buy',
-  'account',
-  'license',
-  'contact',
-];
-const LANGS = ['de', 'en', 'es', 'fr', 'it'] as const;
-
 const TAGS = ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa', 'best-practice'];
 
 /** axe over whatever is currently on screen. */
@@ -71,17 +57,15 @@ function describe(violations: Awaited<ReturnType<typeof scan>>['violations']): s
 }
 
 for (const lang of LANGS) {
-  const prefix = lang === 'de' ? '' : `${lang}/`;
-
   test(`every ${lang} page passes axe with the cookie question open`, async ({ page }) => {
     // The undecided state first, because it is what every first-time visitor
     // gets - and it is the state with a modal dialog in it.
-    for (const path of PAGES) {
+    for (const path of contentPaths(lang)) {
       await page.context().clearCookies();
-      await page.goto(`${prefix}${path}`);
+      await page.goto(path);
       const results = await scan(page);
 
-      expect(results.violations, `/${prefix}${path}\n${describe(results.violations)}`).toEqual([]);
+      expect(results.violations, `/${path}\n${describe(results.violations)}`).toEqual([]);
     }
   });
 
@@ -92,11 +76,11 @@ for (const lang of LANGS) {
     await context.addCookies([
       { name: 'e2p_consent', value: 'accepted', url: 'http://127.0.0.1:4321/enigma2_player/' },
     ]);
-    for (const path of PAGES) {
-      await page.goto(`${prefix}${path}`);
+    for (const path of contentPaths(lang)) {
+      await page.goto(path);
       const results = await scan(page);
 
-      expect(results.violations, `/${prefix}${path}\n${describe(results.violations)}`).toEqual([]);
+      expect(results.violations, `/${path}\n${describe(results.violations)}`).toEqual([]);
     }
   });
 }
@@ -113,7 +97,7 @@ for (const lang of LANGS) {
 test.describe('the dark palette', () => {
   test.use({ colorScheme: 'dark' });
 
-  const DARK_PAGES = [...PAGES, 'impressum', 'datenschutz', 'cookies'];
+  const DARK_PAGES = [...contentPaths('de'), ...legalPaths('de')];
 
   test('every page passes axe in the dark palette, cookie question open', async ({
     page,
@@ -145,14 +129,7 @@ test('the legal pages pass axe in both languages', async ({ page, context }) => 
   await context.addCookies([
     { name: 'e2p_consent', value: 'accepted', url: 'http://127.0.0.1:4321/enigma2_player/' },
   ]);
-  for (const path of [
-    'impressum',
-    'datenschutz',
-    'cookies',
-    'en/imprint',
-    'en/privacy',
-    'en/cookies',
-  ]) {
+  for (const path of [...legalPaths('de'), ...legalPaths('en')]) {
     await page.goto(path);
     const results = await scan(page);
 
@@ -197,6 +174,11 @@ test('every page is reachable by keyboard alone, with the focus visible', async 
   // And it has to actually move the reading position.
   await page.keyboard.press('Enter');
   await expect(page).toHaveURL(/#content$/);
+  // The URL is the cheap half of that: what has to move is the FOCUS, because
+  // a screen reader's reading cursor follows it. A hash jump to an element
+  // that cannot hold focus scrolls the page and leaves the cursor in the
+  // navigation (enigma2_player-dp3).
+  await expect(page.locator('#content')).toBeFocused();
 
   // Every focusable element must show a focus indicator of its own rather than
   // relying on the browser default being switched off somewhere.
@@ -223,9 +205,11 @@ test('every page has a title of its own', async ({ page, context }) => {
   ]);
   const seen = new Map<string, string>();
 
-  // PAGES already starts with the landing page; listing it twice made the
-  // test accuse the site of duplicate titles for the same page.
-  for (const path of [...PAGES, 'impressum', 'datenschutz', 'cookies']) {
+  // The canonical pages only: the landing page is already the first of them
+  // (listing it twice made the test accuse the site of duplicate titles for
+  // the same page), and the two alias paths share the merged page's title on
+  // purpose - `seo.spec.ts` asserts that rather than this forbidding it.
+  for (const path of [...canonicalPaths('de'), ...legalPaths('de')]) {
     await page.goto(path);
     const title = await page.title();
 
@@ -249,10 +233,19 @@ test('a page change and a language change are announced', async ({ page, context
   // The CDK's live region, which is where LiveAnnouncer writes.
   const liveRegion = page.locator('.cdk-live-announcer-element');
 
+  // The arrival is awaited before the announcement is: the announcer writes on
+  // NavigationEnd, so asserting on the region first makes the test a race
+  // against the router rather than a statement about the announcement - and it
+  // lost that race once in a loaded run.
   await page.locator('.nav__links').getByRole('link', { name: 'FAQ' }).click();
+  await expect(page).toHaveURL(/\/faq$/);
   await expect(liveRegion).toContainText('FAQ');
 
+  // The entry shows a flag and "EN" now; what the link is CALLED
+  // is still "English", which is the half of enigma2_player-13h that matters
+  // here - this selector is a screen reader asking for the control by name.
   await page.locator('.nav__langs').getByRole('link', { name: 'English' }).click();
+  await expect(page).toHaveURL(/\/en\/faq$/);
   // In the language it switched TO: "Language changed: English" read with a
   // German voice is the joke that tells the user it did not work.
   await expect(liveRegion).toContainText('Language changed: English');
